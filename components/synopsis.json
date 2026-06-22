@@ -1,0 +1,150 @@
+{
+  "Volatility Warden": {
+    "Tagline": "Calmest when the market is bleeding.",
+    "Synopsis": "You buy when it hurts and hold through the part of the cycle that breaks other people. A falling market invites you in.",
+    "Shadow": "You can hold too long, reading a real break as one more panic. The tolerance that saves you in a correction can trap you in a regime change.",
+    "Pills": [
+      "Selloffs and panic lows",
+      "Volatility spikes",
+      "Capitulation reversals"
+    ]
+  },
+
+  "Momentum Navigator": {
+    "Tagline": "Knows exactly when to leave the party.",
+    "Synopsis": "You ride the move while it is alive and step off the second it stalls. You trade motion, and you never overstay the party.",
+    "Shadow": "In a choppy, directionless market you get chopped up. In and out on false signals. You need a real trend to work, and you bleed when there isn't one.",
+    "Pills": [
+      "Strong trends",
+      "Breakouts with follow-through",
+      "Fast-moving markets"
+    ]
+  },
+
+  "Pattern Sentinel": {
+    "Tagline": "No setup, no trade. No exceptions.",
+    "Synopsis": "Every trade clears the checklist or it does not happen. Your edge is how much you are willing to refuse.",
+    "Shadow": "When the market stops printing textbook setups, you sit out. The discipline that protects you can harden into rigidity, and the refusal to adapt has its own cost.",
+    "Pills": [
+      "Clean technical setups",
+      "Defined ranges",
+      "Rule-confirmable trends"
+    ]
+  },
+
+  "Contrarian Intuit": {
+    "Tagline": "Gets nervous when everyone agrees.",
+    "Synopsis": "When the whole room agrees, you start looking for the exit. You read positioning over headlines and lean against certainty at its loudest.",
+    "Shadow": "Early looks exactly like wrong until it isn't. You can bleed against a trend that runs further than reason allows.",
+    "Pills": ["Sentiment extremes", "Crowded trades", "Turning points"]
+  },
+
+  "Rhythm Steward": {
+    "Tagline": "Patience is the whole position.",
+    "Synopsis": "You think in seasons, not sessions. You wait out the cycle, and when the turn comes you are the one already ready.",
+    "Shadow": "You can be early by an uncomfortable margin. When a cycle breaks its old rhythm, you are positioned for a turn that does not arrive on schedule.",
+    "Pills": ["Cycle turns", "Macro regime shifts", "Multi-month swings"]
+  },
+
+  "Steady Cultivator": {
+    "Tagline": "Buys it once, holds it for years.",
+    "Synopsis": "A few positions, chosen carefully, held for years. You let compounding do the work and treat selling as the exception.",
+    "Shadow": "The conviction that lets you hold a winner can keep you married to a thesis that has quietly broken. You anchor, and you are slow to see when the story changed.",
+    "Pills": ["Long bull cycles", "Quality at a fair price", "Slow compounding"]
+  },
+
+  "Breakout Hunter": {
+    "Tagline": "Lives for the moment it rips.",
+    "Synopsis": "You trade the instant the coil releases. In as the move begins, out before it matures, because the first move is the whole point.",
+    "Shadow": "The market fakes far more breakouts than it delivers. Your eagerness to catch the release can bleed you out across the ones that fail.",
+    "Pills": ["Volatility expansions", "Base breakouts", "Fresh momentum"]
+  },
+
+  "Risk Alchemist": {
+    "Tagline": "Loses small on purpose, wins big by design.",
+    "Synopsis": "You design the payoff before you take the trade. Small deliberate losses buy the occasional outsized win, and the structure does the heavy lifting.",
+    "Shadow": "You can trust the structure too much. A payoff is only as sound as its assumptions, and you can engineer a flawless bet around a risk that was mispriced from the start.",
+    "Pills": [
+      "Asymmetric setups",
+      "Event-driven dislocations",
+      "Convex payoffs"
+    ]
+  },
+
+  "Trend Tactician": {
+    "Tagline": "Feels the turn before the chart does.",
+    "Synopsis": "You feel the change in slope before it has a name. By the time the shift is obvious, you have been positioned for weeks.",
+    "Shadow": "Your reads are early, which makes them fragile. A shift that never develops leaves you positioned for a trend that never comes, and the line between perceptive and premature is thin.",
+    "Pills": [
+      "Early trend inflections",
+      "Regime transitions",
+      "Pre-consensus shifts"
+    ]
+  },
+
+  "Position Architect": {
+    "Tagline": "Never bets it all on one trade.",
+    "Synopsis": "You manage a book, not a single trade. Every position is sized against the others, so nothing on its own can take you down.",
+    "Shadow": "The systemic view can dilute your conviction. Managing balance so carefully can keep you from the decisive concentration that occasionally pays.",
+    "Pills": [
+      "Multi-asset markets",
+      "Shifting correlations",
+      "Risk-budgeted allocation"
+    ]
+  },
+
+  "Sentiment Analyst": {
+    "Tagline": "Trades on everyone else's emotions.",
+    "Synopsis": "You trade the people, not the chart. Who is long, who is trapped, where the pain sits. Price is just the crowd keeping score.",
+    "Shadow": "Reading the crowd right does not mean your timing is right. Sentiment can stay irrational longer than you can hold the position against it.",
+    "Pills": [
+      "Sentiment-driven tape",
+      "Positioning extremes",
+      "Crowded-trade unwinds"
+    ]
+  },
+
+  "Timing Purist": {
+    "Tagline": "Would rather miss than assume.",
+    "Synopsis": "For you the entry is the trade. A great idea at the wrong moment is still a loss, so you wait for your exact spot.",
+    "Shadow": "Chasing the perfect entry can leave you barely in the market at all. Your perfectionism has a cost, and sometimes it is every trade you never took.",
+    "Pills": [
+      "Precise entries",
+      "Defined-risk setups",
+      "Markets that reward waiting"
+    ]
+  },
+
+  "Calibrated Maverick": {
+    "Tagline": "Crazy thesis, cold execution.",
+    "Synopsis": "Your ideas sound crazy, but your execution never is. The thesis runs ahead of the crowd and the discipline keeps it honest.",
+    "Shadow": "When your discipline slips, the maverick in you runs unchecked toward chaos. When your nerve slips, you fall back into the consensus you were built to beat.",
+    "Pills": [
+      "Non-consensus theses",
+      "Asymmetric conviction plays",
+      "Independent-edge setups"
+    ]
+  },
+
+  "Reserved Operator": {
+    "Tagline": "Quiet for months, then all in.",
+    "Synopsis": "You can do nothing for months without flinching. Then a trade clears your bar and you commit with real size.",
+    "Shadow": "The selectivity that protects you can keep you out of perfectly good trades. Held too long, your restraint stops looking like patience and starts looking like indecision.",
+    "Pills": [
+      "Rare, clear opportunities",
+      "Low-noise markets",
+      "Concentrated bets"
+    ]
+  },
+
+  "Intuitive Visionary": {
+    "Tagline": "Looks wrong, until the chart catches up.",
+    "Synopsis": "You buy the idea long before the chart agrees. You are comfortable looking wrong for a while, because being early is how you win.",
+    "Shadow": "The conviction that lets you see the future can dissolve your risk discipline. A thesis that is right eventually can still ruin you if you are too early or too large.",
+    "Pills": [
+      "Thematic megatrends",
+      "Early-stage narratives",
+      "Structural change"
+    ]
+  }
+}
