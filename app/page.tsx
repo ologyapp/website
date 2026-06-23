@@ -47,6 +47,7 @@ import { format } from "date-fns";
 import { createPortal } from "react-dom";
 import synopsis from "../components/synopsis.json";
 
+//removed /images
 import {
   ZodiacAries,
   ZodiacTaurus,
