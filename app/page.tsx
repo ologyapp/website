@@ -35,7 +35,7 @@ import e4 from "../public/images/e4.png";
 import e5 from "../public/images/e5.png";
 import e6 from "../public/images/e6.png";
 import iphone from "../public/iphoneMockup.svg";
-import { signalAlignments, missingLayers } from "@/mockData";
+import { signalAhead, confirmedSignals, missingLayers } from "@/mockData";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
@@ -95,6 +95,90 @@ const images = [
   e6,
 ];
 
+const renderCards = (items: any[]) => (
+  <div className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar">
+    {items.map((data, id) => (
+      <div
+        key={id}
+        className="flex shrink-0 w-[599.382px] p-[31.381px] flex-col justify-center items-start gap-[31.381px]
+        rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
+      >
+        <div className="w-full flex justify-between items-center">
+          <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+            {data.date}
+          </h1>
+
+          <div className="flex justify-start items-center gap-[12.55px]">
+            <div
+              className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
+              style={{ backgroundColor: data.buttonColor }}
+            >
+              <div
+                className="w-[14.64px] h-[14.64px] rounded-full"
+                style={{ backgroundColor: data.statusColor }}
+              />
+            </div>
+
+            <p className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+              {data.signal}
+            </p>
+          </div>
+        </div>
+
+        <div className="gap-[31.38px] flex flex-col">
+          <h2 className="text-[#F8F7FC] font-Recoleta text-[25.105px] font-normal leading-[130%]">
+            {data.title}
+          </h2>
+
+          <p className="text-[#F8F7FC] font-Satoshi text-[18.829px] font-normal leading-[150%]">
+            {data.content}
+          </p>
+        </div>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="537"
+          height="1"
+          viewBox="0 0 537 1"
+          fill="none"
+        >
+          <path
+            d="M-1.52588e-05 0.484375L536.619 0.484375"
+            stroke="#6C8BA4"
+            strokeOpacity="0.1"
+            strokeWidth="0.968858"
+          />
+        </svg>
+
+        <div className="w-full flex justify-between items-center py-[6.6px]">
+          <button
+            type="button"
+            className="flex gap-[20.2px] py-[25.408px] px-[15.88px] rounded-[16.16px]"
+            style={{ backgroundColor: data.buttonColor }}
+          >
+            <span className="text-center justify-center text-slate-50 text-base font-bold font-Satoshi uppercase leading-6">
+              {data.button_text}
+            </span>
+          </button>
+
+          <div className="flex flex-col items-center justify-between gap-[17.26px]">
+            {data.status && data.status == "UPCOMING" && (
+              <p
+                className="font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase"
+                style={{ color: data.statusColor }}
+              >
+                {data.status}
+              </p>
+            )}
+
+            <div className="text-white text-[22px]">{data.icon}</div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 export default function Home() {
   const [isLocked, setIsLocked] = useState(false);
   const [data, setData] = useState<any>({});
@@ -109,6 +193,9 @@ export default function Home() {
     dob: string;
     time: string;
   } | null>(null);
+
+  const [aheadOpen, setAheadOpen] = useState(true);
+  const [recordOpen, setRecordOpen] = useState(true);
 
   const [showNatalForm, setShowNatalForm] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -975,101 +1062,83 @@ export default function Home() {
           </h1>
 
           <div className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar">
-            {signalAlignments.map((data, id) => (
-              <div
-                key={id}
-                className="flex shrink-0 w-[599.382px] p-[31.381px] flex-col justify-center items-start gap-[31.381px]
-      rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
-              >
-                <div className="w-full flex justify-between items-center">
-                  <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                    {data.date}
-                  </h1>
-
-                  <div className="flex justify-start items-center gap-[12.55px]">
-                    <div
-                      className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                      style={{ backgroundColor: data.buttonColor }}
-                    >
-                      <div
-                        className="w-[14.64px] h-[14.64px] rounded-full"
-                        style={{ backgroundColor: data.statusColor }}
-                      ></div>
-                    </div>
-
-                    <p className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                      {data.signal}
-                    </p>
-                  </div>
-
-                  {/* {data.status && (
-                        <p
-                          className="font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                          style={{ color: data.statusColor }}
-                        >
-                          {data.status}
-                        </p>
-                      )} */}
-                </div>
-
-                <div className="gap-[31.38px] flex flex-col">
-                  <h2 className="text-[#F8F7FC] font-Recoleta text-[25.105px] font-normal leading-[130%]">
-                    {data.title}
-                  </h2>
-
-                  <p className="text-[#F8F7FC] font-Satoshi text-[18.829px] font-normal leading-[150%]">
-                    {data.content}
-                  </p>
-                </div>
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="537"
-                  height="1"
-                  viewBox="0 0 537 1"
-                  fill="none"
+            <div className="flex flex-col gap-10 w-full">
+              {/* AHEAD */}
+              <div className="w-full">
+                <button
+                  onClick={() => setAheadOpen(!aheadOpen)}
+                  className="cursor-pointer w-auto flex items-center justify-start py-4 gap-4 text-[#F8F7FC] font-Recoleta text-[25.1px] font-medium leading-[130%] tracking-[-0.005px]"
                 >
-                  <path
-                    d="M-1.52588e-05 0.484375L536.619 0.484375"
-                    stroke="#6C8BA4"
-                    stroke-opacity="0.1"
-                    stroke-width="0.968858"
-                  />
-                </svg>
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-white text-[24px] font-Recoleta">
+                      Ahead
+                    </h2>
 
-                <div className="w-full flex justify-between items-center py-[6.6px]">
-                  <button
-                    type="button"
-                    className="flex gap-[20.2px] py-[25.408px] px-[15.88px] rounded-[16.16px]"
-                    style={{ backgroundColor: data.buttonColor }}
-                  >
-                    <span className="text-center justify-center text-slate-50 text-base font-bold font-Satoshi uppercase leading-6">
-                      {data.buttontxt}
-                    </span>
-                  </button>
-
-                  <div className="flex flex-col items-center justify-between gap-[17.26px]">
-                    {data.status && (
-                      <p
-                        className="font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                        style={{ color: data.statusColor }}
-                      >
-                        {data.status}
-                      </p>
-                    )}
-
-                    <div className="flex justify-start items-center gap-[23.54px]">
-                      {data.icons.map((svg, i) => (
-                        <div
-                          key={i}
-                          dangerouslySetInnerHTML={{ __html: svg }}
-                        />
-                      ))}
-                    </div>
+                    {/* <span className="text-white/50 font-Satoshi">
+                      ({signalAhead.length})
+                    </span> */}
                   </div>
-                </div>
+
+                  <svg
+                    className={`transition-transform duration-300 ${
+                      aheadOpen ? "rotate-180" : ""
+                    }`}
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <path
+                      d="M5 8L10 13L15 8"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {aheadOpen && renderCards(signalAhead)}
               </div>
-            ))}
+
+              {/* RECORD */}
+              <div className="w-full">
+                <button
+                  onClick={() => setRecordOpen(!recordOpen)}
+                  className="cursor-pointer w-auto flex items-center justify-start py-4 gap-4 text-[#F8F7FC] font-Recoleta text-[25.1px] font-medium leading-[130%] tracking-[-0.005px]"
+                >
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-white text-[24px] font-Recoleta">
+                      Record
+                    </h2>
+
+                    {/* <span className="text-white/50 font-Satoshi">
+                      ({confirmedSignals.length})
+                    </span> */}
+                  </div>
+
+                  <svg
+                    className={`transition-transform duration-300 ${
+                      recordOpen ? "rotate-180" : ""
+                    }`}
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <path
+                      d="M5 8L10 13L15 8"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {recordOpen && renderCards(confirmedSignals)}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1286,7 +1355,7 @@ export default function Home() {
                                 <div className="flex justify-center">
                                   <Calendar
                                     mode="single"
-                                    selected={date}
+                                    selected={date as Date}
                                     captionLayout="dropdown"
                                     onSelect={(d) => {
                                       if (!d) return;
