@@ -109,7 +109,7 @@ const renderCards = (items: any[]) => (
       <div
         key={id}
         className="
-    flex shrink-0 w-[375px] h-auto md:w-[599px] md:h-[400px]
+    flex shrink-0 w-[360px] h-auto md:w-[599px] md:h-[400px]
     p-[22px] md:p-[31px] flex-col
     justify-between
     rounded-[16.912px]
@@ -1732,11 +1732,11 @@ export default function Home() {
             The Missing Layer in Modern Market Tools
           </h1>
 
-          <div className="w-full flex flex-col md:flex-row justify-between items-center no-scrollbar gap-8">
+          <div className="w-full flex flex-col md:flex-row items-center md:items-stretch justify-center md:justify-between no-scrollbar gap-8">
             {missingLayers.map((data, id) => (
               <div
                 key={id}
-                className="flex w-[382px] md:w-[488px] p-[31.381px] flex-col justify-center items-start gap-[31.381px] self-stretch
+                className=" mx-auto flex w-[360px] md:w-[488px] p-[31.381px] flex-col justify-center items-start gap-[31.381px] self-stretch
     rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
               >
                 <h1 className="text-[#F8F7FC] font-Satoshi text-[20.477px] font-normal leading-[120%] tracking-[3.481px] uppercase">
