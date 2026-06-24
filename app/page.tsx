@@ -36,7 +36,7 @@ import e5 from "../public/e5.png";
 import e6 from "../public/e6.png";
 import iphone from "../public/iphoneMockup.svg";
 import { signalAhead, confirmedSignals, missingLayers } from "@/mockData";
-import { ArrowRight, CloudDownload, Loader2 } from "lucide-react";
+import { ArrowRight, CloudDownload, Loader2, Menu } from "lucide-react";
 import {
   AnimatePresence,
   motion,
@@ -104,13 +104,13 @@ const images = [
 ];
 
 const renderCards = (items: any[]) => (
-  <div className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar">
+  <div className="flex flex-col md:flex-row justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar">
     {items.map((data, id) => (
       <div
         key={id}
         className="
-    flex shrink-0 w-[599px] h-[400px]
-    p-[31px] flex-col
+    flex shrink-0 w-[375px] h-auto md:w-[599px] md:h-[400px]
+    p-[22px] md:p-[31px] flex-col
     justify-between
     rounded-[16.912px]
     gap-auto
@@ -119,7 +119,7 @@ const renderCards = (items: any[]) => (
     overflow-hidden
   "
       >
-        <div className="w-full flex justify-between items-center">
+        <div className="w-full flex justify-between items-center ">
           <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
             {data.date}
           </h1>
@@ -141,7 +141,7 @@ const renderCards = (items: any[]) => (
           </div>
         </div>
 
-        <div className="gap-[31.38px] flex flex-col">
+        <div className="gap-[31.38px] flex flex-col mt-6 md:mt-0">
           <h2 className="text-[#F8F7FC] font-Recoleta text-[25.105px] font-normal leading-[130%]">
             {data.title}
           </h2>
@@ -157,6 +157,7 @@ const renderCards = (items: any[]) => (
           height="1"
           viewBox="0 0 537 1"
           fill="none"
+          className="mt-4 md:mt-0"
         >
           <path
             d="M-1.52588e-05 0.484375L536.619 0.484375"
@@ -166,10 +167,10 @@ const renderCards = (items: any[]) => (
           />
         </svg>
 
-        <div className="w-full flex justify-between items-center py-[6.6px]">
+        <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
           <button
             type="button"
-            className="flex gap-[20.2px] py-[25.408px] px-[15.88px] rounded-[16.16px]"
+            className="flex gap-[20.2px] py-[15px] lg:py-[25.408px] px-[12px] lg:px-[15.88px] rounded-[16.16px]"
             style={{ backgroundColor: data.buttonColor }}
           >
             <span className="text-center justify-center text-slate-50 text-[15.154px] font-bold font-Satoshi uppercase leading-6">
@@ -213,6 +214,7 @@ export default function Home() {
   const [openTime, setOpenTime] = React.useState(false);
   const [ampm, setAmpm] = React.useState<"AM" | "PM">("AM");
   const [showSpinner, setShowSpinner] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formatted, setFormatted] = React.useState<{
     dob: string;
     time: string;
@@ -399,7 +401,19 @@ export default function Home() {
   const cols = 6;
   const rows = 5;
 
-  const LINES = 16;
+  const [LINES, setLINES] = useState(16);
+
+  useEffect(() => {
+    const updateLines = () => {
+      setLINES(window.innerWidth < 720 ? 6 : 16);
+    };
+
+    updateLines(); // run on mount
+
+    window.addEventListener("resize", updateLines);
+
+    return () => window.removeEventListener("resize", updateLines);
+  }, []);
 
   const activeLines = useMemo(() => {
     return Array.from({ length: LINES }).map(() => Math.random() > 0.7);
@@ -603,14 +617,10 @@ export default function Home() {
     `,
         }}
       />
-      <div className="fixed inset-0 z-0! overflow-hidden pointer-events-none bg-[#070B17]"></div>
+      <div className="fixed inset-0 z-0! overflow-hidden pointer-events-none bg-[#0d1220]"></div>
       {/* HERO SECTION */}
       <section className="relative min-h-screen h-auto  z-50!">
-        {/* ========================================================= */}
-        {/* CINEMATIC BACKGROUND */}
-        {/* ========================================================= */}
-
-        <div className="absolute inset-0 bg-[#070B17]" />
+        <div className="absolute inset-0 bg-[#0d1220]" />
 
         <div
           className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
@@ -628,30 +638,14 @@ export default function Home() {
               const col = index % cols;
               const row = Math.floor(index / cols);
 
-              /* ===================================================== */
-              /* 🌍 NORMALIZED GRID */
-              /* ===================================================== */
-
               const u = col / (cols - 1);
               const v = row / (rows - 1);
-
-              /* ===================================================== */
-              /* 🌍 FULL SPHERE WRAP */
-              /* ===================================================== */
 
               const theta = (u - 0.5) * Math.PI * 1.65;
 
               const phi = (v - 0.5) * Math.PI * 1.08;
 
-              /* ===================================================== */
-              /* 🌍 SMALLER GLOBE */
-              /* ===================================================== */
-
               const radius = 240;
-
-              /* ===================================================== */
-              /* 🌍 TRUE SPHERE */
-              /* ===================================================== */
 
               const sphereX = Math.sin(theta) * Math.cos(phi) * radius;
 
@@ -659,35 +653,15 @@ export default function Home() {
 
               const sphereZ = Math.cos(theta) * Math.cos(phi) * radius;
 
-              /* ===================================================== */
-              /* 🌍 DEPTH */
-              /* ===================================================== */
-
               const depth = (sphereZ + radius) / (radius * 2);
-
-              /* ===================================================== */
-              /* 🌍 MORE SPHERICAL SCALE */
-              /* ===================================================== */
 
               const curveScale = 0.38 + depth * 0.12;
 
-              /* ===================================================== */
-              /* 🌍 FADE BACKSIDE */
-              /* ===================================================== */
-
               const opacity = 0.08 + depth * 0.95;
-
-              /* ===================================================== */
-              /* 🌍 STRONG GLOBE ROTATION */
-              /* ===================================================== */
 
               const rotateY = Math.sin(theta) * 68;
 
               const rotateX = -Math.sin(phi) * 30;
-
-              /* ===================================================== */
-              /* 🌍 TIGHT SPHERE */
-              /* ===================================================== */
 
               const compression = 0.96;
 
@@ -695,15 +669,7 @@ export default function Home() {
 
               const startY = sphereY * compression;
 
-              /* ===================================================== */
-              /* 🌍 DEEPER SPHERE DEPTH */
-              /* ===================================================== */
-
               const zStart = (sphereZ - radius) * 1.4;
-
-              /* ===================================================== */
-              /* 🌸 BLOOM */
-              /* ===================================================== */
 
               const bloom = 1 + (1 - depth) * 0.55;
 
@@ -779,7 +745,6 @@ export default function Home() {
               "
                     />
 
-                    {/* CINEMATIC DEPTH */}
                     <div
                       className="
                 absolute
@@ -796,9 +761,6 @@ export default function Home() {
             })}
           </div>
         </div>
-        {/* ========================================================= */}
-        {/* DARK GLASS OVERLAY */}
-        {/* ========================================================= */}
 
         <>
           <div className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.75)]" />
@@ -820,10 +782,6 @@ export default function Home() {
             className="absolute inset-0 z-10 bg-transparent"
           />
         </>
-
-        {/* ========================================================= */}
-        {/* CONTENT */}
-        {/* ========================================================= */}
 
         <div className="relative z-20 max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10 ">
           <motion.header
@@ -888,7 +846,7 @@ export default function Home() {
                 />
               </svg>
 
-              <nav className="hidden md:block">
+              {/* <nav className="hidden md:block">
                 <ul className="flex items-center gap-[65px]">
                   {["Align", "Decode", "Perform"].map((item) => (
                     <li
@@ -909,11 +867,86 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
+              </nav> */}
+
+              {/* Desktop Nav */}
+              <nav className="hidden md:block">
+                <ul className="flex items-center gap-[65px]">
+                  {["Align", "Decode", "Perform"].map((item) => (
+                    <li
+                      key={item}
+                      className="
+          cursor-pointer
+          text-[#F8F7FC]/60
+          text-[25px]
+          font-Satoshi
+          font-normal
+          leading-[150%]
+          uppercase
+          hover:text-[#F8F7FC]
+          transition
+        "
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </nav>
+
+              {/* Mobile Hamburger */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-[#F8F7FC] cursor-pointer"
+                >
+                  {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+              </div>
+
+              {/* Mobile Menu */}
+              {mobileMenuOpen && (
+                <div
+                  className="
+                  absolute
+                  top-full
+                  left-0
+                  mt-4
+                  w-full
+                  rounded-[16.912px]
+                  border
+                  border-[#7478895c]
+                  bg-[#1e2540]/90
+                  backdrop-blur-xl
+                  p-6
+                  md:hidden
+                  z-50! 
+                "
+                >
+                  <ul className="flex flex-col gap-6 z-50!">
+                    {["Align", "Decode", "Perform"].map((item) => (
+                      <li
+                        key={item}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="
+                        cursor-pointer
+                        text-[#F8F7FC]/80
+                        text-[18px]
+                        font-Satoshi
+                        uppercase
+                        hover:text-[#F8F7FC]
+                        transition
+                      "
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </motion.header>
 
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 1, scale: 4 }}
             animate={{ opacity: 0, scale: 4 }}
             transition={{
@@ -965,9 +998,79 @@ export default function Home() {
                 />
               ))}
             </svg>
-          </motion.div>
+          </motion.div> */}
 
           <div className="px-0 md:px-5 flex flex-col lg:flex-row justify-between items-start gap-10 pt-20 md:pt-24 mt-10">
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 2,
+                y: 600,
+                x: -420,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                x: 0,
+              }}
+              transition={{
+                duration: 3,
+                delay: 3,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="
+    relative
+    w-full
+    lg:w-[60%]
+    flex
+    justify-center
+    lg:justify-end
+    lg:-top-24
+    self-start
+    overflow-visible
+    block
+    md:hidden
+    z-0
+  "
+            >
+              <div
+                className="
+      relative
+      lg:absolute
+      flex
+      justify-center
+      lg:justify-end
+      w-full
+      overflow-visible
+      z-0!
+    "
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -10, 0],
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="z-0!"
+                >
+                  <Image
+                    src={iphone}
+                    alt=""
+                    className="
+                block
+                w-[120px]
+                md:w-[160px]
+                h-auto
+                object-contain z-0!
+        "
+                  />
+                </motion.div>
+              </div>
+            </motion.div>
             <motion.div
               initial={{
                 opacity: 0,
@@ -984,7 +1087,7 @@ export default function Home() {
               }}
               className="w-full lg:w-[80%] flex flex-col gap-[50px]"
             >
-              <div className="flex flex-col gap-[40px] md:gap-[60px]">
+              <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
                 <h1 className="text-[#F8F7FC] text-[44px] md:text-[75px] font-normal leading-[115%]">
                   Timing Intelligence for Modern Investors
                 </h1>
@@ -1003,11 +1106,12 @@ export default function Home() {
                       cursor-pointer
                       inline-flex
                        flex
-                        w-[480px]
+                       w-auto
+                        md:w-[480px]
                         h-[56px]
                         px-[30px]
                         py-[20px]
-                        justify-between
+                        justify-center
                         items-center
 
                         rounded-[16.912px]
@@ -1022,8 +1126,11 @@ export default function Home() {
                     "
               >
                 {" "}
-                <span className="text-[#F8F7FC] font-Satoshi text-[18px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase">
+                <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase">
                   Check your Timing Alignment
+                </span>
+                <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase">
+                  Check your Alignment
                 </span>
               </button>
             </motion.div>
@@ -1057,9 +1164,10 @@ export default function Home() {
       z-20
       self-start
       overflow-visible
+      hidden lg:block
     "
             >
-              <div className="absolute z-50 flex justify-center lg:justify-end w-full overflow-visible">
+              <div className="relative lg:absolute z-50 flex justify-center lg:justify-end w-full overflow-visible">
                 <motion.div
                   animate={{
                     y: [0, -10, 0],
@@ -1081,10 +1189,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* normal section */}
       <section className="z-50!">
         {/* NORMAL SECTION */}
         <section className=" w-full min-h-screen flex flex-col items-center gap-25 px-5 py-25!">
-          <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[71.111px] font-normal leading-[120%]">
+          <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[71.111px] font-normal leading-[120%]">
             Signal Alignment
           </h1>
 
@@ -1171,15 +1281,15 @@ export default function Home() {
 
         {/* COSMIC RHYTHM */}
 
-        <section className="relative w-full flex justify-between items-center py-61.25 px-5">
-          <div className="flex-1 min-w-0 flex flex-col gap-[28.75px] z-20">
-            <h1 className="text-[#F8F7FC] font-Recoleta text-[71.111px] font-normal leading-[120%]">
+        <section className="relative w-full flex flex-col md:flex-row justify-between items-center py-40.25 px-5">
+          <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-[28.75px] z-20 px-4 md:px-0">
+            <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[71.111px] font-normal leading-[120%]">
               Celestial Rhythm for Human Decisions
             </h1>
 
             <div
               id="archetype-form"
-              className="flex flex-col justify-start items-start gap-14.5 min-h-[107.29px] p-[40px_31.381px]
+              className="flex w-[360px] md:w-auto  flex-col justify-start items-start gap-14.5 min-h-[107.29px] p-[40px_31.381px]
       rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
             >
               <div className="flex flex-col gap-[32.71px]">
@@ -1208,8 +1318,8 @@ export default function Home() {
 
               <div className="flex flex-col gap-14.5 w-full">
                 {!showNatalForm && (
-                  <div className="w-full flex gap-6.5 items-end">
-                    <div className="flex flex-col gap-[26.5px] flex-1">
+                  <div className="w-full! flex gap-6.5 items-start md:items-end flex-col md:flex-row">
+                    <div className="flex flex-col gap-[26.5px] flex-1 w-full! ">
                       <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
                         Full Name
                       </label>
@@ -1221,7 +1331,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="flex flex-col gap-[26.5px] flex-1">
+                    <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                       <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
                         Email
                       </label>
@@ -1267,9 +1377,9 @@ export default function Home() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 12 }}
                         transition={{ duration: 0.25 }}
-                        className="w-full flex gap-4 items-end"
+                        className="w-full flex gap-4 items-start md:items-end flex-col md:flex-row"
                       >
-                        <div className="flex flex-col gap-[26.5px] flex-1">
+                        <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                           <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
                             birth date
                           </label>
@@ -1283,7 +1393,7 @@ export default function Home() {
                           </button>
                         </div>
 
-                        <div className="flex flex-col gap-[26.5px] flex-1">
+                        <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                           <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
                             birth time
                           </label>
@@ -1297,7 +1407,7 @@ export default function Home() {
                           </button>
                         </div>
 
-                        <div className="flex flex-col gap-[26.5px] flex-1">
+                        <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                           <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
                             Birth Location
                           </label>
@@ -1555,7 +1665,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative shrink-0 w-[381px] h-[758px]">
+          <div className="relative shrink-0 w-[320px] h-[760px] mt-20">
             {/* VIDEO */}
             <video
               autoPlay
@@ -1567,9 +1677,9 @@ export default function Home() {
     top-[2%]
     left-[5%]
     w-[90%]
-    h-[99%]
+    h-[82%]
     object-cover
-    rounded-[38px]
+    rounded-[24px]
   "
             >
               <source src={"/archetypereel2.mp4"} type="video/mp4" />
@@ -1617,16 +1727,16 @@ export default function Home() {
           </div>
         </section>
 
-        <section className=" w-full min-h-screen flex flex-col items-center gap-25 px-5 py-25!">
-          <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[71.111px] font-normal leading-[120%]">
+        <section className=" w-full min-h-screen flex flex-col items-center gap-25 px-4 md:px-5 py-25!">
+          <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[71.111px] font-normal leading-[120%]">
             The Missing Layer in Modern Market Tools
           </h1>
 
-          <div className="w-full flex justify-between items-center no-scrollbar gap-8">
+          <div className="w-full flex flex-col md:flex-row justify-between items-center no-scrollbar gap-8">
             {missingLayers.map((data, id) => (
               <div
                 key={id}
-                className="flex w-[488px] p-[31.381px] flex-col justify-center items-start gap-[31.381px] self-stretch
+                className="flex w-[382px] md:w-[488px] p-[31.381px] flex-col justify-center items-start gap-[31.381px] self-stretch
     rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
               >
                 <h1 className="text-[#F8F7FC] font-Satoshi text-[20.477px] font-normal leading-[120%] tracking-[3.481px] uppercase">
@@ -1651,11 +1761,11 @@ export default function Home() {
         <section className="relative w-screen left-1/2 -translate-x-1/2 min-h-screen flex flex-col items-center gap-25 px-5 py-61.25! overflow-hidden">
           <div className="flex justify-center items-center w-full z-50!">
             <div className="flex flex-col gap-25 items-center max-w-[1241px]">
-              <h1 className="text-[#F8F7FC] font-Recoleta text-[75.785px] font-normal leading-[120%]">
+              <h1 className="text-[#F8F7FC] font-Recoleta text-center text-[40px] md:text-[75.785px] font-normal leading-[120%]">
                 Ancient Patterns. Modern Lens.
               </h1>
 
-              <p className="text-[#F8F7FC] font-Satoshi text-[26.643px] font-normal leading-[140%] text-center">
+              <p className="text-[#F8F7FC] font-Satoshi text-[18px] md:text-[26.643px] font-normal leading-[140%] text-center">
                 Ology delivers personalized timing guidance by aligning your
                 chart, collective sentiment, and live market conditions into
                 clear daily signals designed to support real decision-making.
@@ -1668,7 +1778,7 @@ export default function Home() {
               >
                 <a
                   href="#archetype-form"
-                  className="text-[#F8F7FC] font-Satoshi text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase text-center"
+                  className="text-[#F8F7FC] font-Satoshi text-[15px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase text-center"
                 >
                   REQUEST EARLY ACCESS
                 </a>
@@ -1908,7 +2018,7 @@ export default function Home() {
             {/* Modal */}
             <div
               ref={cardRef}
-              className="relative flex w-[945.24px] min-h-[107.29px] h-auto p-12.5 flex-col items-center gap-12.5 rounded-[16.912px] border border-white/50 bg-cover bg-center bg-no-repeat bg-lightgray"
+              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto p-12.5 md:p-12.5 p-5 flex-col items-center gap-12.5 md:gap-12.5 gap-6 rounded-[16.912px] border border-white/50 bg-cover bg-center bg-no-repeat bg-lightgray overflow-y-auto max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <video
@@ -1919,8 +2029,8 @@ export default function Home() {
                 src={getCardBg(cardType)}
                 className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
               />
-              {/* Close */}
 
+              {/* Close */}
               {!isDownloading && (
                 <div className="flex justify-start items-center gap-2 absolute top-4 right-4">
                   <div className="relative group">
@@ -1932,7 +2042,7 @@ export default function Home() {
                         setNames("");
                         setEmail("");
                       }}
-                      className=" text-white/60 hover:text-white cursor-pointer"
+                      className="text-white/60 hover:text-white cursor-pointer"
                     >
                       <X size={20} />
                     </button>
@@ -1958,106 +2068,90 @@ export default function Home() {
                 </div>
               )}
 
-              <div className="flex w-full justify-start items-center z-20 gap-20">
-                {/* LEFT (40%) */}
-                <div className="flex flex-col basis-[40%]">
-                  <p className="mb-[36.54px] flex w-auto h-[22.84px] flex-col justify-center text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
+              {/* TOP SECTION */}
+              <div className="flex flex-col md:flex-row w-full justify-start items-start md:items-center z-20 gap-6 md:gap-20">
+                {/* LEFT */}
+                <div className="flex flex-col basis-full md:basis-[40%]">
+                  <p className="mb-[36.54px] flex w-auto h-[22.84px] flex-col justify-center text-[#F8F7FC] font-Recoleta text-[22px] md:text-[35px] font-normal leading-[150%]">
                     {archetype && archetype}
                   </p>
 
-                  <p className="text-[#F8F7FC] font-Satoshi text-[23px] font-normal leading-[120%]">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[16px] md:text-[23px] font-normal leading-[120%]">
                     {tagline && tagline}
                   </p>
                 </div>
 
-                {/* RIGHT (60%) */}
-                <h2 className="text-[#F8F7FC] font-Satoshi text-[20px] font-normal leading-[150%] basis-[60%]">
+                {/* RIGHT */}
+                <h2 className="text-[#F8F7FC] font-Satoshi text-[16px] md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
                   {synopsisText && synopsisText}
                 </h2>
               </div>
 
-              <div className="flex items-start gap-6 w-full z-20">
-                <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
-                    {SunIcon && <SunIcon size={18} />} &nbsp; Sun in{" "}
+              {/* ASTRO ROW */}
+              <div className="flex flex-wrap md:flex-nowrap items-start gap-3 md:gap-6 w-full z-20">
+                <div className="flex flex-1 min-w-[140px] items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[13px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+                    {SunIcon && <SunIcon size={16} />} &nbsp; Sun in{" "}
                     {astroSigns?.sun}
                   </p>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
-                    {MoonIcon && <MoonIcon size={18} />} &nbsp; Moon in{" "}
+                <div className="flex flex-1 min-w-[140px] items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[13px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+                    {MoonIcon && <MoonIcon size={16} />} &nbsp; Moon in{" "}
                     {astroSigns?.moon}
                   </p>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
-                    {MarsIcon && <MarsIcon size={18} />} &nbsp; Mars in{" "}
+                <div className="flex flex-1 min-w-[140px] items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[13px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+                    {MarsIcon && <MarsIcon size={16} />} &nbsp; Mars in{" "}
                     {astroSigns?.mars}
                   </p>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
-                    {SaturnIcon && <SaturnIcon size={18} />} &nbsp; Saturn in{" "}
+                <div className="flex flex-1 min-w-[140px] items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[13px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+                    {SaturnIcon && <SaturnIcon size={16} />} &nbsp; Saturn in{" "}
                     {astroSigns?.saturn}
                   </p>
                 </div>
               </div>
 
-              <div className="flex self-stretch items-center justify-center gap-[9.689px] py-[0.969px] z-20">
+              {/* DIVIDER */}
+              <div className="flex w-full z-20">
                 <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
               </div>
 
-              <div className="flex items-start gap-5 self-stretch w-full z-20">
-                {/* CARD 1 */}
-                <div className="flex flex-1 self-stretch flex-col items-start justify-center gap-5 p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)]">
-                  {/* inner top */}
-                  <div className="flex flex-col">
-                    <p className="text-[#F8F7FC] font-Recoleta text-[20px] font-normal leading-[130%]">
-                      Best Market Conditions
-                    </p>
-                  </div>
+              {/* CARDS */}
+              <div className="flex flex-col md:flex-row items-start gap-5 self-stretch w-full z-20">
+                <div className="flex flex-1 flex-col gap-5 p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)]">
+                  <p className="text-[#F8F7FC] font-Recoleta text-[18px] md:text-[20px]">
+                    Best Market Conditions
+                  </p>
 
-                  {/* inner bottom */}
-                  <div className="flex flex-col h-[57px] justify-between items-start self-stretch font-Satoshi">
-                    {bestMarketConditions &&
-                      bestMarketConditions.map((con: any) => (
-                        <p
-                          className="text-[#F8F7FC] text-[14px] font-normal"
-                          style={
-                            { leadingTrim: "both", textEdge: "cap" } as any
-                          }
-                        >
-                          ✦ &nbsp;{con}
-                        </p>
-                      ))}
+                  <div className="flex flex-col gap-2">
+                    {bestMarketConditions?.map((con: any) => (
+                      <p className="text-[#F8F7FC] text-[13px] md:text-[14px]">
+                        ✦ {con}
+                      </p>
+                    ))}
                   </div>
                 </div>
 
-                <div className="flex flex-1 self-stretch flex-col items-start justify-center gap-5 p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)]">
-                  {/* inner top */}
-                  <div className="flex flex-col">
-                    <p className="text-[#F8F7FC] font-Recoleta text-[20px] font-normal leading-[130%]">
-                      Shadow
-                    </p>
-                  </div>
+                <div className="flex flex-1 flex-col gap-5 p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)]">
+                  <p className="text-[#F8F7FC] font-Recoleta text-[18px] md:text-[20px]">
+                    Shadow
+                  </p>
 
-                  {/* inner bottom */}
-                  <div className="flex flex-col h-[57px] justify-between items-start self-stretch font-Satoshi">
-                    <p className="text-[#F8F7FC] text-[14px] font-normal">
-                      {ShadowText}
-                    </p>
-                  </div>
+                  <p className="text-[#F8F7FC] text-[13px] md:text-[14px]">
+                    {ShadowText}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex self-stretch items-center justify-center gap-[9.689px] py-[0.969px] z-20">
-                <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-              </div>
-
-              <div className="text-[#F8F7FC] font-Satoshi text-[20px] font-normal leading-[150%] text-center z-20">
+              {/* FOOTER TEXT */}
+              <div className="text-[#F8F7FC] font-Satoshi text-[14px] md:text-[20px] text-center z-20">
                 You’re on the list. Your full Trade DNA opens when we launch.
               </div>
             </div>
