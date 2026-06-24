@@ -188,7 +188,7 @@ const renderCards = (items: any[]) => (
             )}
 
             <div className="flex gap-2 text-white">
-              {data.icon.map((svg, i) => (
+              {data.icon.map((svg: any, i: any) => (
                 <div
                   key={i}
                   className="w-[22px] h-[22px] flex items-center justify-center text-white"
