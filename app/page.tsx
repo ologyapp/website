@@ -36,9 +36,15 @@ import e5 from "../public/e5.png";
 import e6 from "../public/e6.png";
 import iphone from "../public/iphoneMockup.svg";
 import { signalAhead, confirmedSignals, missingLayers } from "@/mockData";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import { ArrowRight, CloudDownload, Loader2 } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { ChevronDownIcon, X } from "lucide-react";
@@ -46,6 +52,7 @@ import { Calendar } from "../components/ui/calendar";
 import { format } from "date-fns";
 import { createPortal } from "react-dom";
 import synopsis from "../components/synopsis.json";
+import { toPng } from "html-to-image";
 
 //removed /images
 import {
@@ -101,8 +108,16 @@ const renderCards = (items: any[]) => (
     {items.map((data, id) => (
       <div
         key={id}
-        className="flex shrink-0 w-[599.382px] p-[31.381px] flex-col justify-center items-start gap-[31.381px]
-        rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
+        className="
+    flex shrink-0 w-[599px] h-[400px]
+    p-[31px] flex-col
+    justify-between
+    rounded-[16.912px]
+    gap-auto
+    bg-[rgba(30,37,64,0.3)]
+    backdrop-blur-sm border border-white/10
+    overflow-hidden
+  "
       >
         <div className="w-full flex justify-between items-center">
           <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
@@ -157,7 +172,7 @@ const renderCards = (items: any[]) => (
             className="flex gap-[20.2px] py-[25.408px] px-[15.88px] rounded-[16.16px]"
             style={{ backgroundColor: data.buttonColor }}
           >
-            <span className="text-center justify-center text-slate-50 text-base font-bold font-Satoshi uppercase leading-6">
+            <span className="text-center justify-center text-slate-50 text-[15.154px] font-bold font-Satoshi uppercase leading-6">
               {data.button_text}
             </span>
           </button>
@@ -172,7 +187,15 @@ const renderCards = (items: any[]) => (
               </p>
             )}
 
-            <div className="text-white text-[22px]">{data.icon}</div>
+            <div className="flex gap-2 text-white">
+              {data.icon.map((svg, i) => (
+                <div
+                  key={i}
+                  className="w-[22px] h-[22px] flex items-center justify-center text-white"
+                  dangerouslySetInnerHTML={{ __html: svg }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -197,6 +220,8 @@ export default function Home() {
 
   const [aheadOpen, setAheadOpen] = useState(true);
   const [recordOpen, setRecordOpen] = useState(true);
+
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const [showNatalForm, setShowNatalForm] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -367,10 +392,18 @@ export default function Home() {
 
   const [names, setNames] = useState("");
   const [email, setEmail] = useState("");
+  const [mousePosition, setMousePosition] = useState({
+    x: 0,
+    y: 0,
+  });
   const cols = 6;
   const rows = 5;
 
-  const LINES = 14;
+  const LINES = 16;
+
+  const activeLines = useMemo(() => {
+    return Array.from({ length: LINES }).map(() => Math.random() > 0.7);
+  }, []);
 
   const [result, setResult] = useState<any>(null);
 
@@ -504,61 +537,73 @@ export default function Home() {
     ? zodiacIcons[astroSigns.saturn as keyof typeof zodiacIcons]
     : null;
 
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const smoothX = useSpring(mouseX, {
+    stiffness: 600,
+    damping: 100,
+  });
+
+  const smoothY = useSpring(mouseY, {
+    stiffness: 600,
+    damping: 100,
+  });
+
+  useEffect(() => {
+    mouseX.set(mousePosition.x);
+    mouseY.set(mousePosition.y);
+  }, [mousePosition]);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    try {
+      setIsDownloading(true);
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+      });
+
+      const link = document.createElement("a");
+      link.download = `${names}  ${archetype}-card.png`;
+      link.href = dataUrl;
+      link.click();
+    } finally {
+      setIsDownloading(false);
+      setShowNatalForm(false);
+      setNames("");
+      setEmail("");
+    }
+  };
+
   return (
-    <div className="flex flex-col scroll-smooth">
-      <div className="fixed inset-0 z-0! overflow-hidden pointer-events-none bg-[#070B17]">
-        {/* subtle vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(90,140,255,0.12),transparent_60%)]" />
+    <div
+      className="flex flex-col scroll-smooth relative cursor-pointer mb-0! overflow-x-hidden"
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
 
-        {/* GRID LINES */}
-        <div className="absolute inset-0 flex">
-          {Array.from({ length: LINES }).map((_, i) => {
-            const isActive = i % 3 === 0; // every 3rd line has motion
-
-            return (
-              <div key={i} className="relative flex-1">
-                {/* vertical line */}
-                <div className="absolute left-1/2 top-0 h-full w-[1px] -translate-x-1/2 bg-white/10" />
-
-                {/* SHOOTING STAR / ENERGY PULSE */}
-                {isActive && (
-                  <motion.div
-                    className="absolute left-1/2 top-0 h-[180px] w-[2px] -translate-x-1/2"
-                    style={{
-                      background:
-                        "linear-gradient(to bottom, transparent, rgba(120,170,255,0.9), transparent)",
-                      filter: "blur(0.3px)",
-                    }}
-                    animate={{
-                      y: ["-20vh", "120vh"],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 10 + i * 0.5, // slow variation
-                      repeat: Infinity,
-                      ease: "linear",
-                      delay: i * 1.2,
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* soft floating glow layer */}
-        <motion.div
-          className="absolute inset-0 bg-[#7DA2FF]/5 blur-3xl"
-          animate={{
-            opacity: [0.2, 0.35, 0.2],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      </div>
+        setMousePosition({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        });
+      }}
+    >
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-[9999]! mix-blend-screen"
+        style={{
+          background: useMotionTemplate`
+      radial-gradient(
+        75px circle at ${mousePosition.x}px ${mousePosition.y}px,
+        rgba(210, 255, 240, 0.22),
+        rgba(180, 235, 255, 0.12),
+        transparent 70%
+      )
+    `,
+        }}
+      />
+      <div className="fixed inset-0 z-0! overflow-hidden pointer-events-none bg-[#070B17]"></div>
       {/* HERO SECTION */}
       <section className="relative min-h-screen h-auto  z-50!">
         {/* ========================================================= */}
@@ -567,35 +612,10 @@ export default function Home() {
 
         <div className="absolute inset-0 bg-[#070B17]" />
 
-        {/* radial cinematic lighting */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(87,132,255,0.18),transparent_45%)] z-[1]" />
-
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_40%)] z-[1]" />
-
         <div
           className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
           style={{ perspective: "2600px" }}
         >
-          {/* ATMOSPHERIC GLOW */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.22 }}
-            transition={{
-              duration: 1,
-              delay: 3,
-              ease: "linear",
-            }}
-            className="
-          absolute
-          w-[55vw]
-          h-[55vw]
-          rounded-full
-          bg-[#7DA2FF]/20
-          blur-[180px]
-          pointer-events-none
-        "
-          />
-
           {/* FLOWER SYSTEM */}
           <div
             className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full"
@@ -781,7 +801,7 @@ export default function Home() {
         {/* ========================================================= */}
 
         <>
-          <div className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.48)]" />
+          <div className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.75)]" />
 
           <motion.div
             initial={{
@@ -790,7 +810,7 @@ export default function Home() {
             }}
             animate={{
               opacity: 1,
-              backdropFilter: "blur(16px)",
+              backdropFilter: "blur(4px)",
             }}
             transition={{
               duration: 2,
@@ -823,13 +843,13 @@ export default function Home() {
                   flex
                   items-center
                   justify-between
-                  h-[81.771px]
+                  h-[65.771px]
                   px-[20px]
                   md:px-[30px]
-                  py-[20px]
+                  py-[10px]
                   rounded-[16.912px]
                   border
-                  border-[#747889]
+                  border-[#7478895c]
                   bg-[#1e2540]/30
                   backdrop-blur-xl
                 "
@@ -838,7 +858,7 @@ export default function Home() {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="101"
-                height="42"
+                height="40"
                 viewBox="0 0 101 42"
                 fill="none"
               >
@@ -972,7 +992,8 @@ export default function Home() {
                 <p className="text-[#F8F7FC] text-[18px] md:text-[26px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
                   Ology is a market timing platform that synthesizes celestial
                   cycles, behavioral psychology, and live market data into a
-                  personalized timing profile.
+                  personalized timing profile. Active traders and investors use
+                  it to recognize patterns and time entries with context.
                 </p>
               </div>
 
@@ -981,13 +1002,17 @@ export default function Home() {
                 className="
                       cursor-pointer
                       inline-flex
-                      w-fit
-                      py-[18px]
-                      px-[28px]
-                      justify-center
-                      items-center
-                      rounded-[16.912px]
-                      bg-[#1e2540]/10
+                       flex
+                        w-[480px]
+                        h-[56px]
+                        px-[30px]
+                        py-[20px]
+                        justify-between
+                        items-center
+
+                        rounded-[16.912px]
+
+                        bg-[rgba(30,37,64,0.30)]
                       border
                       border-white/10
                       backdrop-blur-xl
@@ -996,6 +1021,7 @@ export default function Home() {
                       duration-500
                     "
               >
+                {" "}
                 <span className="text-[#F8F7FC] font-Satoshi text-[18px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase">
                   Check your Timing Alignment
                 </span>
@@ -1055,7 +1081,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="p-10! z-50!">
+      <section className="z-50!">
         {/* NORMAL SECTION */}
         <section className=" w-full min-h-screen flex flex-col items-center gap-25 px-5 py-25!">
           <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[71.111px] font-normal leading-[120%]">
@@ -1145,10 +1171,10 @@ export default function Home() {
 
         {/* COSMIC RHYTHM */}
 
-        <section className="w-full flex justify-between items-center py-61.25 px-5">
-          <div className="flex flex-col gap-28.75 max-w-[70%]">
+        <section className="relative w-full flex justify-between items-center py-61.25 px-5">
+          <div className="flex-1 min-w-0 flex flex-col gap-[28.75px] z-20">
             <h1 className="text-[#F8F7FC] font-Recoleta text-[71.111px] font-normal leading-[120%]">
-              Cosmic rhythm powers human decision-making
+              Celestial Rhythm for Human Decisions
             </h1>
 
             <div
@@ -1157,59 +1183,75 @@ export default function Home() {
       rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
             >
               <div className="flex flex-col gap-[32.71px]">
-                <h1 className="text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
-                  Discover your investor timing profile
-                </h1>
-                <h3 className="text-[#F8F7FC] font-Satoshi text-[21.74px] font-light leading-[120%]">
-                  Generate your behavioral market profile and secure early
-                  access.
-                </h3>
+                {!showNatalForm ? (
+                  <>
+                    <h1 className="text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
+                      Discover your investor timing profile
+                    </h1>
+                    <h3 className="text-[#F8F7FC] font-Satoshi text-[21.74px] font-light leading-[120%]">
+                      Generate your behavioral market profile and secure early
+                      access.
+                    </h3>
+                  </>
+                ) : (
+                  <>
+                    <h1 className="text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
+                      Hi, {names.split("")}.
+                    </h1>
+                    <h3 className="text-[#F8F7FC] font-Satoshi text-[21.74px] font-light leading-[120%]">
+                      Add your birth details. This is what maps your chart to a
+                      timing profile.
+                    </h3>
+                  </>
+                )}
               </div>
 
               <div className="flex flex-col gap-14.5 w-full">
-                <div className="w-full flex gap-6.5 items-end">
-                  <div className="flex flex-col gap-[26.5px] flex-1">
-                    <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
-                      Full Name
-                    </label>
+                {!showNatalForm && (
+                  <div className="w-full flex gap-6.5 items-end">
+                    <div className="flex flex-col gap-[26.5px] flex-1">
+                      <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
+                        Full Name
+                      </label>
 
-                    <input
-                      className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
-                      value={names}
-                      onChange={(e: any) => setNames(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-[26.5px] flex-1">
-                    <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
-                      Email
-                    </label>
-
-                    <input
-                      value={email}
-                      onChange={(e: any) => setEmail(e.target.value)}
-                      className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
-                    />
-                  </div>
-
-                  {!showNatalForm && (
-                    <div
-                      onClick={() => {
-                        if (names != "" && email != "") {
-                          setShowNatalForm(true);
-                          setErrMsg("");
-                        } else {
-                          setTimeout(() => {
-                            setErrMsg("Please fill out your name and email");
-                          }, 5000);
-                        }
-                      }}
-                      className="cursor-pointer flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
-                    >
-                      <ArrowRight />
+                      <input
+                        className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
+                        value={names}
+                        onChange={(e: any) => setNames(e.target.value)}
+                      />
                     </div>
-                  )}
-                </div>
+
+                    <div className="flex flex-col gap-[26.5px] flex-1">
+                      <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
+                        Email
+                      </label>
+
+                      <input
+                        value={email}
+                        onChange={(e: any) => setEmail(e.target.value)}
+                        className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
+                      />
+                    </div>
+
+                    {!showNatalForm && (
+                      <div
+                        onClick={() => {
+                          if (names != "" && email != "") {
+                            setShowNatalForm(true);
+                            setErrMsg("");
+                          } else {
+                            setTimeout(() => {
+                              setErrMsg("Please fill out your name and email");
+                            }, 5000);
+                          }
+                        }}
+                        className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                      >
+                        <ArrowRight />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {errMsg && (
                   <p className="text-[#F8F7FC] font-[Satoshi] text-[16px] font-normal leading-[150%]">
@@ -1225,7 +1267,7 @@ export default function Home() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 12 }}
                         transition={{ duration: 0.25 }}
-                        className="w-full flex gap-4"
+                        className="w-full flex gap-4 items-end"
                       >
                         <div className="flex flex-col gap-[26.5px] flex-1">
                           <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
@@ -1315,13 +1357,11 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Birth Location */}
-
                         <button
                           onClick={() => {
                             handleSubmitForm();
                           }}
-                          className="cursor-pointer flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                          className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
                         >
                           <ArrowRight />
                         </button>
@@ -1514,10 +1554,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* <div className="relative flex justify-end  w-[381px] z-20">
-                <Image src={iphone} alt="" className="object-cover fill" />
-              </div> */}
-          <div className="relative w-[320px]">
+
+          <div className="relative shrink-0 w-[381px] h-[758px]">
             {/* VIDEO */}
             <video
               autoPlay
@@ -1525,14 +1563,14 @@ export default function Home() {
               loop
               playsInline
               className="
-          absolute
-          top-[2%]
-          left-[5%]
-          w-[90%]
-          h-[97%]
-          object-cover
-          rounded-[38px]
-        "
+    absolute
+    top-[2%]
+    left-[5%]
+    w-[90%]
+    h-[99%]
+    object-cover
+    rounded-[38px]
+  "
             >
               <source src={"/archetypereel2.mp4"} type="video/mp4" />
             </video>
@@ -1544,11 +1582,44 @@ export default function Home() {
               className="relative z-10 w-full"
             />
           </div>
+
+          {/* GRID LINES */}
+          <div className="absolute inset-0 flex">
+            {Array.from({ length: LINES }).map((_, i) => {
+              const isActive = activeLines[i];
+
+              return (
+                <div key={i} className="relative flex-1">
+                  <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
+
+                  {isActive && (
+                    <motion.div
+                      className="absolute left-1/2 top-0 h-22.5 w-px -translate-x-1/2"
+                      style={{
+                        background:
+                          "linear-gradient(to bottom, transparent, rgba(255,255,255,1), transparent)",
+                      }}
+                      animate={{
+                        y: ["-20vh", "120vh"],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 4 + (i % 3),
+                        repeat: Infinity,
+                        ease: "linear",
+                        delay: i * 0.4,
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </section>
 
         <section className=" w-full min-h-screen flex flex-col items-center gap-25 px-5 py-25!">
           <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[71.111px] font-normal leading-[120%]">
-            There's a missing layer in modern market tools.
+            The Missing Layer in Modern Market Tools
           </h1>
 
           <div className="w-full flex justify-between items-center no-scrollbar gap-8">
@@ -1577,8 +1648,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full min-h-screen flex flex-col items-center gap-25 px-5 py-61.25!">
-          <div className="flex justify-center items-center w-full">
+        <section className="relative w-screen left-1/2 -translate-x-1/2 min-h-screen flex flex-col items-center gap-25 px-5 py-61.25! overflow-hidden">
+          <div className="flex justify-center items-center w-full z-50!">
             <div className="flex flex-col gap-25 items-center max-w-[1241px]">
               <h1 className="text-[#F8F7FC] font-Recoleta text-[75.785px] font-normal leading-[120%]">
                 Ancient Patterns. Modern Lens.
@@ -1603,6 +1674,206 @@ export default function Home() {
                 </a>
               </button>
             </div>
+          </div>
+
+          <>
+            <div className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.75)]" />
+
+            <motion.div
+              initial={{
+                opacity: 0,
+                backdropFilter: "blur(1px)",
+              }}
+              animate={{
+                opacity: 1,
+                backdropFilter: "blur(4px)",
+              }}
+              transition={{
+                duration: 2,
+                delay: 3, // starts after 2 seconds
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="absolute inset-0 z-10 bg-transparent"
+            />
+          </>
+
+          <div
+            className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {images.slice(0, 30).map((img, index) => {
+              const cols = 6;
+              const rows = 5;
+
+              const col = index % cols;
+              const row = Math.floor(index / cols);
+
+              /* ===================================================== */
+              /* 🌍 NORMALIZED GRID */
+              /* ===================================================== */
+
+              const u = col / (cols - 1);
+              const v = row / (rows - 1);
+
+              /* ===================================================== */
+              /* 🌍 FULL SPHERE WRAP */
+              /* ===================================================== */
+
+              const theta = (u - 0.5) * Math.PI * 1.65;
+
+              const phi = (v - 0.5) * Math.PI * 1.08;
+
+              /* ===================================================== */
+              /* 🌍 SMALLER GLOBE */
+              /* ===================================================== */
+
+              const radius = 240;
+
+              /* ===================================================== */
+              /* 🌍 TRUE SPHERE */
+              /* ===================================================== */
+
+              const sphereX = Math.sin(theta) * Math.cos(phi) * radius;
+
+              const sphereY = Math.sin(phi) * radius;
+
+              const sphereZ = Math.cos(theta) * Math.cos(phi) * radius;
+
+              /* ===================================================== */
+              /* 🌍 DEPTH */
+              /* ===================================================== */
+
+              const depth = (sphereZ + radius) / (radius * 2);
+
+              /* ===================================================== */
+              /* 🌍 MORE SPHERICAL SCALE */
+              /* ===================================================== */
+
+              const curveScale = 0.38 + depth * 0.12;
+
+              /* ===================================================== */
+              /* 🌍 FADE BACKSIDE */
+              /* ===================================================== */
+
+              const opacity = 0.08 + depth * 0.95;
+
+              /* ===================================================== */
+              /* 🌍 STRONG GLOBE ROTATION */
+              /* ===================================================== */
+
+              const rotateY = Math.sin(theta) * 68;
+
+              const rotateX = -Math.sin(phi) * 30;
+
+              /* ===================================================== */
+              /* 🌍 TIGHT SPHERE */
+              /* ===================================================== */
+
+              const compression = 0.96;
+
+              const startX = sphereX * compression;
+
+              const startY = sphereY * compression;
+
+              /* ===================================================== */
+              /* 🌍 DEEPER SPHERE DEPTH */
+              /* ===================================================== */
+
+              const zStart = (sphereZ - radius) * 1.4;
+
+              /* ===================================================== */
+              /* 🌸 BLOOM */
+              /* ===================================================== */
+
+              const bloom = 1 + (1 - depth) * 0.55;
+
+              return (
+                <motion.div
+                  key={index}
+                  className="
+            relative
+            min-w-0
+            min-h-0
+            overflow-hidden
+          "
+                  initial={{
+                    x: startX,
+                    y: startY,
+
+                    z: zStart,
+
+                    scale: curveScale * bloom,
+
+                    rotateY,
+                    rotateX,
+
+                    opacity: 0,
+
+                    filter: "blur(12px)",
+                  }}
+                  animate={{
+                    x: 0,
+                    y: 0,
+
+                    z: 0,
+
+                    scale: 1,
+
+                    rotateY: 0,
+                    rotateX: 0,
+
+                    opacity: 1,
+
+                    filter: "blur(0px)",
+                  }}
+                  transition={{
+                    duration: 2,
+                    delay: 3,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  style={{
+                    transformStyle: "preserve-3d",
+                    willChange: "transform",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
+                  {/* TILE */}
+                  <div
+                    className="
+              relative
+              w-full
+              h-full
+              scale-[1]
+            "
+                  >
+                    <Image
+                      src={img}
+                      alt=""
+                      fill
+                      priority
+                      className="
+                object-cover
+                scale-[1.03]
+                pointer-events-none
+                select-none
+              "
+                    />
+
+                    {/* CINEMATIC DEPTH */}
+                    <div
+                      className="
+                absolute
+                inset-0
+                bg-gradient-to-br
+                from-white/10
+                via-transparent
+                to-black/40
+              "
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
       </section>
@@ -1636,6 +1907,7 @@ export default function Home() {
 
             {/* Modal */}
             <div
+              ref={cardRef}
               className="relative flex w-[945.24px] min-h-[107.29px] h-auto p-12.5 flex-col items-center gap-12.5 rounded-[16.912px] border border-white/50 bg-cover bg-center bg-no-repeat bg-lightgray"
               onClick={(e) => e.stopPropagation()}
             >
@@ -1648,13 +1920,38 @@ export default function Home() {
                 className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
               />
               {/* Close */}
-              <button
-                type="button"
-                onClick={() => setShowModal(!showModal)}
-                className="absolute right-4 top-4 text-white/60 hover:text-white"
-              >
-                <X size={20} />
-              </button>
+
+              {!isDownloading && (
+                <div className="flex justify-start items-center gap-2 absolute top-4 right-4">
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(!showModal)}
+                      className=" text-white/60 hover:text-white cursor-pointer"
+                    >
+                      <X size={20} />
+                    </button>
+
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-xs text-white font-Satoshi">
+                      Close
+                    </div>
+                  </div>
+
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => handleDownload()}
+                      className="text-white/60 hover:text-white cursor-pointer"
+                    >
+                      <CloudDownload size={20} />
+                    </button>
+
+                    <div className="font-Satoshi absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-xs text-white">
+                      Download image
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex w-full justify-start items-center z-20 gap-20">
                 {/* LEFT (40%) */}
@@ -1663,41 +1960,41 @@ export default function Home() {
                     {archetype && archetype}
                   </p>
 
-                  <p className="text-[#F8F7FC] font-satoshi text-[23px] font-normal leading-[120%]">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[23px] font-normal leading-[120%]">
                     {tagline && tagline}
                   </p>
                 </div>
 
                 {/* RIGHT (60%) */}
-                <h2 className="text-[#F8F7FC] font-satoshi text-[20px] font-normal leading-[150%] basis-[60%]">
+                <h2 className="text-[#F8F7FC] font-Satoshi text-[20px] font-normal leading-[150%] basis-[60%]">
                   {synopsisText && synopsisText}
                 </h2>
               </div>
 
               <div className="flex items-start gap-6 w-full z-20">
                 <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
                     {SunIcon && <SunIcon size={18} />} &nbsp; Sun in{" "}
                     {astroSigns?.sun}
                   </p>
                 </div>
 
                 <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
                     {MoonIcon && <MoonIcon size={18} />} &nbsp; Moon in{" "}
                     {astroSigns?.moon}
                   </p>
                 </div>
 
                 <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
                     {MarsIcon && <MarsIcon size={18} />} &nbsp; Mars in{" "}
                     {astroSigns?.mars}
                   </p>
                 </div>
 
                 <div className="flex flex-1 items-center justify-center gap-[9.691px] p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
+                  <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-bold leading-[150%] flex justify-between items-center flex-nowrap">
                     {SaturnIcon && <SaturnIcon size={18} />} &nbsp; Saturn in{" "}
                     {astroSigns?.saturn}
                   </p>
@@ -1723,7 +2020,7 @@ export default function Home() {
                     {bestMarketConditions &&
                       bestMarketConditions.map((con: any) => (
                         <p
-                          className="text-[#F8F7FC] text-[14px] font-medium"
+                          className="text-[#F8F7FC] text-[14px] font-normal"
                           style={
                             { leadingTrim: "both", textEdge: "cap" } as any
                           }
@@ -1744,7 +2041,7 @@ export default function Home() {
 
                   {/* inner bottom */}
                   <div className="flex flex-col h-[57px] justify-between items-start self-stretch font-Satoshi">
-                    <p className="text-[#F8F7FC] text-[14px] font-medium">
+                    <p className="text-[#F8F7FC] text-[14px] font-normal">
                       {ShadowText}
                     </p>
                   </div>
@@ -1755,7 +2052,7 @@ export default function Home() {
                 <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
               </div>
 
-              <div className="text-[#F8F7FC] font-satoshi text-[20px] font-normal leading-[150%] text-center z-20">
+              <div className="text-[#F8F7FC] font-Satoshi text-[20px] font-normal leading-[150%] text-center z-20">
                 You’re on the list. Your full Trade DNA opens when we launch.
               </div>
             </div>
