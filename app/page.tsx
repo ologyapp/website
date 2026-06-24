@@ -1926,7 +1926,12 @@ export default function Home() {
                   <div className="relative group">
                     <button
                       type="button"
-                      onClick={() => setShowModal(!showModal)}
+                      onClick={() => {
+                        setShowModal(!showModal);
+                        setShowNatalForm(false);
+                        setNames("");
+                        setEmail("");
+                      }}
                       className=" text-white/60 hover:text-white cursor-pointer"
                     >
                       <X size={20} />
