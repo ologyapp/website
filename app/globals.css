@@ -269,3 +269,30 @@ body {
     @apply font-sans;
   }
 }
+
+.swiper-slide-active .swiper-card {
+  transform: scale(1.08);
+}
+
+.swiper-slide-prev .swiper-card,
+.swiper-slide-next .swiper-card {
+  transform: scale(0.82);
+}
+
+.swiper-slide .swiper-card {
+  transform: scale(0.99);
+  transition: transform 350ms ease;
+}
+
+.swiper-slide-active .swiper-card {
+  transform: scale(1.01);
+  z-index: 10;
+}
+
+.swiper {
+  overflow: visible !important;
+}
+
+.swiper-wrapper {
+  overflow: visible !important;
+}

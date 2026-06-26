@@ -506,15 +506,15 @@ export function DatePickerTime({ value, onChange }: Props) {
 
       {/* ================= TIME MODAL ================= */}
       {openTime && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center font-Satoshi">
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpenTime(false)}
           />
 
-          <div className="relative z-10 w-[90%] max-w-sm p-4 bg-[#1E254C4D] backdrop-blur-xl border border-white/10 rounded-2xl">
+          <div className="font-Satoshi relative z-10 w-[90%] max-w-sm p-4 bg-[#1E254C4D] backdrop-blur-xl border border-white/10 rounded-2xl">
             {/* HEADER */}
-            <div className="flex justify-between mb-3 text-white">
+            <div className="flex justify-between mb-3 text-white font-Satoshi">
               <span>Birth Time</span>
               <button onClick={() => setOpenTime(false)}>Done</button>
             </div>
