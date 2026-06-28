@@ -1108,8 +1108,8 @@ export default function Home() {
               <div className="flex w-full items-center justify-between p-4 md:px-4 z-50!">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="101"
-                  height="40"
+                  width="70"
+                  height="29"
                   viewBox="0 0 101 42"
                   fill="none"
                 >
@@ -1156,7 +1156,7 @@ export default function Home() {
                         }
                         className={`
                           cursor-pointer
-                          text-[25px]
+                          text-[19.72px]
                           font-Satoshi
                           font-normal
                           leading-[150%]
