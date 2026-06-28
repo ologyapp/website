@@ -1227,7 +1227,7 @@ export default function Home() {
             </motion.header>
           </div>
 
-          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-start gap-10 pt-20 md:pt-24 mt-[60px]">
+          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-[60px]">
             <motion.div
               className="
                 relative
@@ -1236,6 +1236,7 @@ export default function Home() {
                 flex
                 justify-center
                 lg:justify-end
+                items-center
                 lg:-top-24
                 self-start
                 overflow-visible
@@ -1295,7 +1296,7 @@ export default function Home() {
                 delay: 3,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full lg:w-[80%] flex flex-col gap-[50px] items-start"
+              className="w-full lg:w-[80%] flex flex-col gap-[50px] items-start mt-40"
             >
               <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
                 <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
@@ -1317,7 +1318,7 @@ export default function Home() {
                       inline-flex
                        flex
                        w-auto
-                       p-5
+                      p-[20px]
                       justify-center
                       items-center
                       rounded-[16.912px]
