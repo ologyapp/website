@@ -1227,7 +1227,7 @@ export default function Home() {
             </motion.header>
           </div>
 
-          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-[60px]">
+          <div className="px-0 md:px-[24px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-[60px]">
             <motion.div
               className="
                 relative
@@ -1272,12 +1272,12 @@ export default function Home() {
                     src={iphone}
                     alt=""
                     className="
-                block
-                w-[120px]
-                md:w-[160px]
-                h-auto
-                object-contain z-0!
-        "
+                    block
+                    w-[120px]
+                    md:w-[160px]
+                    h-auto
+                    object-contain z-0!
+                    "
                   />
                 </motion.div>
               </div>
@@ -1296,9 +1296,9 @@ export default function Home() {
                 delay: 3,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full lg:w-[80%] flex flex-col gap-[93px] items-start mt-30"
+              className="w-full lg:w-[80%] flex flex-col gap-[60px] items-start mt-30"
             >
-              <div className="flex flex-col gap-[40px] md:gap-[93px] text-center md:text-left">
+              <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
                 <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
                   Timing Intelligence for Modern Investors
                 </h1>
