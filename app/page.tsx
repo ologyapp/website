@@ -1295,14 +1295,14 @@ export default function Home() {
                 delay: 3,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full lg:w-[80%] flex flex-col gap-[50px]"
+              className="w-full lg:w-[80%] flex flex-col gap-[50px] items-start"
             >
               <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
-                <h1 className="text-[#F8F7FC] text-[44px] md:text-[75px] font-normal leading-[115%]">
+                <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
                   Timing Intelligence for Modern Investors
                 </h1>
 
-                <p className="text-[#F8F7FC] text-[18px] md:text-[26px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
+                <p className="text-[#F8F7FC] text-[18px] md:text-[24.7px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
                   Ology is a market timing platform that synthesizes celestial
                   cycles, behavioral psychology, and live market data into a
                   personalized timing profile. Active traders and investors use
@@ -1317,16 +1317,11 @@ export default function Home() {
                       inline-flex
                        flex
                        w-auto
-                        md:w-[460px]
-                        h-[56px]
-                        px-[30px]
-                        py-[20px]
-                        justify-center
-                        items-center
-
-                        rounded-[16.912px]
-
-                        bg-[rgba(30,37,64,0.30)]
+                       p-5
+                      justify-center
+                      items-center
+                      rounded-[16.912px]
+                      bg-[rgba(30,37,64,0.30)]
                       border
                       border-white/10
                       backdrop-blur-xl
@@ -1336,11 +1331,11 @@ export default function Home() {
                     "
               >
                 {" "}
-                <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase">
-                  Check your Timing Alignment
+                <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[1.32px] uppercase">
+                  Access the Beta
                 </span>
-                <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase">
-                  Check your Alignment
+                <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[1.32px] uppercase">
+                  Access the Beta
                 </span>
               </button>
             </motion.div>
