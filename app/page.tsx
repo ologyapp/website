@@ -1227,7 +1227,7 @@ export default function Home() {
             </motion.header>
           </div>
 
-          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-start gap-10 pt-20 md:pt-24">
+          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-start gap-10 pt-20 md:pt-24 mt-[60px]">
             <motion.div
               className="
                 relative
