@@ -50,7 +50,9 @@ import {
   motion,
   useMotionTemplate,
   useMotionValue,
+  useScroll,
   useSpring,
+  useTransform,
 } from "framer-motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -663,11 +665,11 @@ export default function Home() {
   const cols = 6;
   const rows = 5;
 
-  const [LINES, setLINES] = useState(16);
+  const [LINES, setLINES] = useState(11);
 
   useEffect(() => {
     const updateLines = () => {
-      setLINES(window.innerWidth < 720 ? 6 : 16);
+      setLINES(window.innerWidth < 720 ? 6 : 11);
     };
 
     updateLines(); // run on mount
@@ -906,6 +908,20 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  const heroRef = useRef(null);
+
+  // Track scroll progress *within this section only*
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+    // "start start" = when top of hero hits top of viewport (progress 0)
+    // "end start"   = when bottom of hero hits top of viewport (progress 1)
+  });
+
+  // Map that progress to opacity + a little upward drift
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, -80]);
+
   return (
     <div
       className="flex flex-col scroll-smooth relative cursor-pointer mb-0! overflow-x-hidden"
@@ -933,183 +949,119 @@ export default function Home() {
       />
       <div className="fixed inset-0 z-0! overflow-hidden pointer-events-none bg-[#0d1220]"></div>
       {/* HERO SECTION */}
-      <section className="relative min-h-screen h-auto  z-50!">
-        <div className="absolute inset-0 bg-[#0d1220]" />
+      <section ref={heroRef} className="relative h-screen z-50!">
+        <motion.div style={{ opacity, y }}>
+          <div className="absolute inset-0 bg-[#0d1220]" />
 
-        <div
-          className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
-          style={{ perspective: "2600px" }}
-        >
-          <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
-            {images.slice(0, 30).map((img, index) => {
-              const cols = 6;
+          <div
+            className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
+            style={{ perspective: "2600px" }}
+          >
+            <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
+              {images.slice(0, 30).map((img, index) => {
+                const cols = 6;
 
-              const col = index % cols;
-              const row = Math.floor(index / cols);
+                const col = index % cols;
+                const row = Math.floor(index / cols);
 
-              const baseDelay = 1;
-              const staggerStep = 0.045;
-              const order = row + col;
-              const itemDelay = baseDelay + order * staggerStep;
+                const baseDelay = 1;
+                const staggerStep = 0.045;
+                const order = row + col;
+                const itemDelay = baseDelay + order * staggerStep;
 
-              return (
-                <motion.div
-                  key={index}
-                  className="relative min-w-0 min-h-0 overflow-hidden"
-                  initial={{
-                    opacity: 0,
-                    scale: 1,
-                    filter: "blur(1px)",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    filter: "blur(0px)",
-                  }}
-                  transition={{
-                    duration: 1.4,
-                    delay: itemDelay,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  style={{
-                    transformStyle: "preserve-3d",
-                    willChange: "transform, opacity, filter",
-                    backfaceVisibility: "hidden",
-                  }}
-                >
-                  <div className="relative w-full h-full scale-[1]">
-                    <Image
-                      src={img}
-                      alt=""
-                      fill
-                      priority
-                      sizes="17vw"
-                      className="object-cover scale-[1.03] pointer-events-none select-none"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
-                  </div>
-                </motion.div>
-              );
-            })}
+                return (
+                  <motion.div
+                    key={index}
+                    className="relative min-w-0 min-h-0 overflow-hidden"
+                    initial={{
+                      opacity: 0,
+                      scale: 1,
+                      filter: "blur(1px)",
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      filter: "blur(0px)",
+                    }}
+                    transition={{
+                      duration: 1.4,
+                      delay: itemDelay,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    style={{
+                      transformStyle: "preserve-3d",
+                      willChange: "transform, opacity, filter",
+                      backfaceVisibility: "hidden",
+                    }}
+                  >
+                    <div className="relative w-full h-full scale-[1]">
+                      <Image
+                        src={img}
+                        alt=""
+                        fill
+                        priority
+                        sizes="17vw"
+                        className="object-cover scale-[1.03] pointer-events-none select-none"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        <>
-          <motion.div
-            className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.75)]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              delay: 2,
-              duration: 0.5,
-              ease: "easeOut",
-            }}
-          />
-
-          <motion.div
-            initial={{
-              opacity: 0,
-              backdropFilter: "blur(1px)",
-            }}
-            animate={{
-              opacity: 1,
-              backdropFilter: "blur(16px)",
-            }}
-            transition={{
-              duration: 2,
-              delay: 3, // starts after 2 seconds
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="absolute inset-0 z-10 bg-transparent"
-          />
-        </>
-
-        <AnimatePresence>
-          {showLogo && (
+          <>
             <motion.div
-              className="z-50! absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
-              initial={{
-                opacity: 0,
-                scale: 1.1,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-              }}
+              className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.75)]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{
-                duration: 0.8,
+                delay: 2,
+                duration: 0.5,
                 ease: "easeOut",
               }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="101"
-                height="40"
-                viewBox="0 0 101 42"
-                fill="none"
-              >
-                <path
-                  d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
-                  fill="#F8F7FC"
-                />
-                <path
-                  d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
-                  fill="#F8F7FC"
-                />
-                <path
-                  d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
-                  fill="#F8F7FC"
-                />
-                <path
-                  d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
-                  fill="#F8F7FC"
-                />
-                <path
-                  d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
-                  fill="#F8F7FC"
-                />
-                <path
-                  d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
-                  fill="#F8F7FC"
-                />
-              </svg>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            />
 
-        <div className="relative z-20 max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-[60px]">
-          <div className="fixed top-0 left-0 right-0 z-[9999]! max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10">
-            <motion.header
+            <motion.div
               initial={{
                 opacity: 0,
+                backdropFilter: "blur(1px)",
               }}
               animate={{
                 opacity: 1,
+                backdropFilter: "blur(16px)",
               }}
               transition={{
-                delay: 3.5,
-                duration: 0.8,
-                ease: "easeOut",
+                duration: 2,
+                delay: 3, // starts after 2 seconds
+                ease: [0.22, 1, 0.36, 1],
               }}
-              className="
-              flex
-              items-center
-              justify-between
-              // h-[65.771px]
-              p-5
-              rounded-[20px]
-              border
-              border-[#7478895c]
-              bg-[#1e2540]/30
-              backdrop-blur-xl
-              z-50!
-            "
-            >
-              <div className="flex w-full items-center justify-between p-4 md:px-4 z-50!">
+              className="absolute inset-0 z-10 bg-transparent"
+            />
+          </>
+
+          <AnimatePresence>
+            {showLogo && (
+              <motion.div
+                className="z-50! absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
+                initial={{
+                  opacity: 0,
+                  scale: 1.1,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  duration: 0.8,
+                  ease: "easeOut",
+                }}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="70"
-                  height="29"
+                  width="101"
+                  height="40"
                   viewBox="0 0 101 42"
                   fill="none"
                 >
@@ -1138,23 +1090,88 @@ export default function Home() {
                     fill="#F8F7FC"
                   />
                 </svg>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                <nav className="hidden md:block">
-                  <ul className="flex items-center gap-[65px]">
-                    {[
-                      { label: "Align", id: "align" },
-                      { label: "Decode", id: "decode" },
-                      { label: "Perform", id: "perform" },
-                    ].map((item) => (
-                      <li
-                        key={item.id}
-                        onClick={() =>
-                          document.getElementById(item.id)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          })
-                        }
-                        className={`
+          <div className="relative z-20 max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-[60px]">
+            <div className="fixed top-0 left-0 right-0 z-[9999]! max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10">
+              <motion.header
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                }}
+                transition={{
+                  delay: 3.5,
+                  duration: 0.8,
+                  ease: "easeOut",
+                }}
+                className="
+              flex
+              items-center
+              justify-between
+              // h-[65.771px]
+              p-5
+              rounded-[20px]
+              border
+              border-[#7478895c]
+              bg-[#1e2540]/30
+              backdrop-blur-xl
+              z-50!
+            "
+              >
+                <div className="flex w-full items-center justify-between p-4 md:px-4 z-50!">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="70"
+                    height="29"
+                    viewBox="0 0 101 42"
+                    fill="none"
+                  >
+                    <path
+                      d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
+                      fill="#F8F7FC"
+                    />
+                    <path
+                      d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
+                      fill="#F8F7FC"
+                    />
+                    <path
+                      d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
+                      fill="#F8F7FC"
+                    />
+                    <path
+                      d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
+                      fill="#F8F7FC"
+                    />
+                    <path
+                      d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
+                      fill="#F8F7FC"
+                    />
+                    <path
+                      d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
+                      fill="#F8F7FC"
+                    />
+                  </svg>
+
+                  <nav className="hidden md:block">
+                    <ul className="flex items-center gap-[65px]">
+                      {[
+                        { label: "Align", id: "align" },
+                        { label: "Decode", id: "decode" },
+                        { label: "Perform", id: "perform" },
+                      ].map((item) => (
+                        <li
+                          key={item.id}
+                          onClick={() =>
+                            document.getElementById(item.id)?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            })
+                          }
+                          className={`
                           cursor-pointer
                           text-[19.72px]
                           font-Satoshi
@@ -1168,25 +1185,25 @@ export default function Home() {
                               : "text-[#F8F7FC]/60 hover:text-[#F8F7FC]"
                           }
                         `}
-                      >
-                        {item.label}
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
+                        >
+                          {item.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
 
-                <div className="md:hidden">
-                  <button
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="text-[#F8F7FC] cursor-pointer"
-                  >
-                    {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-                  </button>
-                </div>
+                  <div className="md:hidden">
+                    <button
+                      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                      className="text-[#F8F7FC] cursor-pointer"
+                    >
+                      {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                    </button>
+                  </div>
 
-                {mobileMenuOpen && (
-                  <div
-                    className="
+                  {mobileMenuOpen && (
+                    <div
+                      className="
                       absolute
                       top-full
                       left-0
@@ -1201,13 +1218,13 @@ export default function Home() {
                       md:hidden
                       z-50! 
                     "
-                  >
-                    <ul className="flex flex-col gap-6 z-50!">
-                      {["Align", "Decode", "Perform"].map((item) => (
-                        <li
-                          key={item}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="
+                    >
+                      <ul className="flex flex-col gap-6 z-50!">
+                        {["Align", "Decode", "Perform"].map((item) => (
+                          <li
+                            key={item}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="
                         cursor-pointer
                         text-[#F8F7FC]/80
                         text-[18px]
@@ -1216,20 +1233,20 @@ export default function Home() {
                         hover:text-[#F8F7FC]
                         transition
                       "
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </motion.header>
-          </div>
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </motion.header>
+            </div>
 
-          <div className="px-0 md:px-[24px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-[60px]">
-            <motion.div
-              className="
+            <div className="px-0 md:px-[24px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-[60px]">
+              <motion.div
+                className="
                 relative
                 w-full
                 lg:w-[60%]
@@ -1244,9 +1261,9 @@ export default function Home() {
                 md:hidden
                 z-0
               "
-            >
-              <div
-                className="
+              >
+                <div
+                  className="
                 relative
                 lg:absolute
                 flex
@@ -1256,64 +1273,64 @@ export default function Home() {
                 overflow-visible
                 z-0!
               "
-              >
-                <motion.div
-                  animate={{
-                    y: [0, -10, 0],
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="z-0!"
                 >
-                  <Image
-                    src={iphone}
-                    alt=""
-                    className="
+                  <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="z-0!"
+                  >
+                    <Image
+                      src={iphone}
+                      alt=""
+                      className="
                     block
                     w-[120px]
                     md:w-[160px]
                     h-auto
                     object-contain z-0!
                     "
-                  />
-                </motion.div>
-              </div>
-            </motion.div>
+                    />
+                  </motion.div>
+                </div>
+              </motion.div>
 
-            <motion.div
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              transition={{
-                duration: 3,
-                delay: 3,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="w-full lg:w-[80%] flex flex-col gap-[60px] items-start mt-30"
-            >
-              <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
-                <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
-                  Timing Intelligence for Modern Investors
-                </h1>
+              <motion.div
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                transition={{
+                  duration: 3,
+                  delay: 3,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="w-full lg:w-[80%] flex flex-col gap-[60px] items-start mt-30"
+              >
+                <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
+                  <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
+                    Timing Intelligence for Modern Investors
+                  </h1>
 
-                <p className="text-[#F8F7FC] text-[18px] md:text-[24.7px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
-                  Ology is a market timing platform that synthesizes celestial
-                  cycles, behavioral psychology, and live market data into a
-                  personalized timing profile. Active traders and investors use
-                  it to recognize patterns and time entries with context.
-                </p>
-              </div>
+                  <p className="text-[#F8F7FC] text-[18px] md:text-[24.7px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
+                    Ology is a market timing platform that synthesizes celestial
+                    cycles, behavioral psychology, and live market data into a
+                    personalized timing profile. Active traders and investors
+                    use it to recognize patterns and time entries with context.
+                  </p>
+                </div>
 
-              <button
-                type="button"
-                className="
+                <button
+                  type="button"
+                  className="
                       cursor-pointer
                       inline-flex
                       flex
@@ -1330,33 +1347,33 @@ export default function Home() {
                       transition-all
                       duration-500
                     "
-              >
-                {" "}
-                <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
-                  Access the Beta
-                </span>
-                <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
-                  Access the Beta
-                </span>
-              </button>
-            </motion.div>
+                >
+                  {" "}
+                  <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
+                    Access the Beta
+                  </span>
+                  <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
+                    Access the Beta
+                  </span>
+                </button>
+              </motion.div>
 
-            <motion.div
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                y: 0,
-                x: 0,
-              }}
-              transition={{
-                duration: 3,
-                delay: 3,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="
+              <motion.div
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                  x: 0,
+                }}
+                transition={{
+                  duration: 3,
+                  delay: 3,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="
                 relative
                 w-full
                 lg:w-[60%]
@@ -1369,25 +1386,25 @@ export default function Home() {
                 overflow-visible
                 hidden lg:block
               "
-            >
-              <div className="relative lg:absolute z-50 flex justify-center lg:justify-end w-full overflow-visible">
-                <motion.div
-                  animate={{
-                    y: [0, -10, 0],
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <div className="relative shrink-0 w-90.25 h-194.75 mt-20">
-                    <video
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="
+              >
+                <div className="relative lg:absolute z-50 flex justify-center lg:justify-end w-full overflow-visible">
+                  <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <div className="relative shrink-0 w-90.25 h-194.75 mt-20">
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="
                       absolute
                       top-[2.5%]
                       left-[5.5%]
@@ -1397,38 +1414,38 @@ export default function Home() {
                       rounded-[24px]
                       z-30!
                     "
-                    >
-                      <source src={"/appflow.mp4"} type="video/mp4" />
-                    </video>
+                      >
+                        <source src={"/appflow.mp4"} type="video/mp4" />
+                      </video>
 
-                    <img
-                      src="/iphone-frame.png"
-                      alt=""
-                      className="relative z-40! w-95.25 h-198.75!"
-                    />
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
+                      <img
+                        src="/iphone-frame.png"
+                        alt=""
+                        className="relative z-40! w-95.25 h-198.75!"
+                      />
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </section>
-
       {/* normal section */}
-      <section className="relative z-40! px-[40p]">
+      <section className="relative z-40! px-[40px] ">
         {/* NORMAL SECTION */}
         <SectionReveal>
           <section
             id="align"
-            className="relative  w-full min-h-auto flex flex-col items-center gap-25 px-2 md:px-20 py-25!"
+            className="relative w-full flex flex-col items-center justify-between md:px-[50px] py-[60px]! h-screen "
           >
-            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[71.111px] font-normal leading-[120%]">
+            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[65px] font-normal leading-[120%] mt-20">
               Signal Alignment
             </h1>
 
-            <div className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar">
+            <div className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px]">
               {/* AHEAD */}
-              <div className="flex flex-col w-full gap-12">
+              <div className="flex flex-col w-full gap-[30px]">
                 {renderCards(signalAhead)}
               </div>
             </div>
@@ -1471,16 +1488,16 @@ export default function Home() {
         <SectionReveal>
           <section
             id="decode"
-            className="relative w-full flex flex-col md:flex-row justify-between items-center py-40.25 px-20"
+            className="relative w-full flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
           >
             <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-[28.75px] z-20 px-4 md:px-0 max-w-[900px]">
-              <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[71.111px] font-normal leading-[120%] md-w-[600px]">
-                Celestial Rhythm for Human Decisions
+              <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
+                Access the Beta
               </h1>
 
               <div
                 id="archetype-form"
-                className="flex w-[360px] md:w-[900px]  flex-col justify-start items-start gap-14.5 min-h-[107.29px] p-[40px_31.381px]
+                className="flex w-[360px] md:w-[908px]  flex-col justify-start items-start gap-14.5 min-h-[107.29px] p-[40px_31.381px]
             not-even: rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
               >
                 <div className="flex flex-col gap-[32.71px]">
@@ -1490,8 +1507,8 @@ export default function Home() {
                         Discover your investor timing profile
                       </h1>
                       <h3 className="text-[#F8F7FC] font-Satoshi text-[21.74px] font-light leading-[120%]">
-                        Generate your behavioral market profile and secure early
-                        access.
+                        Generate your behavioral market profile and claim your
+                        spot.
                       </h3>
                     </>
                   ) : (
@@ -1863,7 +1880,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative shrink-0 w-95.25 h-198.75 mt-20">
+            <div className="relative shrink-0 w-90.25 h-194.75 mt-20">
               {/* VIDEO */}
               <video
                 autoPlay
@@ -1929,38 +1946,60 @@ export default function Home() {
         <SectionReveal>
           <section
             id="perform"
-            className=" w-full min-h-screen flex flex-col items-center gap-25 px-4 md:px-5 py-25! "
+            className="relative w-full min-h-screen flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
           >
-            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[71.111px] font-normal leading-[120%]">
+            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%]">
               The Missing Layer in Modern Market Tools
             </h1>
 
-            <div className="w-full flex flex-col md:flex-row items-center md:items-stretch justify-center md:justify-between no-scrollbar gap-8">
+            <div className="w-full hidden md:flex items-center justify-between">
               {missingLayers.map((data, id) => (
-                <>
-                  <div
-                    key={id}
-                    className=" mx-auto flex w-[360px] md:w-[488px] p-[31.381px] flex-col justify-center items-start gap-[31.381px] self-stretch
-    rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10 z-50!"
-                  >
-                    <h1 className="text-[#F8F7FC] font-Satoshi text-[20.477px] font-normal leading-[120%] tracking-[3.481px] uppercase">
-                      {data.heading}
-                    </h1>
-
+                <React.Fragment key={id}>
+                  {/* Card */}
+                  <div className="w-110 flex p-[31.381px] flex-col gap-[31.381px] rounded-[16.912px] bg-[rgba(30,37,64,0.3)]  backdrop-blur-sm border border-white/10">
                     <img src={data.imgPath} />
-                    <div className="flex flex-col gap-10">
-                      <h1 className="text-[#F8F7FC] font-[Recoleta] text-[30px] font-normal leading-[150%]">
+
+                    <div className="flex flex-col gap-10 items-center">
+                      <h1 className="text-[#F8F7FC] font-[Recoleta] text-[25px] text-center leading-[150%]">
                         {data.title}
                       </h1>
 
-                      <p className="text-[#F8F7FC] font-[Satoshi] text-[20px] font-normal leading-[150%]">
+                      <p className="text-[#F8F7FC] font-[Satoshi] text-[18.06px] text-center leading-[150%]">
                         {data.subtitle}
                       </p>
                     </div>
                   </div>
-                </>
+
+                  {/* Divider */}
+                  {id < missingLayers.length - 1 && (
+                    <div className="flex justify-center items-center px-6 shrink-0">
+                      <svg
+                        width="31"
+                        height="47"
+                        viewBox="0 0 31 47"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <rect
+                          y="8.28125"
+                          width="30.6382"
+                          height="30"
+                          rx="15"
+                          fill="#7FA8D4"
+                          fillOpacity="0.1"
+                        />
+                        <path
+                          d="M11.0478 22.9958L14.7883 22.9958L14.7883 19.2553L15.8473 19.2553L15.8473 22.9958L19.5878 22.9958L19.5878 24.0548L15.8473 24.0548L15.8473 27.8124L14.7883 27.8124L14.7883 24.0548L11.0478 24.0548L11.0478 22.9958Z"
+                          fill="white"
+                          fillOpacity="0.8"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
             </div>
+
             <div className="absolute inset-0 flex ">
               {Array.from({ length: LINES }).map((_, i) => {
                 const isActive = activeLines[i];
