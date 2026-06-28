@@ -1318,7 +1318,7 @@ export default function Home() {
                       inline-flex
                       flex
                       w-auto
-                      p-[20px]
+                      p-[16px]
                       justify-center
                       items-center
                       rounded-[20px]
