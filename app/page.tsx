@@ -1097,7 +1097,7 @@ export default function Home() {
               justify-between
               // h-[65.771px]
               p-5
-              rounded-[16.912px]
+              rounded-[20px]
               border
               border-[#7478895c]
               bg-[#1e2540]/30
@@ -1296,9 +1296,9 @@ export default function Home() {
                 delay: 3,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full lg:w-[80%] flex flex-col gap-[50px] items-start mt-40"
+              className="w-full lg:w-[80%] flex flex-col gap-[93px] items-start mt-30"
             >
-              <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
+              <div className="flex flex-col gap-[40px] md:gap-[93px] text-center md:text-left">
                 <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
                   Timing Intelligence for Modern Investors
                 </h1>
@@ -1316,12 +1316,12 @@ export default function Home() {
                 className="
                       cursor-pointer
                       inline-flex
-                       flex
-                       w-auto
+                      flex
+                      w-auto
                       p-[20px]
                       justify-center
                       items-center
-                      rounded-[16.912px]
+                      rounded-[20px]
                       bg-[rgba(30,37,64,0.30)]
                       border
                       border-white/10
@@ -1332,10 +1332,10 @@ export default function Home() {
                     "
               >
                 {" "}
-                <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[1.32px] uppercase">
+                <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
                   Access the Beta
                 </span>
-                <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[1.32px] uppercase">
+                <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
                   Access the Beta
                 </span>
               </button>
