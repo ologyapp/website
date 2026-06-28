@@ -1077,7 +1077,7 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        <div className="relative z-20 max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10 ">
+        <div className="relative z-20 max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-[60px]">
           <div className="fixed top-0 left-0 right-0 z-[9999]! max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10">
             <motion.header
               initial={{
@@ -1227,7 +1227,7 @@ export default function Home() {
             </motion.header>
           </div>
 
-          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-start gap-10 pt-20 md:pt-24 mt-10">
+          <div className="px-0 md:px-0 flex flex-col lg:flex-row justify-between items-start gap-10 pt-20 md:pt-24">
             <motion.div
               className="
                 relative
