@@ -1381,7 +1381,7 @@ export default function Home() {
                     ease: "easeInOut",
                   }}
                 >
-                  <div className="relative shrink-0 w-95.25 h-198.75 mt-20">
+                  <div className="relative shrink-0 w-90.25 h-194.75 mt-20">
                     <video
                       autoPlay
                       muted
