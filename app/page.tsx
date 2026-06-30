@@ -291,6 +291,7 @@ const SectionReveal = ({ children }: { children: React.ReactNode }) => (
       damping: 22,
       mass: 1,
     }}
+    className="w-full flex justify-center"
   >
     {children}
   </motion.section>
@@ -415,7 +416,7 @@ const renderCards = (items: any[]) => {
                   </span>
                 </button>
 
-                <div className="flex flex-col items-center justify-between gap-[17.26px]">
+                <div className="flex flex-col items-start justify-between gap-[17.26px]">
                   {data.status && data.status == "UPCOMING" && (
                     <p
                       className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
@@ -425,7 +426,7 @@ const renderCards = (items: any[]) => {
                     </p>
                   )}
 
-                  <div className="flex gap-2 text-white items-center gap-[23.5px]">
+                  <div className="flex text-white items-center gap-[14.5px]">
                     {data.icon.map((svg: any, i: number) => {
                       if (i !== 1) {
                         return (
@@ -943,10 +944,6 @@ export default function Home() {
     offset: ["start end", "end end"],
   });
 
-  const cardsOpacity = useTransform(scrollYProgress, [0.9, 1], [0, 1]);
-
-  const cardsY = useTransform(scrollYProgress, [0.9, 1], [80, 0]);
-
   const [showCards, setShowCards] = useState(false);
 
   const BLOCKS = 5; // 0,100,200,300,400vh
@@ -957,8 +954,8 @@ export default function Home() {
 
       const rect = sectionRef.current.getBoundingClientRect();
 
-      // Bottom has entered the viewport
-      setShowCards(rect.bottom <= window.innerHeight);
+      // Trigger when the bottom reaches 80% of the viewport height
+      setShowCards(rect.bottom <= window.innerHeight * 1.3);
     };
 
     onScroll();
@@ -980,7 +977,7 @@ export default function Home() {
       }}
     >
       <motion.div
-        className="pointer-events-none absolute inset-0 z-[9999]! mix-blend-screen"
+        className="pointer-events-none absolute inset-0 z-9999! mix-blend-screen"
         style={{
           background: useMotionTemplate`
           radial-gradient(
@@ -1042,6 +1039,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+
       {/* HERO SECTION */}
       <section ref={heroRef} className="relative h-screen z-40!">
         <motion.div style={{ opacity }}>
@@ -1188,7 +1186,7 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <div className="relative z-20 max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-[60px]">
+          <div className="relative z-20 max-w-360 w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-15">
             <div className="fixed top-0 left-0 right-0 z-[9999]! max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10">
               <motion.header
                 initial={{
@@ -1338,7 +1336,7 @@ export default function Home() {
               </motion.header>
             </div>
 
-            <div className="px-0 md:px-[24px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-[60px]">
+            <div className="px-0 md:px-[24px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-15">
               <motion.div
                 className="
                 relative
@@ -1526,8 +1524,7 @@ export default function Home() {
         </motion.div>
 
         {/* header */}
-
-        <div className="fixed top-0 left-0 right-0 z-50! max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10">
+        <div className="fixed top-0 left-0 right-0 z-50! max-w-360 w-full mx-auto px-5 md:px-10 py-6 md:py-10">
           <motion.header
             initial={{
               opacity: 0,
@@ -1678,37 +1675,42 @@ export default function Home() {
       </section>
 
       {/* normal section */}
-      <section className="relative z-30! px-10 ">
-        {/* NORMAL SECTION */}
-
-        <div ref={sectionRef} className="relative w-full h-[150vh]">
+      <section className="relative z-30! px-[30px] flex flex-col items-center">
+        <SectionReveal>
           <div
-            id="align"
-            className="sticky top-0 w-full flex flex-col items-center justify-between md:px-[50px] py-[60px]! h-screen "
+            ref={sectionRef}
+            className="relative w-full h-[150vh] lg:w-[90%]"
           >
-            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[65px] font-normal leading-[120%] mt-20">
-              Signal Alignment
-            </h1>
-
-            <motion.div
-              initial={{ opacity: 0, y: 80 }}
-              animate={showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }}
-              transition={{ duration: 0.6 }}
-              className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px]"
+            <div
+              id="align"
+              className="sticky top-0 w-full flex flex-col items-center justify-between md:px-[50px] py-[60px]! h-screen "
             >
-              {/* AHEAD */}
-              <div className="flex flex-col w-full gap-[30px]">
-                {renderCards(signalAhead)}
-              </div>
-            </motion.div>
+              <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[65px] font-normal leading-[120%] mt-20">
+                Signal Alignment
+              </h1>
+
+              <motion.div
+                initial={{ opacity: 0, y: 80 }}
+                animate={
+                  showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                }
+                transition={{ duration: 0.6 }}
+                className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px]"
+              >
+                {/* AHEAD */}
+                <div className="flex flex-col w-full gap-[30px]">
+                  {renderCards(signalAhead)}
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
+        </SectionReveal>
 
         {/* COSMIC RHYTHM */}
         <SectionReveal>
           <section
             id="decode"
-            className="relative w-full flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
+            className="relative w-full lg:w-[90%] flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
           >
             <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-[28.75px] z-20 px-4 md:px-0 max-w-[900px]">
               <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
@@ -1717,10 +1719,10 @@ export default function Home() {
 
               <div
                 id="archetype-form"
-                className="flex w-[360px] md:w-[908px]  flex-col justify-start items-start gap-14.5 min-h-[107.29px] p-[40px_31.381px]
-            not-even: rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
+                className="flex w-90 h-[320px] md:w-227  flex-col justify-evenly items-start  p-[18px_31.381px]
+                not-even: rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
               >
-                <div className="flex flex-col gap-[32.71px]">
+                <div className="flex flex-col gap-[16.71px] -mt-2">
                   {!showNatalForm ? (
                     <>
                       <h1 className="text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
@@ -1744,7 +1746,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-14.5 w-full">
+                <div className="flex flex-col w-full mt-10">
                   {!showNatalForm && (
                     <div className="w-full! flex gap-6.5 items-start md:items-end flex-col md:flex-row">
                       <div className="flex flex-col gap-[26.5px] flex-1 w-full! ">
@@ -2173,7 +2175,7 @@ export default function Home() {
         <SectionReveal>
           <section
             id="perform"
-            className="relative w-full min-h-screen flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
+            className="relative w-full lg:w-[90%] min-h-screen flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
           >
             <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%]">
               The Missing Layer in Modern Market Tools
@@ -2262,55 +2264,12 @@ export default function Home() {
         </SectionReveal>
       </section>
 
-      <section className="relative w-full min-h-screen flex flex-col items-center gap-25 px-5 py-61.25! overflow-hidden">
-        <div className="flex justify-center items-center w-full z-50!">
-          <div className="flex flex-col gap-25 items-center max-w-[1241px]">
-            <h1 className="text-[#F8F7FC] font-Recoleta text-center text-[40px] md:text-[75.785px] font-normal leading-[120%]">
-              Ancient Patterns. Modern Lens.
-            </h1>
-
-            <p className="text-[#F8F7FC] font-Satoshi text-[18px] md:text-[26.643px] font-normal leading-[140%] text-center">
-              Ology delivers personalized timing guidance by aligning your
-              chart, collective sentiment, and live market conditions into clear
-              daily signals designed to support real decision-making.
-            </p>
-
-            <button
-              type="button"
-              className="flex w-auto h-[56px] px-[30px] py-[20px] justify-between items-center
-    rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10 cursor-pointer"
-            >
-              <a
-                href="#archetype-form"
-                className="text-[#F8F7FC] font-Satoshi text-[15px] md:text-[22px] font-medium leading-[150%] tracking-[1.32px] uppercase text-center"
-              >
-                REQUEST EARLY ACCESS
-              </a>
-            </button>
-          </div>
-        </div>
-
-        <>
-          <div className="absolute inset-0 z-10 bg-[rgba(17,17,17,0.75)] top-0 " />
-
-          <motion.div
-            initial={{
-              opacity: 0,
-              backdropFilter: "blur(1px)",
-            }}
-            animate={{
-              opacity: 1,
-              backdropFilter: "blur(16px)",
-            }}
-            transition={{
-              duration: 2,
-              delay: 3, // starts after 2 seconds
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="absolute inset-0 z-10 bg-transparent"
-          />
-        </>
-
+      <motion.section
+        className="relative w-full min-h-screen flex flex-col items-center gap-25 px-5 py-61.25 overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
           {images.slice(0, 30).map((img, index) => {
             const cols = 6;
@@ -2329,13 +2288,17 @@ export default function Home() {
                 className="relative min-w-0 min-h-0 overflow-hidden"
                 initial={{
                   opacity: 0,
-                  scale: 1,
-                  filter: "blur(1px)",
+                  scale: 0.96,
+                  filter: "blur(6px)",
                 }}
-                animate={{
+                whileInView={{
                   opacity: 1,
                   scale: 1,
                   filter: "blur(0px)",
+                }}
+                viewport={{
+                  once: true,
+                  amount: 0.3,
                 }}
                 transition={{
                   duration: 1.4,
@@ -2348,22 +2311,73 @@ export default function Home() {
                   backfaceVisibility: "hidden",
                 }}
               >
-                <div className="relative w-full h-full scale-[1]">
-                  <Image
-                    src={img}
-                    alt=""
-                    fill
-                    priority
-                    sizes="17vw"
-                    className="object-cover scale-[1.03] pointer-events-none select-none"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
-                </div>
+                <Image
+                  src={img}
+                  alt=""
+                  fill
+                  priority
+                  sizes="17vw"
+                  className="object-cover scale-[1.03] pointer-events-none select-none"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
               </motion.div>
             );
           })}
         </div>
-      </section>
+
+        <motion.div
+          className="relative z-30 flex justify-center items-center w-full"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{
+            duration: 0.8,
+            delay: 3,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          <div className="flex flex-col gap-25 items-center max-w-[1241px]">
+            <h1 className="text-[#F8F7FC] font-Recoleta text-center text-[40px] md:text-[75.785px] font-normal leading-[120%]">
+              Ancient Patterns. Modern Lens.
+            </h1>
+
+            <p className="text-[#F8F7FC] font-Satoshi text-[18px] md:text-[26.643px] font-normal leading-[140%] text-center">
+              Ology delivers personalized timing guidance by aligning your
+              chart, collective sentiment, and live market conditions into clear
+              daily signals designed to support real decision-making.
+            </p>
+
+            <button
+              type="button"
+              className="
+                      cursor-pointer
+                      inline-flex
+                      flex
+                      w-auto
+                      p-[16px]
+                      justify-center
+                      items-center
+                      rounded-[20px]
+                      bg-[rgba(30,37,64,0.30)]
+                      border
+                      border-white/10
+                      backdrop-blur-xl
+                      hover:bg-white/10
+                      transition-all
+                      duration-500
+                    "
+            >
+              {" "}
+              <a
+                href="#archetype-form"
+                className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase"
+              >
+                REQUEST EARLY ACCESS
+              </a>
+            </button>
+          </div>
+        </motion.div>
+      </motion.section>
 
       {showSpinner && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center">
