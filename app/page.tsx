@@ -2265,68 +2265,89 @@ export default function Home() {
       </section>
 
       <motion.section
-        className="relative w-full min-h-screen flex flex-col items-center gap-25 px-5 py-61.25 overflow-hidden"
+        className="relative w-full min-h-screen overflow-hidden"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
-          {images.slice(0, 30).map((img, index) => {
-            const cols = 6;
+        {/* Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Image Grid */}
+          <div className="absolute inset-0 grid grid-cols-6 grid-rows-5">
+            {images.slice(0, 30).map((img, index) => {
+              const cols = 6;
+              const col = index % cols;
+              const row = Math.floor(index / cols);
 
-            const col = index % cols;
-            const row = Math.floor(index / cols);
+              const staggerStep = 0.045;
+              const itemDelay = (row + col) * staggerStep;
 
-            const baseDelay = 0;
-            const staggerStep = 0.045;
-            const order = row + col;
-            const itemDelay = baseDelay + order * staggerStep;
+              return (
+                <motion.div
+                  key={index}
+                  className="relative overflow-hidden"
+                  initial={{
+                    opacity: 0,
+                    scale: 0.96,
+                    filter: "blur(6px)",
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    scale: 1,
+                    filter: "blur(0px)",
+                  }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{
+                    duration: 1.4,
+                    delay: itemDelay,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <Image
+                    src={img}
+                    alt=""
+                    fill
+                    priority
+                    sizes="17vw"
+                    className="object-cover scale-[1.03] pointer-events-none select-none"
+                  />
 
-            return (
-              <motion.div
-                key={index}
-                className="relative min-w-0 min-h-0 overflow-hidden"
-                initial={{
-                  opacity: 0,
-                  scale: 0.96,
-                  filter: "blur(6px)",
-                }}
-                whileInView={{
-                  opacity: 1,
-                  scale: 1,
-                  filter: "blur(0px)",
-                }}
-                viewport={{
-                  once: true,
-                  amount: 0.3,
-                }}
-                transition={{
-                  duration: 1.4,
-                  delay: itemDelay,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                style={{
-                  transformStyle: "preserve-3d",
-                  willChange: "transform, opacity, filter",
-                  backfaceVisibility: "hidden",
-                }}
-              >
-                <Image
-                  src={img}
-                  alt=""
-                  fill
-                  priority
-                  sizes="17vw"
-                  className="object-cover scale-[1.03] pointer-events-none select-none"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
-              </motion.div>
-            );
-          })}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Dark overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{
+              duration: 0.8,
+              delay: 3,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="absolute inset-0 bg-[#070B16]/60"
+          />
+
+          {/* Blur layer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{
+              duration: 0.8,
+              delay: 3,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="absolute inset-0 backdrop-blur-lg pointer-events-none"
+          />
         </div>
 
+        {/* Foreground Content */}
         <motion.div
-          className="relative z-30 flex justify-center items-center w-full"
+          className="relative z-10 flex min-h-screen w-full items-center justify-center px-5 py-61.25"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -2336,12 +2357,12 @@ export default function Home() {
             ease: [0.22, 1, 0.36, 1],
           }}
         >
-          <div className="flex flex-col gap-25 items-center max-w-[1241px]">
-            <h1 className="text-[#F8F7FC] font-Recoleta text-center text-[40px] md:text-[75.785px] font-normal leading-[120%]">
+          <div className="flex max-w-[1241px] flex-col items-center gap-25">
+            <h1 className="text-center font-Recoleta text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[75.785px]">
               Ancient Patterns. Modern Lens.
             </h1>
 
-            <p className="text-[#F8F7FC] font-Satoshi text-[18px] md:text-[26.643px] font-normal leading-[140%] text-center">
+            <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[26.643px]">
               Ology delivers personalized timing guidance by aligning your
               chart, collective sentiment, and live market conditions into clear
               daily signals designed to support real decision-making.
@@ -2349,28 +2370,11 @@ export default function Home() {
 
             <button
               type="button"
-              className="
-                      cursor-pointer
-                      inline-flex
-                      flex
-                      w-auto
-                      p-[16px]
-                      justify-center
-                      items-center
-                      rounded-[20px]
-                      bg-[rgba(30,37,64,0.30)]
-                      border
-                      border-white/10
-                      backdrop-blur-xl
-                      hover:bg-white/10
-                      transition-all
-                      duration-500
-                    "
+              className="inline-flex w-auto cursor-pointer items-center justify-center rounded-[20px] border border-white/10 bg-[rgba(30,37,64,0.30)] p-[16px] backdrop-blur-xl transition-all duration-500 hover:bg-white/10"
             >
-              {" "}
               <a
                 href="#archetype-form"
-                className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase"
+                className="hidden font-Satoshi text-[18px] font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] md:block md:text-[17.47px]"
               >
                 REQUEST EARLY ACCESS
               </a>
