@@ -1490,7 +1490,7 @@ export default function Home() {
                       ease: "easeInOut",
                     }}
                   >
-                    <div className="relative shrink-0 w-90.25 h-194.75 mt-20">
+                    <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
                       <video
                         autoPlay
                         muted
@@ -1501,7 +1501,7 @@ export default function Home() {
                       top-[2.5%]
                       left-[5.5%]
                       w-[90%]
-                      h-[757px]
+                      h-[695px]
                       object-cover
                       rounded-[24px]
                       z-30!
@@ -1513,7 +1513,7 @@ export default function Home() {
                       <img
                         src="/iphone-frame.png"
                         alt=""
-                        className="relative z-40! w-95.25 h-198.75!"
+                        className="relative z-40! w-95.25 h-182.5!"
                       />
                     </div>
                   </motion.div>
@@ -1679,11 +1679,11 @@ export default function Home() {
         <SectionReveal>
           <div
             ref={sectionRef}
-            className="relative w-full h-[150vh] lg:w-[90%]"
+            className="relative w-full h-[150vh] lg:w-[85%]"
           >
             <div
               id="align"
-              className="sticky top-0 w-full flex flex-col items-center justify-between md:px-[50px] py-[60px]! h-screen "
+              className="sticky top-0 w-full flex flex-col items-center justify-start gap-8 md:px-[50px] py-[60px]! h-screen "
             >
               <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[65px] font-normal leading-[120%] mt-20">
                 Signal Alignment
@@ -1710,7 +1710,7 @@ export default function Home() {
         <SectionReveal>
           <section
             id="decode"
-            className="relative w-full lg:w-[90%] flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
+            className="relative w-full lg:w-[85%] flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
           >
             <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-[28.75px] z-20 px-4 md:px-0 max-w-[900px]">
               <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
@@ -2109,7 +2109,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative shrink-0 w-90.25 h-194.75 mt-20">
+            <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
               {/* VIDEO */}
               <video
                 autoPlay
@@ -2121,7 +2121,7 @@ export default function Home() {
                 top-[2.5%]
                 left-[5.5%]
                 w-[90%]
-                h-[757px]
+                h-[695px]
                 object-cover
                 rounded-[24px]
                 z-30!
@@ -2134,7 +2134,7 @@ export default function Home() {
               <img
                 src="/iphone-frame.png"
                 alt=""
-                className="relative z-30! w-95.25 h-198.75!"
+                className="relative z-30! w-95.25 h-182.5!"
               />
             </div>
 
@@ -2175,7 +2175,7 @@ export default function Home() {
         <SectionReveal>
           <section
             id="perform"
-            className="relative w-full lg:w-[90%] min-h-screen flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
+            className="relative w-full lg:w-[85%] min-h-screen flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
           >
             <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%]">
               The Missing Layer in Modern Market Tools
