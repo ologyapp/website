@@ -131,144 +131,6 @@ const images = [
   e6,
 ];
 
-// const renderCards = (items: any[]) => (
-//   <div>
-//     <Swiper
-//       // install Swiper modules
-//       className="flex flex-col md:flex-row justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar"
-//       spaceBetween={10}
-//       slidesPerView={3}
-//       navigation={{
-//         nextEl: ".custom-next",
-//         prevEl: ".custom-prev",
-//       }}
-//       centeredSlides
-//       onSwiper={(swiper) => console.log(swiper)}
-//       onSlideChange={() => console.log("slide change")}
-//     >
-//       {items.map((data, id) => (
-//         <SwiperSlide>
-//           <div
-//             key={id}
-//             className="
-//           flex shrink-0 w-[360px] h-auto md:w-[475px] md:h-[313px]
-//           p-[22px] md:p-[27.23px] flex-col
-//           justify-between
-//           rounded-[16.912px]
-//           gap-auto
-//           bg-[rgba(30,37,64,0.3)]
-//           backdrop-blur-sm border border-white/10
-//           overflow-hidden
-
-//         "
-//           >
-//             <div className="w-full flex justify-between items-center ">
-//               <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-//                 {data.date}
-//               </h1>
-
-//               <div className="flex justify-start items-center gap-[12.55px]">
-//                 <div
-//                   className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-//                   style={{ backgroundColor: data.buttonColor }}
-//                 >
-//                   <div
-//                     className="w-[14.64px] h-[14.64px] rounded-full"
-//                     style={{ backgroundColor: data.statusColor }}
-//                   />
-//                 </div>
-
-//                 <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-//                   {data.signal}
-//                 </p>
-//               </div>
-//             </div>
-
-//             <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-//               <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-//                 {data.title}
-//               </h2>
-
-//               <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-//                 {data.content}
-//               </p>
-//             </div>
-
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               width="537"
-//               height="1"
-//               viewBox="0 0 537 1"
-//               fill="none"
-//               className="mt-4 md:mt-0"
-//             >
-//               <path
-//                 d="M-1.52588e-05 0.484375L536.619 0.484375"
-//                 stroke="#6C8BA4"
-//                 strokeOpacity="0.1"
-//                 strokeWidth="0.968858"
-//               />
-//             </svg>
-
-//             <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-//               <button
-//                 type="button"
-//                 className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-//                 style={{ backgroundColor: data.buttonColor }}
-//               >
-//                 <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-//                   {data.button_text}
-//                 </span>
-//               </button>
-
-//               <div className="flex flex-col items-center justify-between gap-[17.26px]">
-//                 {data.status && data.status == "UPCOMING" && (
-//                   <p
-//                     className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-//                     style={{ color: data.statusColor }}
-//                   >
-//                     {data.status}
-//                   </p>
-//                 )}
-
-//                 <div className="flex gap-2 text-white items-center gap-[23.5px]">
-//                   {data.icon.map((svg: any, i: number) => {
-//                     if (i !== 1) {
-//                       return (
-//                         <div
-//                           key={i}
-//                           className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
-//                           dangerouslySetInnerHTML={{ __html: svg }}
-//                         />
-//                       );
-//                     }
-
-//                     return (
-//                       <div
-//                         key={i}
-//                         className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-//                         dangerouslySetInnerHTML={{ __html: svg }}
-//                       />
-//                     );
-//                   })}
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </SwiperSlide>
-//       ))}
-//     </Swiper>
-
-//     <button className="custom-prev absolute left-0 top-1/2 z-20 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur border border-white/20">
-//       <ChevronLeft className="text-white" />
-//     </button>
-
-//     <button className="custom-next absolute right-0 top-1/2 z-20 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur border border-white/20">
-//       <ChevronRight className="text-white" />
-//     </button>
-//   </div>
-// );
-
 const SectionReveal = ({ children }: { children: React.ReactNode }) => (
   <motion.section
     initial={{
@@ -302,49 +164,56 @@ const renderCards = (items: any[]) => {
   const nextRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div className="relative w-full ">
-      <Swiper
-        modules={[Navigation, Mousewheel, EffectCoverflow]}
-        spaceBetween={30}
-        slidesPerView="auto"
-        effect="coverflow"
-        coverflowEffect={{
-          rotate: 0,
-          stretch: 0,
-          depth: 120,
-          scale: 0.9, // side slides scale
-          modifier: 1,
-          slideShadows: false,
-        }}
-        centeredSlides
-        loop
-        onBeforeInit={(swiper) => {
-          // @ts-ignore
-          swiper.params.navigation.prevEl = prevRef.current;
-          // @ts-ignore
-          swiper.params.navigation.nextEl = nextRef.current;
-        }}
-        navigation={{
-          prevEl: prevRef.current,
-          nextEl: nextRef.current,
-        }}
-        speed={700}
-        freeMode={{
-          enabled: true,
-          sticky: true,
-        }}
-        mousewheel={{
-          forceToAxis: true,
-          sensitivity: 0.5,
-          releaseOnEdges: true,
-        }}
-        scrollbar={{ draggable: true }}
-        className="overflow-visible w-[90%] flex justify-center"
+    <div className="relative w-full flex items-center gap-2 md:gap-8 overflow-hidden ">
+      <button
+        ref={prevRef}
+        className="cursor-pointer shrink-0 z-30 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
       >
-        {items.map((data, id) => (
-          <SwiperSlide key={id} className="!w-[360px] md:!w-[475px] ">
-            <div
-              className="
+        <ArrowLeft className="text-white" size={22} />
+      </button>
+      <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
+        <Swiper
+          modules={[Navigation, Mousewheel, EffectCoverflow]}
+          spaceBetween={30}
+          slidesPerView="auto"
+          effect="coverflow"
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 0,
+            depth: 120,
+            scale: 0.9, // side slides scale
+            modifier: 1,
+            slideShadows: false,
+          }}
+          centeredSlides
+          loop
+          onBeforeInit={(swiper) => {
+            // @ts-ignore
+            swiper.params.navigation.prevEl = prevRef.current;
+            // @ts-ignore
+            swiper.params.navigation.nextEl = nextRef.current;
+          }}
+          navigation={{
+            prevEl: prevRef.current,
+            nextEl: nextRef.current,
+          }}
+          speed={700}
+          freeMode={{
+            enabled: true,
+            sticky: true,
+          }}
+          mousewheel={{
+            forceToAxis: true,
+            sensitivity: 0.5,
+            releaseOnEdges: true,
+          }}
+          scrollbar={{ draggable: true }}
+          className="overflow-visible max-w-[calc(100%-400px)] flex justify-center"
+        >
+          {items.map((data, id) => (
+            <SwiperSlide key={id} className="!w-[360px] md:!w-[475px] ">
+              <div
+                className="
               swiper-card
               flex h-auto md:h-[313px]
               p-[22px] md:p-[27.23px]
@@ -356,114 +225,108 @@ const renderCards = (items: any[]) => {
               overflow-hidden
               transition-all duration-500
             "
-            >
-              <div className="w-full flex justify-between items-center ">
-                <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                  {data.date}
-                </h1>
+              >
+                <div className="w-full flex justify-between items-center ">
+                  <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                    {data.date}
+                  </h1>
 
-                <div className="flex justify-start items-center gap-[12.55px]">
-                  <div
-                    className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                    style={{ backgroundColor: data.buttonColor }}
-                  >
+                  <div className="flex justify-start items-center gap-[12.55px]">
                     <div
-                      className="w-[14.64px] h-[14.64px] rounded-full"
-                      style={{ backgroundColor: data.statusColor }}
-                    />
-                  </div>
+                      className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
+                      style={{ backgroundColor: data.buttonColor }}
+                    >
+                      <div
+                        className="w-[14.64px] h-[14.64px] rounded-full"
+                        style={{ backgroundColor: data.statusColor }}
+                      />
+                    </div>
 
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                    {data.signal}
+                    <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                      {data.signal}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
+                  <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
+                    {data.title}
+                  </h2>
+
+                  <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
+                    {data.content}
                   </p>
                 </div>
-              </div>
 
-              <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-                  {data.title}
-                </h2>
-
-                <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-                  {data.content}
-                </p>
-              </div>
-
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="537"
-                height="1"
-                viewBox="0 0 537 1"
-                fill="none"
-                className="mt-4 md:mt-0"
-              >
-                <path
-                  d="M-1.52588e-05 0.484375L536.619 0.484375"
-                  stroke="#6C8BA4"
-                  strokeOpacity="0.1"
-                  strokeWidth="0.968858"
-                />
-              </svg>
-
-              <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-                <button
-                  type="button"
-                  className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-                  style={{ backgroundColor: data.buttonColor }}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="537"
+                  height="1"
+                  viewBox="0 0 537 1"
+                  fill="none"
+                  className="mt-4 md:mt-0"
                 >
-                  <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-                    {data.button_text}
-                  </span>
-                </button>
+                  <path
+                    d="M-1.52588e-05 0.484375L536.619 0.484375"
+                    stroke="#6C8BA4"
+                    strokeOpacity="0.1"
+                    strokeWidth="0.968858"
+                  />
+                </svg>
 
-                <div className="flex flex-col items-start justify-between gap-[17.26px]">
-                  {data.status && data.status == "UPCOMING" && (
-                    <p
-                      className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                      style={{ color: data.statusColor }}
-                    >
-                      {data.status}
-                    </p>
-                  )}
+                <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
+                  <button
+                    type="button"
+                    className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
+                    style={{ backgroundColor: data.buttonColor }}
+                  >
+                    <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
+                      {data.button_text}
+                    </span>
+                  </button>
 
-                  <div className="flex text-white items-center gap-[14.5px]">
-                    {data.icon.map((svg: any, i: number) => {
-                      if (i !== 1) {
+                  <div className="flex flex-col items-start justify-between gap-[17.26px]">
+                    {data.status && data.status == "UPCOMING" && (
+                      <p
+                        className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
+                        style={{ color: data.statusColor }}
+                      >
+                        {data.status}
+                      </p>
+                    )}
+
+                    <div className="flex text-white items-center gap-[14.5px]">
+                      {data.icon.map((svg: any, i: number) => {
+                        if (i !== 1) {
+                          return (
+                            <div
+                              key={i}
+                              className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
+                              dangerouslySetInnerHTML={{ __html: svg }}
+                            />
+                          );
+                        }
+
                         return (
                           <div
                             key={i}
-                            className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
+                            className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
                             dangerouslySetInnerHTML={{ __html: svg }}
                           />
                         );
-                      }
-
-                      return (
-                        <div
-                          key={i}
-                          className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-                          dangerouslySetInnerHTML={{ __html: svg }}
-                        />
-                      );
-                    })}
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       <button
         ref={prevRef}
-        className="cursor-pointer absolute left-4 top-1/2 z-30 -translate-y-1/2 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
-      >
-        <ArrowLeft className="text-white" size={22} />
-      </button>
-
-      <button
-        ref={nextRef}
-        className="cursor-pointer absolute right-4 top-1/2 z-30 -translate-y-1/2 flex h-[30.6px] w-[30.6px]  items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
+        className="cursor-pointer shrink-0 z-30 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
       >
         <ArrowRight className="text-white" size={22} />
       </button>
@@ -1497,14 +1360,14 @@ export default function Home() {
                         loop
                         playsInline
                         className="
-                      absolute
-                      top-[2.5%]
-                      left-[5.5%]
-                      w-[90%]
-                      h-[695px]
-                      object-cover
-                      rounded-[24px]
-                      z-30!
+                        absolute
+                        top-[2.5%]
+                        left-[5.5%]
+                        w-[90%]
+                        h-[695px]
+                        object-cover
+                        rounded-[24px]
+                        z-30!
                     "
                       >
                         <source src={"/appflow.mp4"} type="video/mp4" />
@@ -1712,14 +1575,14 @@ export default function Home() {
             id="decode"
             className="relative w-full lg:w-[85%] flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
           >
-            <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-[28.75px] z-20 px-4 md:px-0 max-w-[900px]">
+            <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-[900px]">
               <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
                 Access the Beta
               </h1>
 
               <div
                 id="archetype-form"
-                className="flex w-90 h-[320px] md:w-227  flex-col justify-evenly items-start  p-[18px_31.381px]
+                className="flex w-90 h-[320px] md:w-[800px]  flex-col justify-evenly items-start  p-[18px_31.381px]
                 not-even: rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
               >
                 <div className="flex flex-col gap-[16.71px] -mt-2">
@@ -1910,7 +1773,7 @@ export default function Home() {
 
                           {openDate &&
                             createPortal(
-                              <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                              <div className="fixed inset-0 z-999999 flex items-center justify-center p-4">
                                 {/* Backdrop */}
                                 <div
                                   className="absolute inset-0 bg-black/10 backdrop-blur-md"
@@ -2185,10 +2048,10 @@ export default function Home() {
               {missingLayers.map((data, id) => (
                 <React.Fragment key={id}>
                   {/* Card */}
-                  <div className="w-110 flex p-[31.381px] flex-col gap-[31.381px] rounded-[16.912px] bg-[rgba(30,37,64,0.3)]  backdrop-blur-sm border border-white/10">
+                  <div className="w-116.25 flex p-[31.381px] flex-col gap-[31.381px] rounded-[16.912px] bg-[rgba(30,37,64,0.3)]  backdrop-blur-sm border border-white/10">
                     <img src={data.imgPath} />
 
-                    <div className="flex flex-col gap-10 items-center">
+                    <div className="flex flex-col gap-4 items-center">
                       <h1 className="text-[#F8F7FC] font-[Recoleta] text-[25px] text-center leading-[150%]">
                         {data.title}
                       </h1>
