@@ -1594,7 +1594,7 @@ export default function Home() {
                       <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
                         Discover your investor timing profile
                       </h1>
-                      <h3 className="text-[#F8F7FC] font-Satoshi text-[12px] font-light leading-[120%]">
+                      <h3 className="text-[#F8F7FC] font-Satoshi text-[15px] font-light leading-[120%]">
                         Generate your behavioral market profile and claim your
                         spot.
                       </h3>
