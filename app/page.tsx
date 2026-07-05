@@ -214,7 +214,7 @@ const renderCards = (items: any[]) => {
           className="pb-8 overflow-visible max-w-[calc(100%-400px)] flex justify-center"
         >
           {items.map((data, id) => (
-            <SwiperSlide key={id} className="!w-[360px] md:!w-[430px] ">
+            <SwiperSlide key={id} className="!w-[360px] md:!w-[450px] ">
               <div
                 className="
               swiper-card
