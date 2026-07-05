@@ -1542,7 +1542,7 @@ export default function Home() {
         <SectionReveal>
           <div
             ref={sectionRef}
-            className="relative w-full h-[150vh] lg:w-[85%]"
+            className="relative w-full h-[150vh] lg:w-[90%]"
           >
             <div
               id="align"
