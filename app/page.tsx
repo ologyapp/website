@@ -214,7 +214,7 @@ const renderCards = (items: any[]) => {
           className="pb-8 overflow-visible max-w-[calc(100%-400px)] flex justify-center"
         >
           {items.map((data, id) => (
-            <SwiperSlide key={id} className="!w-[360px] md:!w-[475px] ">
+            <SwiperSlide key={id} className="!w-[360px] md:!w-[430px] ">
               <div
                 className="
               swiper-card
@@ -1545,7 +1545,7 @@ export default function Home() {
         <SectionReveal>
           <div
             ref={sectionRef}
-            className="relative w-full h-[150vh] lg:w-[90%]"
+            className="relative w-full h-[150vh] lg:w-[85%]"
           >
             <div
               id="align"
