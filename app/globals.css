@@ -271,7 +271,7 @@ body {
 }
 
 .swiper-slide-active .swiper-card {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .swiper-slide-prev .swiper-card,
@@ -285,7 +285,7 @@ body {
 }
 
 .swiper-slide-active .swiper-card {
-  transform: scale(1.01);
+  transform: scale(1);
   z-index: 10;
 }
 
@@ -295,4 +295,9 @@ body {
 
 .swiper-wrapper {
   overflow: visible !important;
+}
+
+.swiper-horizontal > .swiper-scrollbar,
+.swiper-scrollbar.swiper-scrollbar-horizontal {
+  bottom: -10px !important;
 }

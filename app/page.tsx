@@ -211,7 +211,7 @@ const renderCards = (items: any[]) => {
             sensitivity: 0.5,
             releaseOnEdges: true,
           }}
-          className="overflow-visible max-w-[calc(100%-400px)] flex justify-center"
+          className="pb-8 overflow-visible max-w-[calc(100%-400px)] flex justify-center"
         >
           {items.map((data, id) => (
             <SwiperSlide key={id} className="!w-[360px] md:!w-[475px] ">
@@ -1549,14 +1549,14 @@ export default function Home() {
           >
             <div
               id="align"
-              className="sticky top-0 w-full flex flex-col items-center justify-start gap-8 md:px-[50px] py-[60px]! h-screen "
+              className="sticky top-80 w-full flex flex-col items-center justify-start gap-8 md:px-[50px] py-[60px]! h-screen "
             >
               <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[65px] font-normal leading-[120%] mt-20">
                 Signal Alignment
               </h1>
 
               <motion.div
-                initial={{ opacity: 0, y: 200 }}
+                initial={{ opacity: 0, y: 80 }}
                 animate={
                   showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                 }
