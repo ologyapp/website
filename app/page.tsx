@@ -1591,10 +1591,10 @@ export default function Home() {
                 <div className="flex flex-col gap-[16.71px] -mt-2">
                   {!showNatalForm ? (
                     <>
-                      <h1 className="text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
+                      <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
                         Discover your investor timing profile
                       </h1>
-                      <h3 className="text-[#F8F7FC] font-Satoshi text-[21.74px] font-light leading-[120%]">
+                      <h3 className="text-[#F8F7FC] font-Satoshi text-[12px] font-light leading-[120%]">
                         Generate your behavioral market profile and claim your
                         spot.
                       </h3>
