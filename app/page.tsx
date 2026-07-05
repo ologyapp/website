@@ -801,6 +801,7 @@ export default function Home() {
 
   const sectionRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
 
   // Tracks scroll progress while this (taller) section moves through viewport
 
@@ -813,6 +814,7 @@ export default function Home() {
 
   const [showCards, setShowCards] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showLayers, setShowLayers] = useState(false);
 
   const BLOCKS = 5; // 0,100,200,300,400vh
 
@@ -840,6 +842,22 @@ export default function Home() {
 
       // Trigger when the bottom reaches 80% of the viewport height
       setShowForm(rect.bottom <= window.innerHeight * 1.2);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!layerRef.current) return;
+
+      const rect = layerRef.current.getBoundingClientRect();
+
+      // Trigger when the bottom reaches 80% of the viewport height
+      setShowLayers(rect.bottom <= window.innerHeight * 1.2);
     };
 
     onScroll();
@@ -1563,7 +1581,7 @@ export default function Home() {
         <SectionReveal>
           <div
             ref={sectionRef}
-            className="relative w-full h-[150vh] lg:w-[85%]"
+            className="relative w-full h-[150vh] lg:w-[87%]"
           >
             <div
               id="align"
@@ -2065,13 +2083,21 @@ export default function Home() {
         <SectionReveal>
           <section
             id="perform"
-            className="relative w-full lg:w-[85%] min-h-screen flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
+            ref={layerRef}
+            className="sticky top-0 w-full lg:w-[85%] min-h-screen  flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
           >
             <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%]">
               The Missing Layer in Modern Market Tools
             </h1>
 
-            <div className="w-full hidden md:flex items-center justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 80 }}
+              animate={
+                showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+              }
+              transition={{ duration: 0.6 }}
+              className="w-full hidden md:flex items-center justify-between"
+            >
               {missingLayers.map((data, id) => (
                 <React.Fragment key={id}>
                   {/* Card */}
@@ -2117,7 +2143,7 @@ export default function Home() {
                   )}
                 </React.Fragment>
               ))}
-            </div>
+            </motion.div>
 
             {/* <div className="absolute inset-0 flex ">
               {Array.from({ length: LINES }).map((_, i) => {
