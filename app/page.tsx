@@ -1581,7 +1581,7 @@ export default function Home() {
         <SectionReveal>
           <div
             ref={sectionRef}
-            className="relative w-full h-[150vh] lg:w-[87%]"
+            className="relative w-full h-[150vh] lg:w-[85.5%]"
           >
             <div
               id="align"
@@ -1613,7 +1613,7 @@ export default function Home() {
           <section
             id="decode"
             ref={formRef}
-            className="sticky top-0 w-full lg:w-[85%] flex flex-col md:flex-row justify-between h-[150vh] items-center py-40.25 md:px-[50px]"
+            className="sticky top-0 w-full lg:w-[85.5%] flex flex-col md:flex-row justify-between h-[150vh] items-center py-40.25 md:px-[50px]"
           >
             <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-[900px]">
               <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
@@ -2084,7 +2084,7 @@ export default function Home() {
           <section
             id="perform"
             ref={layerRef}
-            className="sticky top-0 w-full lg:w-[85%] min-h-screen  flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
+            className="sticky top-0 w-full lg:w-[85.5%] min-h-screen  flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
           >
             <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%]">
               The Missing Layer in Modern Market Tools
