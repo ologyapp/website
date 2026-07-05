@@ -800,6 +800,7 @@ export default function Home() {
   //pin section to top
 
   const sectionRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   // Tracks scroll progress while this (taller) section moves through viewport
 
@@ -811,6 +812,7 @@ export default function Home() {
   });
 
   const [showCards, setShowCards] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const BLOCKS = 5; // 0,100,200,300,400vh
 
@@ -822,6 +824,22 @@ export default function Home() {
 
       // Trigger when the bottom reaches 80% of the viewport height
       setShowCards(rect.bottom <= window.innerHeight * 1.2);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!formRef.current) return;
+
+      const rect = formRef.current.getBoundingClientRect();
+
+      // Trigger when the bottom reaches 80% of the viewport height
+      setShowForm(rect.bottom <= window.innerHeight * 1.2);
     };
 
     onScroll();
@@ -1576,15 +1594,21 @@ export default function Home() {
         <SectionReveal>
           <section
             id="decode"
-            className="relative w-full lg:w-[85%] flex flex-col md:flex-row justify-between items-center py-40.25 md:px-[50px]"
+            ref={formRef}
+            className="sticky top-0 w-full lg:w-[85%] flex flex-col md:flex-row justify-between h-[150vh] items-center py-40.25 md:px-[50px]"
           >
             <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-[900px]">
               <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
                 Access the Beta
               </h1>
 
-              <div
+              <motion.div
                 id="archetype-form"
+                initial={{ opacity: 0, y: 80 }}
+                animate={
+                  showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                }
+                transition={{ duration: 0.6 }}
                 className="flex w-90 h-[320px] md:w-[800px]  flex-col justify-evenly items-start  p-[18px_31.381px]
                 not-even: rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
               >
@@ -1972,7 +1996,7 @@ export default function Home() {
                     </AnimatePresence>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
