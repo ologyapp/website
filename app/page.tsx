@@ -214,20 +214,20 @@ const renderCards = (items: any[]) => {
           className="pb-8 overflow-visible max-w-[calc(100%-400px)] flex justify-center"
         >
           {items.map((data, id) => (
-            <SwiperSlide key={id} className="!w-[360px] md:!w-[450px] ">
+            <SwiperSlide key={id} className="!w-[360px] md:!w-[460px] ">
               <div
                 className="
-              swiper-card
-              flex h-auto md:h-[313px]
-              p-[22px] md:p-[27.23px]
-              flex-col justify-between
-              rounded-[16.912px]
-              bg-[rgba(30,37,64,0.3)]
-              backdrop-blur-sm
-              border border-white/10
-              overflow-hidden
-              transition-all duration-500
-            "
+                swiper-card
+                flex h-auto md:h-[313px]
+                p-[22px] md:p-[27.23px]
+                flex-col justify-between
+                rounded-[16.912px]
+                bg-[rgba(30,37,64,0.3)]
+                backdrop-blur-sm
+                border border-white/10
+                overflow-hidden
+                transition-all duration-500
+              "
               >
                 <div className="w-full flex justify-between items-center ">
                   <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
@@ -821,7 +821,7 @@ export default function Home() {
       const rect = sectionRef.current.getBoundingClientRect();
 
       // Trigger when the bottom reaches 80% of the viewport height
-      setShowCards(rect.bottom <= window.innerHeight * 1.3);
+      setShowCards(rect.bottom <= window.innerHeight * 1.2);
     };
 
     onScroll();
