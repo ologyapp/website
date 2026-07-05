@@ -165,17 +165,23 @@ const renderCards = (items: any[]) => {
 
   return (
     <div className="relative w-full flex items-center gap-2 md:gap-8 overflow-hidden ">
-      <button
+      {/* <button
         ref={prevRef}
         className="cursor-pointer shrink-0 z-30 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
       >
         <ArrowLeft className="text-white" size={22} />
-      </button>
+      </button> */}
       <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
         <Swiper
-          modules={[Navigation, Mousewheel, EffectCoverflow]}
-          spaceBetween={30}
+          modules={[Navigation, Mousewheel, EffectCoverflow, Scrollbar]}
           slidesPerView="auto"
+          centeredSlides
+          loop
+          scrollbar={{
+            draggable: true,
+            hide: false,
+          }}
+          spaceBetween={30}
           effect="coverflow"
           coverflowEffect={{
             rotate: 0,
@@ -185,8 +191,6 @@ const renderCards = (items: any[]) => {
             modifier: 1,
             slideShadows: false,
           }}
-          centeredSlides
-          loop
           onBeforeInit={(swiper) => {
             // @ts-ignore
             swiper.params.navigation.prevEl = prevRef.current;
@@ -207,7 +211,6 @@ const renderCards = (items: any[]) => {
             sensitivity: 0.5,
             releaseOnEdges: true,
           }}
-          scrollbar={{ draggable: true }}
           className="overflow-visible max-w-[calc(100%-400px)] flex justify-center"
         >
           {items.map((data, id) => (
@@ -324,12 +327,12 @@ const renderCards = (items: any[]) => {
         </Swiper>
       </div>
 
-      <button
+      {/* <button
         ref={prevRef}
         className="cursor-pointer shrink-0 z-30 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
       >
         <ArrowRight className="text-white" size={22} />
-      </button>
+      </button> */}
     </div>
   );
 };
@@ -1553,7 +1556,7 @@ export default function Home() {
               </h1>
 
               <motion.div
-                initial={{ opacity: 0, y: 80 }}
+                initial={{ opacity: 0, y: 200 }}
                 animate={
                   showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                 }
