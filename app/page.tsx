@@ -211,23 +211,35 @@ const renderCards = (items: any[]) => {
             sensitivity: 0.5,
             releaseOnEdges: true,
           }}
-          className="pb-8 overflow-visible max-w-[calc(100%-400px)] flex justify-center"
+          className="pb-8 overflow-visible max-w-[calc(100%-400px)] h-auto flex justify-center"
         >
           {items.map((data, id) => (
             <SwiperSlide key={id} className="!w-[360px] md:!w-[460px] ">
               <div
                 className="
-                swiper-card
-                flex h-auto md:h-[313px]
-                p-[22px] md:p-[27.23px]
-                flex-col justify-between
-                rounded-[16.912px]
-                bg-[rgba(30,37,64,0.3)]
-                backdrop-blur-sm
-                border border-white/10
-                overflow-hidden
-                transition-all duration-500
-              "
+  swiper-card
+  relative
+  flex h-auto md:h-[313px]
+  p-[22px] md:p-[27.23px]
+  flex-col justify-between
+  rounded-[16.912px]
+
+  bg-[rgba(30,37,64,0.24)]
+
+  backdrop-blur-[2px]
+
+  border border-white/20
+
+  overflow-hidden
+  transition-all duration-500
+
+  before:absolute
+  before:inset-0
+  before:rounded-[inherit]
+  before:border
+  before:border-white/10
+  before:pointer-events-none
+"
               >
                 <div className="w-full flex justify-between items-center ">
                   <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
@@ -352,6 +364,21 @@ export default function Home() {
     dob: string;
     time: string;
   } | null>(null);
+
+  const [isLg, setIsLg] = useState(false);
+
+  const phoneMock = "/iPhone17ProDeepBlue.svg";
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+
+    const update = () => setIsLg(media.matches);
+
+    update();
+    media.addEventListener("change", update);
+
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   const [aheadOpen, setAheadOpen] = useState(true);
   const [recordOpen, setRecordOpen] = useState(false);
@@ -825,7 +852,7 @@ export default function Home() {
       const rect = sectionRef.current.getBoundingClientRect();
 
       // Trigger when the bottom reaches 80% of the viewport height
-      setShowCards(rect.bottom <= window.innerHeight * 1.2);
+      setShowCards(rect.bottom <= window.innerHeight);
     };
 
     onScroll();
@@ -841,7 +868,7 @@ export default function Home() {
       const rect = formRef.current.getBoundingClientRect();
 
       // Trigger when the bottom reaches 80% of the viewport height
-      setShowForm(rect.bottom <= window.innerHeight * 1.2);
+      setShowForm(rect.bottom <= window.innerHeight);
     };
 
     onScroll();
@@ -857,7 +884,7 @@ export default function Home() {
       const rect = layerRef.current.getBoundingClientRect();
 
       // Trigger when the bottom reaches 80% of the viewport height
-      setShowLayers(rect.bottom <= window.innerHeight * 1.2);
+      setShowLayers(rect.bottom <= window.innerHeight);
     };
 
     onScroll();
@@ -868,7 +895,7 @@ export default function Home() {
 
   return (
     <div
-      className="flex flex-col scroll-smooth relative cursor-pointer mb-0!"
+      className="flex flex-col scroll-smooth relative cursor-pointer mb-0! w-full!"
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
 
@@ -898,7 +925,7 @@ export default function Home() {
         {Array.from({ length: BLOCKS }).map((_, block) => (
           <div
             key={block}
-            className="absolute left-0 right-0 flex h-screen"
+            className="absolute left-0 right-0 flex h-[150vh]"
             style={{ top: `${block * 100}vh` }}
           >
             {Array.from({ length: LINES }).map((_, i) => {
@@ -943,7 +970,10 @@ export default function Home() {
       </div>
 
       {/* HERO SECTION */}
-      <section ref={heroRef} className="relative h-screen z-40!">
+      <section
+        ref={heroRef}
+        className="relative h-screen w-full! flex flex-col items-center! z-40!"
+      >
         <motion.div style={{ opacity }}>
           <div className="absolute inset-0 bg-[#0d1220]" />
 
@@ -1088,8 +1118,23 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <div className="relative z-20 max-w-360 w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-15">
-            <div className="fixed top-0 left-0 right-0 z-[9999]! max-w-[1440px] w-full mx-auto px-5 md:px-10 py-6 md:py-10">
+          <div className="relative z-20 max-w-360 lg:max-w-245.5 xl:max-w-360 w-full mx-auto px-5 md:px-10 py-6 md:py-10 gap-15 flex flex-col items-center">
+            <div
+              className="
+                fixed
+                top-0
+             
+                z-9999
+                w-full
+                max-w-360
+                lg:max-w-245.5
+                xl:max-w-360
+                px-5
+                md:px-10
+                py-6
+                md:py-10
+              "
+            >
               <motion.header
                 initial={{
                   opacity: 0,
@@ -1238,7 +1283,7 @@ export default function Home() {
               </motion.header>
             </div>
 
-            <div className="px-0 md:px-[24px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-15">
+            <div className="w-full! px-0  xl:px-[18px] flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-15">
               <motion.div
                 className="
                 relative
@@ -1307,7 +1352,7 @@ export default function Home() {
                   delay: 3,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="w-full lg:w-[80%] flex flex-col gap-[60px] items-start mt-30"
+                className="w-full lg:w-[100%] xl:w-[80%] flex flex-col gap-[60px] items-start mt-30 "
               >
                 <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
                   <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
@@ -1343,12 +1388,11 @@ export default function Home() {
                     "
                 >
                   {" "}
-                  <span className="hidden md:block text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
-                    Access the Beta
-                  </span>
-                  <span className="md:hidden text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
-                    Access the Beta
-                  </span>
+                  <a href="#archetype-form">
+                    <span className=" text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
+                      Access the Beta
+                    </span>
+                  </a>
                 </button>
               </motion.div>
 
@@ -1413,7 +1457,7 @@ export default function Home() {
                       </video>
 
                       <img
-                        src="/iphone-frame.png"
+                        src={phoneMock}
                         alt=""
                         className="relative z-40! w-95.25 h-182.5!"
                       />
@@ -1426,7 +1470,23 @@ export default function Home() {
         </motion.div>
 
         {/* header */}
-        <div className="fixed top-0 left-0 right-0 z-50! max-w-360 w-full mx-auto px-5 md:px-10 py-6 md:py-10">
+        <div
+          className="
+                fixed
+                top-0
+                z-9999
+                w-full!
+                max-w-360
+                lg:max-w-245.5
+                xl:max-w-360
+                px-5
+                md:px-10
+                py-6
+                md:py-10
+               mx-auto!
+               
+              "
+        >
           <motion.header
             initial={{
               opacity: 0,
@@ -1577,734 +1637,926 @@ export default function Home() {
       </section>
 
       {/* normal section */}
-      <section className="relative z-30! px-[30px] flex flex-col items-center">
-        <SectionReveal>
-          <div
-            ref={sectionRef}
-            className="relative w-full h-[150vh] lg:w-[85.5%]"
-          >
-            <div
-              id="align"
-              className="sticky top-80 w-full flex flex-col items-center justify-start gap-8 md:px-[50px] py-[60px]! h-screen "
-            >
-              <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[65px] font-normal leading-[120%] mt-20">
-                Signal Alignment
-              </h1>
-
-              <motion.div
-                initial={{ opacity: 0, y: 80 }}
-                animate={
-                  showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
-                }
-                transition={{ duration: 0.6 }}
-                className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px]"
+      <main className="flex justify-center ">
+        <section className="relative z-30! w-full max-w-360! lg:max-w-237.5! xl:max-w-360! mx-auto px-8 flex flex-col items-center! justify-evenly">
+          <SectionReveal>
+            <div ref={sectionRef} className="relative w-full! h-[150vh]">
+              <div
+                id="align"
+                className="sticky top-40 w-full flex flex-col items-center justify-start xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
-                {/* AHEAD */}
-                <div className="flex flex-col w-full gap-[30px]">
-                  {renderCards(signalAhead)}
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </SectionReveal>
+                <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[60px] font-normal leading-[120%] mt-20">
+                  Signal Alignment
+                </h1>
 
-        {/* COSMIC RHYTHM */}
-        <SectionReveal>
-          <section
-            id="decode"
-            ref={formRef}
-            className="sticky top-0 w-full lg:w-[85.5%] flex flex-col md:flex-row justify-between h-[150vh] items-center py-40.25 md:px-[50px]"
-          >
-            <div className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-[900px]">
-              <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%] md-w-[600px]">
-                Access the Beta
-              </h1>
+                <motion.div
+                  initial={{ opacity: 0, y: 80 }}
+                  animate={
+                    showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                  }
+                  transition={{ duration: 0.3 }}
+                  className="flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px]"
+                >
+                  {/* AHEAD */}
+                  <div className="hidden xl:block flex flex-col w-full gap-[30px]">
+                    {renderCards(signalAhead)}
+                  </div>
+                </motion.div>
 
-              <motion.div
-                id="archetype-form"
-                initial={{ opacity: 0, y: 80 }}
-                animate={
-                  showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
-                }
-                transition={{ duration: 0.6 }}
-                className="flex w-90 h-[320px] md:w-[800px]  flex-col justify-evenly items-start  p-[18px_31.381px]
-                not-even: rounded-[16.912px] bg-[rgba(30,37,64,0.3)] backdrop-blur-sm border border-white/10"
-              >
-                <div className="flex flex-col gap-[16.71px] -mt-2">
-                  {!showNatalForm ? (
-                    <>
-                      <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
-                        Discover your investor timing profile
-                      </h1>
-                      <h3 className="text-[#F8F7FC] font-Satoshi text-[15px] font-light leading-[120%]">
-                        Generate your behavioral market profile and claim your
-                        spot.
-                      </h3>
-                    </>
-                  ) : (
-                    <>
-                      <h1 className="text-[#F8F7FC] font-Recoleta text-[35px] font-normal leading-[150%]">
-                        Hi, {names.split("")}.
-                      </h1>
-                      <h3 className="text-[#F8F7FC] font-Satoshi text-[21.74px] font-light leading-[120%]">
-                        Add your birth details. This is what maps your chart to
-                        a timing profile.
-                      </h3>
-                    </>
-                  )}
-                </div>
+                <div className="block xl:hidden w-full! gap-7.5">
+                  <motion.div
+                    initial={{ opacity: 0, y: 80 }}
+                    animate={
+                      showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                    }
+                    transition={{ duration: 0.3 }}
+                    className="w-full! flex justify-around max-h-[75vh] overflow-y-auto  flex-wrap gap-[20px] lg:-mt-80 xl:mt-0"
+                  >
+                    {signalAhead.map((data, id) => (
+                      <div
+                        className="
+                            
+                                relative
+                                flex h-[343px] w-[415px] max-w-[415px]
+                                p-5.5 md:p-[27.23px]
+                                flex-col justify-between
+                                rounded-[16.912px]
 
-                <div className="flex flex-col w-full mt-10">
-                  {!showNatalForm && (
-                    <div className="w-full! flex gap-6.5 items-start md:items-end flex-col md:flex-row">
-                      <div className="flex flex-col gap-[26.5px] flex-1 w-full! ">
-                        <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
-                          Full Name
-                        </label>
+                                bg-[rgba(30,37,64,0.24)]
 
-                        <input
-                          className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
-                          value={names}
-                          onChange={(e: any) => setNames(e.target.value)}
-                        />
-                      </div>
+                                backdrop-blur-[2px]
 
-                      <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                        <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
-                          Email
-                        </label>
+                                border border-white/20
 
-                        <input
-                          value={email}
-                          onChange={(e: any) => setEmail(e.target.value)}
-                          className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
-                        />
-                      </div>
+                                overflow-hidden
+                                transition-all duration-500
 
-                      {!showNatalForm && (
-                        <div
-                          onClick={() => {
-                            if (names != "" && email != "") {
-                              setShowNatalForm(true);
-                              setErrMsg("");
-                            } else {
-                              setTimeout(() => {
-                                setErrMsg(
-                                  "Please fill out your name and email",
-                                );
-                              }, 5000);
-                            }
-                          }}
-                          className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
-                        >
-                          <ArrowRight />
-                        </div>
-                      )}
-                    </div>
-                  )}
+                                before:absolute
+                                before:inset-0
+                                before:rounded-[inherit]
+                                before:border
+                                before:border-white/10
+                                before:pointer-events-none
+                              "
+                      >
+                        <div className="w-full flex justify-between items-center ">
+                          <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                            {data.date}
+                          </h1>
 
-                  {errMsg && (
-                    <p className="text-[#F8F7FC] font-[Satoshi] text-[16px] font-normal leading-[150%]">
-                      {errMsg}
-                    </p>
-                  )}
-
-                  <div className="flex gap-6.5 w-full items-end">
-                    <AnimatePresence>
-                      {showNatalForm && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 12 }}
-                          transition={{ duration: 0.25 }}
-                          className="w-full flex gap-4 items-start md:items-end flex-col md:flex-row"
-                        >
-                          <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
-                              birth date
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => setOpenDate(true)}
-                              className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] text-[#F8F7FC] flex justify-between items-center"
+                          <div className="flex justify-start items-center gap-[12.55px]">
+                            <div
+                              className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
+                              style={{ backgroundColor: data.buttonColor }}
                             >
-                              {date ? format(date, "PPP") : "Date of Birth"}
-                              <ChevronDownIcon size={16} />
-                            </button>
-                          </div>
-
-                          <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
-                              birth time
-                            </label>
-                            <button
-                              type="button"
-                              onClick={() => setOpenTime(true)}
-                              className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] text-[#F8F7FC] flex justify-between items-center"
-                            >
-                              {time || "Time of Birth"}
-                              <ChevronDownIcon size={16} />
-                            </button>
-                          </div>
-
-                          <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
-                              Birth Location
-                            </label>
-
-                            <div className="relative w-full">
-                              <input
-                                ref={inputRef}
-                                autoComplete="off"
-                                spellCheck={false}
-                                placeholder="Location of Birth"
-                                value={data.location || ""}
-                                onChange={(e) => handleChange(e.target.value)}
-                                onFocus={() => setShowDropdown(true)}
-                                className="py-4 px-5 w-full rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-base font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]"
+                              <div
+                                className="w-[14.64px] h-[14.64px] rounded-full"
+                                style={{ backgroundColor: data.statusColor }}
                               />
-
-                              {showDropdown && suggestions.length > 0 && (
-                                <div className="font-Satoshi absolute top-full left-0 w-full bg-[#1c1c2c] border border-[rgba(248,247,252,0.1)] rounded-[10px] z-50 max-h-[calc(100vh-150px)] overflow-auto mt-1">
-                                  {suggestions.map((s) => (
-                                    <div
-                                      key={s.place_id}
-                                      className="px-4 py-2 cursor-pointer hover:bg-[#2a2a40]"
-                                      onMouseDown={(e) => {
-                                        e.preventDefault();
-
-                                        const placesService = new (
-                                          window as any
-                                        ).google.maps.places.PlacesService(
-                                          document.createElement("div"),
-                                        );
-
-                                        placesService.getDetails(
-                                          { placeId: s.place_id },
-                                          (place: any) => {
-                                            const lat =
-                                              place.geometry.location.lat();
-                                            const lng =
-                                              place.geometry.location.lng();
-                                            console.log(lat, lng);
-                                            setData({
-                                              ...data,
-                                              location: s.description,
-                                              lat,
-                                              lng,
-                                            });
-                                          },
-                                        );
-
-                                        setShowDropdown(false);
-                                      }}
-                                    >
-                                      {s.description}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
                             </div>
-                          </div>
 
+                            <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                              {data.signal}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
+                          <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
+                            {data.title}
+                          </h2>
+
+                          <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
+                            {data.content}
+                          </p>
+                        </div>
+
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="537"
+                          height="1"
+                          viewBox="0 0 537 1"
+                          fill="none"
+                          className="mt-4 md:mt-0"
+                        >
+                          <path
+                            d="M-1.52588e-05 0.484375L536.619 0.484375"
+                            stroke="#6C8BA4"
+                            strokeOpacity="0.1"
+                            strokeWidth="0.968858"
+                          />
+                        </svg>
+
+                        <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
                           <button
-                            onClick={() => {
-                              handleSubmitForm();
-                            }}
-                            className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                            type="button"
+                            className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
+                            style={{ backgroundColor: data.buttonColor }}
                           >
-                            <ArrowRight />
+                            <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
+                              {data.button_text}
+                            </span>
                           </button>
 
-                          {openDate &&
-                            createPortal(
-                              <div className="fixed inset-0 z-999999 flex items-center justify-center p-4">
-                                {/* Backdrop */}
-                                <div
-                                  className="absolute inset-0 bg-black/10 backdrop-blur-md"
-                                  onClick={() => setOpenDate(false)}
-                                />
+                          <div className="flex flex-col items-start justify-between gap-[17.26px]">
+                            {data.status && data.status == "UPCOMING" && (
+                              <p
+                                className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
+                                style={{ color: data.statusColor }}
+                              >
+                                {data.status}
+                              </p>
+                            )}
 
-                                {/* Modal */}
-                                <div
-                                  className="font-Satoshi relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
-                                  onClick={(e) => e.stopPropagation()}
+                            <div className="flex text-white items-center gap-[14.5px]">
+                              {data.icon.map((svg: any, i: number) => {
+                                if (i !== 1) {
+                                  return (
+                                    <div
+                                      key={i}
+                                      className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
+                                      dangerouslySetInnerHTML={{
+                                        __html: svg,
+                                      }}
+                                    />
+                                  );
+                                }
+
+                                return (
+                                  <div
+                                    key={i}
+                                    className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
+                                    dangerouslySetInnerHTML={{ __html: svg }}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </SectionReveal>
+
+          {/* COSMIC RHYTHM */}
+          <SectionReveal>
+            <div className="relative w-full h-[150vh]">
+              <div
+                id="decode"
+                ref={formRef}
+                className="sticky top-40 w-full flex flex-col xl:flex-row justify-center xl:justify-between h-auto items-center py-40.25 md:px-[50px]"
+              >
+                <div
+                  id="archetype-form"
+                  className="flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-225"
+                >
+                  <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
+                    Access the Beta
+                  </h1>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 80 }}
+                    animate={
+                      showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                    }
+                    transition={{ duration: 0.3 }}
+                    className="
+                      relative
+                      flex w-90 h-[320px] md:w-[800px]
+                      flex-col justify-evenly items-start
+                      p-[18px_31.381px]
+
+                      rounded-[16.912px]
+
+                      bg-[rgba(30,37,64,0.24)]
+                      backdrop-blur-[2px]
+
+                      border border-white/20
+
+                      overflow-hidden
+                      transition-all duration-500
+
+                      before:absolute
+                      before:inset-0
+                      before:rounded-[inherit]
+                      before:border
+                      before:border-white/10
+                      before:pointer-events-none
+                    "
+                  >
+                    <div className="flex flex-col gap-[16.71px] -mt-2">
+                      {!showNatalForm ? (
+                        <>
+                          <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                            Discover your investor timing profile
+                          </h1>
+                          <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
+                            Generate your behavioral market profile and claim
+                            your spot.
+                          </h3>
+                        </>
+                      ) : (
+                        <>
+                          <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                            Hi, {names.split("")}.
+                          </h1>
+                          <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
+                            Add your birth details. This is what maps your chart
+                            to a timing profile.
+                          </h3>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col w-full mt-10">
+                      {!showNatalForm && (
+                        <div className="w-full! flex gap-6.5 items-start md:items-end flex-col md:flex-row">
+                          <div className="flex flex-col gap-[26.5px] flex-1 w-full! ">
+                            <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
+                              Full Name
+                            </label>
+
+                            <input
+                              className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
+                              value={names}
+                              onChange={(e: any) => setNames(e.target.value)}
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
+                            <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
+                              Email
+                            </label>
+
+                            <input
+                              value={email}
+                              onChange={(e: any) => setEmail(e.target.value)}
+                              className="w-full h-[50.959px] px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
+                            />
+                          </div>
+
+                          {!showNatalForm && (
+                            <div
+                              onClick={() => {
+                                if (names != "" && email != "") {
+                                  setShowNatalForm(true);
+                                  setErrMsg("");
+                                } else {
+                                  setTimeout(() => {
+                                    setErrMsg(
+                                      "Please fill out your name and email",
+                                    );
+                                  }, 5000);
+                                }
+                              }}
+                              className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                            >
+                              <ArrowRight />
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {errMsg && (
+                        <p className="text-[#F8F7FC] font-[Satoshi] text-[16px] font-normal leading-[150%]">
+                          {errMsg}
+                        </p>
+                      )}
+
+                      <div className="flex gap-6.5 w-full items-end">
+                        <AnimatePresence>
+                          {showNatalForm && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 12 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 12 }}
+                              transition={{ duration: 0.25 }}
+                              className="w-full flex gap-4 items-start md:items-end flex-col md:flex-row"
+                            >
+                              <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
+                                <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
+                                  birth date
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenDate(true)}
+                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px]  font-Satoshi text-[#F8F7FC]/40 font-normal text-[13.801px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
                                 >
-                                  {/* Close */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenDate(false)}
-                                    className="absolute right-4 top-4 text-white/60 hover:text-white"
-                                  >
-                                    {/* <X size={20} /> */}
-                                  </button>
+                                  {date
+                                    ? format(date, "PPP")
+                                    : "( MM / DD / YYYY )"}
+                                  {/* <ChevronDownIcon size={16} /> */}
+                                </button>
+                              </div>
 
-                                  {/* <h3 className="mb-4 text-center text-lg font-semibold text-white">
+                              <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
+                                <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
+                                  birth time
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenTime(true)}
+                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-[13.801px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
+                                >
+                                  {time || "Select"}
+                                  {/* <ChevronDownIcon size={16} /> */}
+                                </button>
+                              </div>
+
+                              <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
+                                <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
+                                  Birth Location
+                                </label>
+
+                                <div className="relative w-full">
+                                  <input
+                                    ref={inputRef}
+                                    autoComplete="off"
+                                    spellCheck={false}
+                                    placeholder="SELECT"
+                                    value={data.location || ""}
+                                    onChange={(e) =>
+                                      handleChange(e.target.value)
+                                    }
+                                    onFocus={() => setShowDropdown(true)}
+                                    className="py-4 px-5 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-[13.801px] placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-base font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]"
+                                  />
+
+                                  {showDropdown && suggestions.length > 0 && (
+                                    <div className="font-Satoshi absolute top-full left-0 w-full bg-[#1c1c2c] border border-[rgba(248,247,252,0.1)] rounded-[10px] z-50 max-h-[calc(100vh-150px)] overflow-auto mt-1">
+                                      {suggestions.map((s) => (
+                                        <div
+                                          key={s.place_id}
+                                          className="px-4 py-2 cursor-pointer hover:bg-[#2a2a40]"
+                                          onMouseDown={(e) => {
+                                            e.preventDefault();
+
+                                            const placesService = new (
+                                              window as any
+                                            ).google.maps.places.PlacesService(
+                                              document.createElement("div"),
+                                            );
+
+                                            placesService.getDetails(
+                                              { placeId: s.place_id },
+                                              (place: any) => {
+                                                const lat =
+                                                  place.geometry.location.lat();
+                                                const lng =
+                                                  place.geometry.location.lng();
+                                                console.log(lat, lng);
+                                                setData({
+                                                  ...data,
+                                                  location: s.description,
+                                                  lat,
+                                                  lng,
+                                                });
+                                              },
+                                            );
+
+                                            setShowDropdown(false);
+                                          }}
+                                        >
+                                          {s.description}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => {
+                                  handleSubmitForm();
+                                }}
+                                className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                              >
+                                <ArrowRight />
+                              </button>
+
+                              {openDate &&
+                                createPortal(
+                                  <div className="fixed inset-0 z-999999 flex items-center justify-center p-4">
+                                    {/* Backdrop */}
+                                    <div
+                                      className="absolute inset-0 bg-black/10 backdrop-blur-md"
+                                      onClick={() => setOpenDate(false)}
+                                    />
+
+                                    {/* Modal */}
+                                    <div
+                                      className="font-Satoshi relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      {/* Close */}
+                                      <button
+                                        type="button"
+                                        onClick={() => setOpenDate(false)}
+                                        className="absolute right-4 top-4 text-white/60 hover:text-white"
+                                      >
+                                        {/* <X size={20} /> */}
+                                      </button>
+
+                                      {/* <h3 className="mb-4 text-center text-lg font-semibold text-white">
                                 Select Date of Birth
                               </h3> */}
 
-                                  <div className="flex justify-center">
-                                    <Calendar
-                                      mode="single"
-                                      selected={date as Date}
-                                      captionLayout="dropdown"
-                                      onSelect={(d) => {
-                                        if (!d) return;
-                                        setDate(d);
-                                        setOpenDate(false);
-                                      }}
+                                      <div className="flex justify-center">
+                                        <Calendar
+                                          mode="single"
+                                          selected={date as Date}
+                                          captionLayout="dropdown"
+                                          onSelect={(d) => {
+                                            if (!d) return;
+                                            setDate(d);
+                                            setOpenDate(false);
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>,
+                                  document.body,
+                                )}
+
+                              {openTime &&
+                                createPortal(
+                                  <div className="font-Satoshi fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                                    {/* Backdrop */}
+                                    <div
+                                      className="absolute inset-0 bg-black/10 backdrop-blur-md"
+                                      onClick={() => setOpenTime(false)}
                                     />
-                                  </div>
-                                </div>
-                              </div>,
-                              document.body,
-                            )}
 
-                          {openTime &&
-                            createPortal(
-                              <div className="font-Satoshi fixed inset-0 z-[999999] flex items-center justify-center p-4">
-                                {/* Backdrop */}
-                                <div
-                                  className="absolute inset-0 bg-black/10 backdrop-blur-md"
-                                  onClick={() => setOpenTime(false)}
-                                />
-
-                                {/* Modal */}
-                                <div
-                                  className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {/* Close */}
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenTime(false)}
-                                    className="absolute right-4 top-4 text-white/60 hover:text-white"
-                                  >
-                                    {/* <X size={20} /> */}
-                                  </button>
-
-                                  <h3 className="mb-6 text-center text-lg font-semibold text-white">
-                                    Select Birth Time
-                                  </h3>
-
-                                  <div className="relative flex h-52 overflow-hidden">
-                                    {/* Selection Area */}
-                                    <div className="absolute left-0 right-0 top-1/2 h-12 -translate-y-1/2 rounded-xl bg-white/5 pointer-events-none" />
-
-                                    {/* HOURS */}
+                                    {/* Modal */}
                                     <div
-                                      className="flex-1 overflow-y-auto scrollbar-none text-center snap-y snap-mandatory"
-                                      ref={hourRef}
-                                      onScroll={() =>
-                                        handleScrollSelect(
-                                          hourRef,
-                                          hours,
-                                          "hour",
-                                        )
-                                      }
+                                      className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
+                                      onClick={(e) => e.stopPropagation()}
                                     >
-                                      <div className="h-20" />
+                                      {/* Close */}
+                                      <button
+                                        type="button"
+                                        onClick={() => setOpenTime(false)}
+                                        className="absolute right-4 top-4 text-white/60 hover:text-white"
+                                      >
+                                        {/* <X size={20} /> */}
+                                      </button>
 
-                                      {hours.map((h, index) => (
+                                      <h3 className="mb-6 text-center text-lg font-semibold text-white">
+                                        Select Birth Time
+                                      </h3>
+
+                                      <div className="relative flex h-52 overflow-hidden">
+                                        {/* Selection Area */}
+                                        <div className="absolute left-0 right-0 top-1/2 h-12 -translate-y-1/2 rounded-xl bg-white/5 pointer-events-none" />
+
+                                        {/* HOURS */}
                                         <div
-                                          key={h}
-                                          onClick={() => {
-                                            const m =
-                                              time
-                                                .split(":")[1]
-                                                ?.split(" ")[0] || "00";
-                                            setTime(`${h}:${m} ${ampm}`);
-
-                                            scrollToItem(hourRef, index);
-                                          }}
-                                          className={`h-12 flex items-center justify-center snap-center cursor-pointer transition ${
-                                            time.startsWith(h)
-                                              ? "text-white font-semibold text-lg"
-                                              : "text-white/40"
-                                          }`}
+                                          className="flex-1 overflow-y-auto scrollbar-none text-center snap-y snap-mandatory"
+                                          ref={hourRef}
+                                          onScroll={() =>
+                                            handleScrollSelect(
+                                              hourRef,
+                                              hours,
+                                              "hour",
+                                            )
+                                          }
                                         >
-                                          {h}
+                                          <div className="h-20" />
+
+                                          {hours.map((h, index) => (
+                                            <div
+                                              key={h}
+                                              onClick={() => {
+                                                const m =
+                                                  time
+                                                    .split(":")[1]
+                                                    ?.split(" ")[0] || "00";
+                                                setTime(`${h}:${m} ${ampm}`);
+
+                                                scrollToItem(hourRef, index);
+                                              }}
+                                              className={`h-12 flex items-center justify-center snap-center cursor-pointer transition ${
+                                                time.startsWith(h)
+                                                  ? "text-white font-semibold text-lg"
+                                                  : "text-white/40"
+                                              }`}
+                                            >
+                                              {h}
+                                            </div>
+                                          ))}
+
+                                          <div className="h-20" />
                                         </div>
-                                      ))}
 
-                                      <div className="h-20" />
-                                    </div>
-
-                                    {/* MINUTES */}
-                                    <div
-                                      className="flex-1 overflow-y-auto scrollbar-none text-center snap-y snap-mandatory"
-                                      ref={minuteRef}
-                                      onScroll={() =>
-                                        handleScrollSelect(
-                                          minuteRef,
-                                          minutes,
-                                          "minute",
-                                        )
-                                      }
-                                    >
-                                      <div className="h-20" />
-
-                                      {minutes.map((m, index) => (
+                                        {/* MINUTES */}
                                         <div
-                                          key={m}
-                                          onClick={() => {
-                                            const h = time.split(":")[0];
-                                            setTime(`${h}:${m} ${ampm}`);
-
-                                            scrollToItem(minuteRef, index);
-                                          }}
-                                          className={`h-12 flex items-center justify-center snap-center cursor-pointer transition ${
-                                            time.includes(`:${m}`)
-                                              ? "text-white font-semibold text-lg"
-                                              : "text-white/40"
-                                          }`}
+                                          className="flex-1 overflow-y-auto scrollbar-none text-center snap-y snap-mandatory"
+                                          ref={minuteRef}
+                                          onScroll={() =>
+                                            handleScrollSelect(
+                                              minuteRef,
+                                              minutes,
+                                              "minute",
+                                            )
+                                          }
                                         >
-                                          {m}
+                                          <div className="h-20" />
+
+                                          {minutes.map((m, index) => (
+                                            <div
+                                              key={m}
+                                              onClick={() => {
+                                                const h = time.split(":")[0];
+                                                setTime(`${h}:${m} ${ampm}`);
+
+                                                scrollToItem(minuteRef, index);
+                                              }}
+                                              className={`h-12 flex items-center justify-center snap-center cursor-pointer transition ${
+                                                time.includes(`:${m}`)
+                                                  ? "text-white font-semibold text-lg"
+                                                  : "text-white/40"
+                                              }`}
+                                            >
+                                              {m}
+                                            </div>
+                                          ))}
+
+                                          <div className="h-20" />
                                         </div>
-                                      ))}
 
-                                      <div className="h-20" />
-                                    </div>
-
-                                    {/* AM PM */}
-                                    <div
-                                      className="flex-1 overflow-y-auto scrollbar-none text-center snap-y snap-mandatory"
-                                      ref={ampmRef}
-                                      onScroll={() =>
-                                        handleScrollSelect(
-                                          ampmRef,
-                                          ["AM", "PM"],
-                                          "ampm",
-                                        )
-                                      }
-                                    >
-                                      <div className="h-20" />
-
-                                      {["AM", "PM"].map((p, index) => (
+                                        {/* AM PM */}
                                         <div
-                                          key={p}
-                                          onClick={() => {
-                                            setAmpm(p as "AM" | "PM");
-
-                                            const [h, m] = time.split(":");
-                                            const minute = m.split(" ")[0];
-                                            setTime(`${h}:${minute} ${p}`);
-
-                                            scrollToItem(ampmRef, index);
-                                          }}
-                                          className={`h-12 flex items-center justify-center snap-center cursor-pointer transition ${
-                                            ampm === p
-                                              ? "text-white font-semibold text-lg"
-                                              : "text-white/40"
-                                          }`}
+                                          className="flex-1 overflow-y-auto scrollbar-none text-center snap-y snap-mandatory"
+                                          ref={ampmRef}
+                                          onScroll={() =>
+                                            handleScrollSelect(
+                                              ampmRef,
+                                              ["AM", "PM"],
+                                              "ampm",
+                                            )
+                                          }
                                         >
-                                          {p}
+                                          <div className="h-20" />
+
+                                          {["AM", "PM"].map((p, index) => (
+                                            <div
+                                              key={p}
+                                              onClick={() => {
+                                                setAmpm(p as "AM" | "PM");
+
+                                                const [h, m] = time.split(":");
+                                                const minute = m.split(" ")[0];
+                                                setTime(`${h}:${minute} ${p}`);
+
+                                                scrollToItem(ampmRef, index);
+                                              }}
+                                              className={`h-12 flex items-center justify-center snap-center cursor-pointer transition ${
+                                                ampm === p
+                                                  ? "text-white font-semibold text-lg"
+                                                  : "text-white/40"
+                                              }`}
+                                            >
+                                              {p}
+                                            </div>
+                                          ))}
+
+                                          <div className="h-20" />
                                         </div>
-                                      ))}
-
-                                      <div className="h-20" />
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                              </div>,
-                              document.body,
-                            )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
-              {/* VIDEO */}
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="
-                absolute
-                top-[2.5%]
-                left-[5.5%]
-                w-[90%]
-                h-[695px]
-                object-cover
-                rounded-[24px]
-                z-30!
-              "
-              >
-                <source src={"/archetypereel2.mp4"} type="video/mp4" />
-              </video>
-
-              {/* IPHONE FRAME */}
-              <img
-                src="/iphone-frame.png"
-                alt=""
-                className="relative z-30! w-95.25 h-182.5!"
-              />
-            </div>
-
-            {/* <div className="absolute inset-0 flex ">
-              {Array.from({ length: LINES }).map((_, i) => {
-                const isActive = activeLines[i];
-
-                return (
-                  <div key={i} className="relative flex-1">
-                    <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
-
-                    {isActive && (
-                      <motion.div
-                        className="absolute left-1/2 top-0 h-22.5 w-px -translate-x-1/2"
-                        style={{
-                          background:
-                            "linear-gradient(to bottom, transparent, rgba(255,255,255,1), transparent)",
-                        }}
-                        animate={{
-                          y: ["-20vh", "120vh"],
-                          opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                          duration: 4 + (i % 3),
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: i * 0.4,
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div> */}
-          </section>
-        </SectionReveal>
-
-        <SectionReveal>
-          <section
-            id="perform"
-            ref={layerRef}
-            className="sticky top-0 w-full lg:w-[85.5%] min-h-screen  flex flex-col items-center gap-25 px-4 md:px-[50px] py-25! "
-          >
-            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[65px] font-normal leading-[120%]">
-              The Missing Layer in Modern Market Tools
-            </h1>
-
-            <motion.div
-              initial={{ opacity: 0, y: 80 }}
-              animate={
-                showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
-              }
-              transition={{ duration: 0.6 }}
-              className="w-full hidden md:flex items-center justify-between"
-            >
-              {missingLayers.map((data, id) => (
-                <React.Fragment key={id}>
-                  {/* Card */}
-                  <div className="w-116.25 flex p-[31.381px] flex-col gap-[31.381px] rounded-[16.912px] bg-[rgba(30,37,64,0.3)]  backdrop-blur-sm border border-white/10">
-                    <img src={data.imgPath} />
-
-                    <div className="flex flex-col gap-4 items-center">
-                      <h1 className="text-[#F8F7FC] font-[Recoleta] text-[25px] text-center leading-[150%]">
-                        {data.title}
-                      </h1>
-
-                      <p className="text-[#F8F7FC] font-[Satoshi] text-[18.06px] text-center leading-[150%]">
-                        {data.subtitle}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  {id < missingLayers.length - 1 && (
-                    <div className="flex justify-center items-center px-6 shrink-0">
-                      <svg
-                        width="31"
-                        height="47"
-                        viewBox="0 0 31 47"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <rect
-                          y="8.28125"
-                          width="30.6382"
-                          height="30"
-                          rx="15"
-                          fill="#7FA8D4"
-                          fillOpacity="0.1"
-                        />
-                        <path
-                          d="M11.0478 22.9958L14.7883 22.9958L14.7883 19.2553L15.8473 19.2553L15.8473 22.9958L19.5878 22.9958L19.5878 24.0548L15.8473 24.0548L15.8473 27.8124L14.7883 27.8124L14.7883 24.0548L11.0478 24.0548L11.0478 22.9958Z"
-                          fill="white"
-                          fillOpacity="0.8"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </React.Fragment>
-              ))}
-            </motion.div>
-
-            {/* <div className="absolute inset-0 flex ">
-              {Array.from({ length: LINES }).map((_, i) => {
-                const isActive = activeLines[i];
-
-                return (
-                  <div key={i} className="relative flex-1">
-                    <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
-
-                    {isActive && (
-                      <motion.div
-                        className="absolute left-1/2 top-0 h-22.5 w-px -translate-x-1/2"
-                        style={{
-                          background:
-                            "linear-gradient(to bottom, transparent, rgba(255,255,255,1), transparent)",
-                        }}
-                        animate={{
-                          y: ["-20vh", "120vh"],
-                          opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                          duration: 4 + (i % 3),
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: i * 0.4,
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div> */}
-          </section>
-        </SectionReveal>
-
-        <motion.section
-          className="relative w-screen min-h-screen overflow-hidden"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          <motion.div
-            className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
-            style={{ perspective: "2600px" }}
-          >
-            <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
-              {images.slice(0, 30).map((img, index) => {
-                const cols = 6;
-
-                const col = index % cols;
-                const row = Math.floor(index / cols);
-
-                const baseDelay = 1;
-                const staggerStep = 0.045;
-                const order = row + col;
-                const itemDelay = baseDelay + order * staggerStep;
-
-                return (
-                  <motion.div
-                    key={index}
-                    className="relative min-w-0 min-h-0 overflow-hidden"
-                    initial={{
-                      opacity: 0,
-                      scale: 1,
-                      filter: "blur(1px)",
-                    }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      filter: "blur(0px)",
-                    }}
-                    transition={{
-                      duration: 1.4,
-                      delay: itemDelay,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    style={{
-                      transformStyle: "preserve-3d",
-                      willChange: "transform, opacity, filter",
-                      backfaceVisibility: "hidden",
-                    }}
-                  >
-                    <div className="relative w-full h-full scale-[1]">
-                      <Image
-                        src={img}
-                        alt=""
-                        fill
-                        priority
-                        sizes="17vw"
-                        className="object-cover scale-[1.03] pointer-events-none select-none"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
+                                  </div>,
+                                  document.body,
+                                )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </motion.div>
+                </div>
+
+                <div className="hidden xl:block relative shrink-0 w-90.25 h-182.5 mt-5">
+                  {/* VIDEO */}
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="
+                    absolute
+                    top-[2.5%]
+                    left-[5.5%]
+                    w-[90%]
+                    h-[695px]
+                    object-cover
+                    rounded-[24px]
+                    z-30!
+                  "
+                  >
+                    <source src={"/archetypereel2.mp4"} type="video/mp4" />
+                  </video>
+
+                  {/* IPHONE FRAME */}
+                  <img
+                    src={phoneMock}
+                    alt=""
+                    className="relative z-30! w-95.25 h-182.5!"
+                  />
+                </div>
+
+                {/* <div className="absolute inset-0 flex ">
+              {Array.from({ length: LINES }).map((_, i) => {
+                const isActive = activeLines[i];
+
+                return (
+                  <div key={i} className="relative flex-1">
+                    <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
+
+                    {isActive && (
+                      <motion.div
+                        className="absolute left-1/2 top-0 h-22.5 w-px -translate-x-1/2"
+                        style={{
+                          background:
+                            "linear-gradient(to bottom, transparent, rgba(255,255,255,1), transparent)",
+                        }}
+                        animate={{
+                          y: ["-20vh", "120vh"],
+                          opacity: [0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 4 + (i % 3),
+                          repeat: Infinity,
+                          ease: "linear",
+                          delay: i * 0.4,
+                        }}
+                      />
+                    )}
+                  </div>
                 );
               })}
+            </div> */}
+              </div>
             </div>
-          </motion.div>
+          </SectionReveal>
 
-          <motion.div
-            className="relative z-10 flex min-h-screen w-full items-center justify-center px-5 py-61.25"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{
-              duration: 0.8,
-              delay: 1.5,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-          >
-            <div className="flex max-w-[1241px] flex-col items-center gap-25">
-              <h1 className="text-center font-Recoleta text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[75.785px]">
-                Ancient Patterns. Modern Lens.
-              </h1>
-
-              <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[26.643px]">
-                Ology delivers personalized timing guidance by aligning your
-                chart, collective sentiment, and live market conditions into
-                clear daily signals designed to support real decision-making.
-              </p>
-
-              <button
-                type="button"
-                className="inline-flex w-auto cursor-pointer items-center justify-center rounded-[20px] border border-white/10 bg-[rgba(30,37,64,0.30)] p-[16px] backdrop-blur-xl transition-all duration-500 hover:bg-white/10"
+          <SectionReveal>
+            <div className="relative w-full h-[150vh]">
+              <div
+                id="perform"
+                ref={layerRef}
+                className="sticky top-40 w-full min-h-screen h-auto flex flex-col items-center gap-25 xl:px-12.5 md:px-12.5 py-25! "
               >
-                <a
-                  href="#archetype-form"
-                  className="hidden font-Satoshi text-[18px] font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] md:block md:text-[17.47px]"
+                <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
+                  The Missing Layer in Modern Market Tools
+                </h1>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 80 }}
+                  animate={
+                    showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                  }
+                  transition={{ duration: 0.3 }}
+                  className="w-full flex lg:flex-wrap xl:flex-nowrap lg:gap-2 items-center xl:justify-between md:justify-evenly"
                 >
-                  REQUEST EARLY ACCESS
-                </a>
-              </button>
+                  {missingLayers.map((data, id) => (
+                    <React.Fragment key={id}>
+                      {/* Card */}
+                      <div
+                        className="
+                      relative
+                      xl:w-130 lg:w-100
+                      flex
+                      flex-col
+                      gap-[31.381px]
+                      p-[31.381px]
+
+                      rounded-[16.912px]
+
+                      bg-[rgba(30,37,64,0.24)]
+                      backdrop-blur-[2px]
+
+                    border border-white/20
+                      shadow-inner
+
+                      overflow-hidden
+                      transition-all duration-500
+
+                      before:absolute
+                      before:inset-0
+                      before:rounded-[inherit]
+                      before:border
+                      before:border-white/10
+                      before:pointer-events-none
+                    "
+                      >
+                        <img src={data.imgPath} />
+
+                        <div className="flex flex-col gap-4 items-center">
+                          <h1 className="text-[#F8F7FC] font-[Recoleta] text-[232x] text-center leading-[150%]">
+                            {data.title}
+                          </h1>
+
+                          <p className="text-[#F8F7FC] font-Satoshi text-[13.06px] text-center leading-[150%]">
+                            {data.subtitle}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Divider */}
+                      {id < missingLayers.length - 1 && (
+                        <div className="hidden xl:block flex justify-center items-center px-6 shrink-0">
+                          <svg
+                            width="31"
+                            height="47"
+                            viewBox="0 0 31 47"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <rect
+                              y="8.28125"
+                              width="30.6382"
+                              height="30"
+                              rx="15"
+                              fill="#7FA8D4"
+                              fillOpacity="0.1"
+                            />
+                            <path
+                              d="M11.0478 22.9958L14.7883 22.9958L14.7883 19.2553L15.8473 19.2553L15.8473 22.9958L19.5878 22.9958L19.5878 24.0548L15.8473 24.0548L15.8473 27.8124L14.7883 27.8124L14.7883 24.0548L11.0478 24.0548L11.0478 22.9958Z"
+                              fill="white"
+                              fillOpacity="0.8"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </motion.div>
+
+                {/* <div className="absolute inset-0 flex ">
+              {Array.from({ length: LINES }).map((_, i) => {
+                const isActive = activeLines[i];
+
+                return (
+                  <div key={i} className="relative flex-1">
+                    <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
+
+                    {isActive && (
+                      <motion.div
+                        className="absolute left-1/2 top-0 h-22.5 w-px -translate-x-1/2"
+                        style={{
+                          background:
+                            "linear-gradient(to bottom, transparent, rgba(255,255,255,1), transparent)",
+                        }}
+                        animate={{
+                          y: ["-20vh", "120vh"],
+                          opacity: [0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 4 + (i % 3),
+                          repeat: Infinity,
+                          ease: "linear",
+                          delay: i * 0.4,
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div> */}
+              </div>
             </div>
-          </motion.div>
+          </SectionReveal>
 
-          {/* Dark overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.8,
-              delay: 1.5,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="absolute inset-0 bg-[#070B16]/60"
-          />
+          <motion.section
+            className="relative w-screen min-h-screen overflow-hidden"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <motion.div
+              className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
+              style={{ perspective: "2600px" }}
+            >
+              <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
+                {images.slice(0, 30).map((img, index) => {
+                  const cols = 6;
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{
-              duration: 0.8,
-              delay: 1.5,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="absolute inset-0 backdrop-blur-lg pointer-events-none"
-          />
-        </motion.section>
-      </section>
+                  const col = index % cols;
+                  const row = Math.floor(index / cols);
+
+                  const baseDelay = 1;
+                  const staggerStep = 0.045;
+                  const order = row + col;
+                  const itemDelay = baseDelay + order * staggerStep;
+
+                  return (
+                    <motion.div
+                      key={index}
+                      className="relative min-w-0 min-h-0 overflow-hidden"
+                      initial={{
+                        opacity: 0,
+                        scale: 1,
+                        filter: "blur(1px)",
+                      }}
+                      animate={{
+                        opacity: 1,
+                        scale: 1,
+                        filter: "blur(0px)",
+                      }}
+                      transition={{
+                        duration: 1.4,
+                        delay: itemDelay,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      style={{
+                        transformStyle: "preserve-3d",
+                        willChange: "transform, opacity, filter",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <div className="relative w-full h-full scale-[1]">
+                        <Image
+                          src={img}
+                          alt=""
+                          fill
+                          priority
+                          sizes="17vw"
+                          className="object-cover scale-[1.03] pointer-events-none select-none"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="relative z-10 flex min-h-screen w-full items-center justify-center px-5 py-61.25"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                duration: 0.8,
+                delay: 1.5,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              <div className="flex max-w-[1241px] flex-col items-center gap-25">
+                <h1 className="text-center font-Recoleta text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
+                  Ancient Patterns. Modern Lens.
+                </h1>
+
+                <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[26.643px]">
+                  Ology delivers personalized timing guidance by aligning your
+                  chart, collective sentiment, and live market conditions into
+                  clear daily signals designed to support real decision-making.
+                </p>
+
+                <button
+                  type="button"
+                  className="inline-flex w-auto cursor-pointer items-center justify-center rounded-[20px] border border-white/10 bg-[rgba(30,37,64,0.30)] p-[16px] backdrop-blur-xl transition-all duration-500 hover:bg-white/10"
+                >
+                  <a
+                    href="#archetype-form"
+                    className="hidden font-Satoshi text-[18px] font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] md:block md:text-[17.47px]"
+                  >
+                    REQUEST EARLY ACCESS
+                  </a>
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Dark overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.8,
+                delay: 1.5,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="absolute inset-0 bg-[#070B16]/60"
+            />
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.8,
+                delay: 1.5,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="absolute inset-0 backdrop-blur-lg pointer-events-none"
+            />
+          </motion.section>
+        </section>
+      </main>
 
       {showSpinner && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center">
