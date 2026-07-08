@@ -929,7 +929,7 @@ export default function Home() {
         {Array.from({ length: BLOCKS }).map((_, block) => (
           <div
             key={block}
-            className="absolute left-0 right-0 flex h-[860vh] lg:h-[220vh]"
+            className="absolute left-0 right-0 flex h-[860vh] lg:h-[200vh]"
             style={{ top: `${block * 100}vh` }}
           >
             {Array.from({ length: LINES }).map((_, i) => {
