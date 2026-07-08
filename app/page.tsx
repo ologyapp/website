@@ -1935,7 +1935,7 @@ export default function Home() {
               <div
                 id="decode"
                 ref={formRef}
-                className="relative xl:sticky xl:top-10 w-full flex flex-col xl:flex-row justify-center xl:justify-between h-[100vh] items-center py-40.25 md:px-[50px]"
+                className="relative xl:sticky xl:top-5 w-full flex flex-col xl:flex-row justify-center xl:justify-between h-[100vh] items-center py-40.25 md:px-[50px]"
               >
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
