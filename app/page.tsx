@@ -236,9 +236,9 @@ const renderCards = (items: any[]) => {
 "
               >
                 <div className="w-full flex justify-between items-center ">
-                  <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                  <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
                     {data.date}
-                  </h1>
+                  </h3>
 
                   <div className="flex justify-start items-center gap-[12.55px]">
                     <div
@@ -1662,9 +1662,9 @@ export default function Home() {
                 id="align"
                 className="relative xl:sticky xl:top-40 w-full flex flex-col items-center justify-start gap-8 xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
-                <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[60px] font-normal leading-[120%] mt-20">
+                <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[60px] font-normal leading-[120%] mt-20">
                   Signal Alignment
-                </h1>
+                </h2>
 
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
@@ -1705,9 +1705,9 @@ export default function Home() {
                               "
                       >
                         <div className="w-full flex justify-between items-center ">
-                          <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                          <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
                             {data.date}
-                          </h1>
+                          </h3>
 
                           <div className="flex justify-start items-center gap-[12.55px]">
                             <div
@@ -1828,9 +1828,9 @@ export default function Home() {
                               "
                       >
                         <div className="w-full flex justify-between items-center ">
-                          <h1 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                          <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
                             {data.date}
-                          </h1>
+                          </h3>
 
                           <div className="flex justify-start items-center gap-[12.55px]">
                             <div
@@ -1946,9 +1946,9 @@ export default function Home() {
                   id="archetype-form"
                   className="hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-225"
                 >
-                  <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
+                  <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
                     Access the Beta
-                  </h1>
+                  </h2>
 
                   <motion.div
                     className="
@@ -1972,9 +1972,9 @@ export default function Home() {
                     <div className="flex flex-col gap-[16.71px] -mt-2">
                       {!showNatalForm ? (
                         <>
-                          <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
                             Discover your investor timing profile
-                          </h1>
+                          </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Generate your behavioral market profile and claim
                             your spot.
@@ -1982,9 +1982,9 @@ export default function Home() {
                         </>
                       ) : (
                         <>
-                          <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
                             Hi, {names.split("")}.
-                          </h1>
+                          </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Add your birth details. This is what maps your chart
                             to a timing profile.
@@ -2364,9 +2364,9 @@ export default function Home() {
                   id="archetype-form"
                   className="block xl:hidden flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-225"
                 >
-                  <h1 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
+                  <h3 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
                     Access the Beta
-                  </h1>
+                  </h3>
 
                   <motion.div
                     className="
@@ -2390,9 +2390,9 @@ export default function Home() {
                     <div className="flex flex-col gap-[16.71px] -mt-2">
                       {!showNatalForm ? (
                         <>
-                          <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
                             Discover your investor timing profile
-                          </h1>
+                          </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Generate your behavioral market profile and claim
                             your spot.
@@ -2400,9 +2400,9 @@ export default function Home() {
                         </>
                       ) : (
                         <>
-                          <h1 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
                             Hi, {names.split("")}.
-                          </h1>
+                          </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Add your birth details. This is what maps your chart
                             to a timing profile.
@@ -2849,9 +2849,9 @@ export default function Home() {
                 ref={layerRef}
                 className="sticky top-40 w-full min-h-screen h-auto flex flex-col items-center gap-25 xl:px-12.5 md:px-12.5 py-25! "
               >
-                <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
+                <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
                   The Missing Layer in Modern Market Tools
-                </h1>
+                </h2>
 
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
@@ -2889,9 +2889,9 @@ export default function Home() {
                         <img src={data.imgPath} />
 
                         <div className="flex flex-col gap-4 items-center">
-                          <h1 className="text-[#F8F7FC] font-[Recoleta] text-[24px] text-center leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-[Recoleta] text-[24px] text-center leading-[150%]">
                             {data.title}
-                          </h1>
+                          </h3>
 
                           <p className="text-[#F8F7FC] font-Satoshi text-[13.06px] text-center leading-[150%]">
                             {data.subtitle}
@@ -2958,9 +2958,9 @@ export default function Home() {
                         <img src={data.imgPath} />
 
                         <div className="flex flex-col gap-4 items-center">
-                          <h1 className="text-[#F8F7FC] font-[Recoleta] text-[24px] text-center leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-[Recoleta] text-[24px] text-center leading-[150%]">
                             {data.title}
-                          </h1>
+                          </h3>
 
                           <p className="text-[#F8F7FC] font-Satoshi text-[13.06px] text-center leading-[150%]">
                             {data.subtitle}
@@ -3109,9 +3109,9 @@ export default function Home() {
               }}
             >
               <div className="flex max-w-[1241px] flex-col items-center gap-25">
-                <h1 className="text-center font-Recoleta text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
+                <h2 className="text-center font-Recoleta text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
                   Ancient Patterns. Modern Lens.
-                </h1>
+                </h2>
 
                 <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[26.643px]">
                   Ology delivers personalized timing guidance by aligning your
