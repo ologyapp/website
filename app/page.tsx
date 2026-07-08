@@ -1931,7 +1931,7 @@ export default function Home() {
 
           {/* COSMIC RHYTHM */}
           <SectionReveal>
-            <div className="relative w-full h-screen lg:h-[100vh] xl:h-[200vh]">
+            <div className="relative w-full h-screen lg:h-[100vh] xl:h-[150vh]">
               <div
                 id="decode"
                 ref={formRef}
