@@ -929,7 +929,7 @@ export default function Home() {
         {Array.from({ length: BLOCKS }).map((_, block) => (
           <div
             key={block}
-            className="absolute left-0 right-0 flex h-[860vh] lg:h-[200vh]"
+            className="absolute left-0 right-0 flex h-[830vh] lg:h-[200vh]"
             style={{ top: `${block * 100}vh` }}
           >
             {Array.from({ length: LINES }).map((_, i) => {
@@ -985,7 +985,7 @@ export default function Home() {
             className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
             style={{ perspective: "2600px" }}
           >
-            <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
+            <div className="absolute inset-0 grid grid-cols-3 grid-rows-10 lg:grid-cols-6 lg:grid-rows-5 w-full h-full">
               {images.slice(0, 30).map((img, index) => {
                 const cols = 6;
 
@@ -1263,10 +1263,21 @@ export default function Home() {
                     "
                     >
                       <ul className="flex flex-col gap-6 z-50!">
-                        {["Align", "Decode", "Perform"].map((item) => (
+                        {[
+                          { label: "Align", id: "align" },
+                          { label: "Decode", id: "decode" },
+                          { label: "Perform", id: "perform" },
+                        ].map((item) => (
                           <li
-                            key={item}
-                            onClick={() => setMobileMenuOpen(false)}
+                            key={item.id}
+                            onClick={(item) => {
+                              document.getElementById(item.id)?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
+
+                              setMobileMenuOpen(false);
+                            }}
                             className="
                         cursor-pointer
                         text-[#F8F7FC]/80
@@ -1277,7 +1288,7 @@ export default function Home() {
                         transition
                       "
                           >
-                            {item}
+                            {item?.label}
                           </li>
                         ))}
                       </ul>
@@ -1335,20 +1346,35 @@ export default function Home() {
                         ease: "easeInOut",
                       },
                     }}
-                    className="z-0!"
                   >
-                    <Image
-                      src={iphone}
-                      alt="phone mock"
-                      className="
-                    block
-                    w-[120px]
-                    md:w-[160px]
-                    h-auto
-                    object-contain
-                    z-0!
-                  "
-                    />
+                    <div className="relative w-26.25 md:w-[160px]">
+                      {/* Video */}
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="
+                        absolute
+                        top-[2.25%]
+                        left-[4.4%]
+                        w-[92%]
+                        h-[95.4%]
+                        object-cover
+                        rounded-[16px]
+                        z-10
+                      "
+                      >
+                        <source src="/appflow.mp4" type="video/mp4" />
+                      </video>
+
+                      {/* Phone frame */}
+                      <img
+                        src={phoneMock}
+                        alt=""
+                        className="relative z-20 w-full h-auto pointer-events-none"
+                      />
+                    </div>
                   </motion.div>
                 </div>
               </motion.div>
@@ -1366,10 +1392,10 @@ export default function Home() {
                   delay: 3,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="w-full lg:w-full xl:w-[80%] flex flex-col gap-15 items-start mt-30 "
+                className="w-full xl:w-[100%] flex flex-col gap-15 items-center lg:items-start -mt-5 lg:mt-30"
               >
                 <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
-                  <h1 className="text-[#F8F7FC] text-[44px] md:text-[65px] font-normal leading-[115%]">
+                  <h1 className="text-[#F8F7FC] text-[36px] md:text-[65px] font-normal leading-[115%]">
                     Timing Intelligence for Modern Investors
                   </h1>
 
@@ -1399,11 +1425,12 @@ export default function Home() {
                       hover:bg-white/10
                       transition-all
                       duration-500
+                      
                     "
                 >
                   {" "}
                   <a href="#archetype-form">
-                    <span className=" text-[#F8F7FC] font-Satoshi text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
+                    <span className=" text-[#F8F7FC] font-Satoshi text-[16px] lg:text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
                       Access the Beta
                     </span>
                   </a>
@@ -1625,10 +1652,20 @@ export default function Home() {
                     "
                 >
                   <ul className="flex flex-col gap-6 z-50!">
-                    {["Align", "Decode", "Perform"].map((item) => (
+                    {[
+                      { label: "Align", id: "align" },
+                      { label: "Decode", id: "decode" },
+                      { label: "Perform", id: "perform" },
+                    ].map((item) => (
                       <li
-                        key={item}
-                        onClick={() => setMobileMenuOpen(false)}
+                        key={item.id}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          document.getElementById(item.id)?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                        }}
                         className="
                         cursor-pointer
                         text-[#F8F7FC]/80
@@ -1639,7 +1676,7 @@ export default function Home() {
                         transition
                       "
                       >
-                        {item}
+                        {item?.label}
                       </li>
                     ))}
                   </ul>
@@ -1654,10 +1691,7 @@ export default function Home() {
       <main className="flex justify-center ">
         <section className="relative z-30! w-full max-w-360! lg:max-w-237.5! xl:max-w-360! mx-auto px-8 flex flex-col items-center! justify-evenly">
           <SectionReveal>
-            <div
-              ref={sectionRef}
-              className="relative w-full! h-auto lg:h-[150vh] "
-            >
+            <div ref={sectionRef} className="relative w-full! lg:h-[150vh]">
               <div
                 id="align"
                 className="relative xl:sticky xl:top-30 w-full flex flex-col items-center justify-start gap-8 xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
@@ -1803,7 +1837,7 @@ export default function Home() {
                   </motion.div>
                 </div>
 
-                <div className="block lg:hidden w-full! gap-7.5">
+                <div className="relative block lg:hidden w-full! gap-7.5">
                   <motion.div className="w-full! flex justify-around max-h-auto lg:max-h-[75vh] overflow-y-auto  flex-wrap gap-[20px] sm:mt-40  xl:mt-0">
                     {signalAhead.map((data, id) => (
                       <div
@@ -1973,7 +2007,7 @@ export default function Home() {
                     <div className="flex flex-col gap-[16.71px] -mt-2">
                       {!showNatalForm ? (
                         <>
-                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[28px] font-normal leading-[150%]">
                             Discover your investor timing profile
                           </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
@@ -2363,7 +2397,7 @@ export default function Home() {
 
                 <motion.div
                   id="archetype-form"
-                  className="block xl:hidden flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-225"
+                  className="block relative xl:hidden flex-1 min-w-0 sm:flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-225 mt-20"
                 >
                   <h3 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
                     Access the Beta
@@ -2385,13 +2419,13 @@ export default function Home() {
 
                       overflow-hidden
                       transition-all duration-500
-
+                      mt-10
                     "
                   >
                     <div className="flex flex-col gap-[16.71px] -mt-2">
                       {!showNatalForm ? (
                         <>
-                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[28px] font-normal leading-[150%]">
                             Discover your investor timing profile
                           </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
@@ -2779,7 +2813,7 @@ export default function Home() {
                   </motion.div>
                 </motion.div>
 
-                <div className="hidden lg:block relative shrink-0 w-90.25 h-182.5 mt-5 lg:mt-20">
+                <div className="hidden lg:block relative shrink-0 lg:w-90.25 lg:h-182.5 mt-5 lg:mt-20">
                   {/* VIDEO */}
                   <video
                     autoPlay
@@ -2790,8 +2824,8 @@ export default function Home() {
                     absolute
                      top-[2.25%]
                         left-[5.3%]
-                        w-[89%]
-                        h-174
+                        lg:w-[89%]
+                        lg:h-174
                     object-cover
                     rounded-[24px]
                     z-30!
@@ -2808,37 +2842,34 @@ export default function Home() {
                   />
                 </div>
 
-                {/* <div className="absolute inset-0 flex ">
-              {Array.from({ length: LINES }).map((_, i) => {
-                const isActive = activeLines[i];
+                <div className="block lg:hidden relative shrink-0 w-26.25 mt-10">
+                  {/* VIDEO */}
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="
+      absolute
+      top-[2.2%]
+      left-[5.5%]
+      w-[89%]
+      h-[95.5%]
+      object-cover
+      rounded-[14px]
+      z-10
+    "
+                  >
+                    <source src="/archetypereel2.mp4" type="video/mp4" />
+                  </video>
 
-                return (
-                  <div key={i} className="relative flex-1">
-                    <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
-
-                    {isActive && (
-                      <motion.div
-                        className="absolute left-1/2 top-0 h-22.5 w-px -translate-x-1/2"
-                        style={{
-                          background:
-                            "linear-gradient(to bottom, transparent, rgba(255,255,255,1), transparent)",
-                        }}
-                        animate={{
-                          y: ["-20vh", "120vh"],
-                          opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                          duration: 4 + (i % 3),
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: i * 0.4,
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div> */}
+                  {/* IPHONE FRAME */}
+                  <img
+                    src={phoneMock}
+                    alt=""
+                    className="relative z-20 w-full h-auto"
+                  />
+                </div>
               </div>
             </div>
           </SectionReveal>
@@ -3044,7 +3075,7 @@ export default function Home() {
               className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
               style={{ perspective: "2600px" }}
             >
-              <div className="absolute inset-0 grid grid-cols-6 grid-rows-5 w-full h-full">
+              <div className="absolute inset-0 grid grid-cols-3 grid-rows-10 lg:grid-cols-6 lg:grid-rows-5 w-full h-full">
                 {images.slice(0, 30).map((img, index) => {
                   const cols = 6;
 
