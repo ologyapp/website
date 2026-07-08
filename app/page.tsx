@@ -937,7 +937,7 @@ export default function Home() {
 
               return (
                 <div key={i} className="relative flex-1">
-                  <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10" />
+                  <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/4" />
 
                   {isActive && (
                     <motion.div
@@ -1660,7 +1660,7 @@ export default function Home() {
             >
               <div
                 id="align"
-                className="relative xl:sticky xl:top-40 w-full flex flex-col items-center justify-start gap-8 xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
+                className="relative xl:sticky xl:top-30 w-full flex flex-col items-center justify-start gap-8 xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
                 <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[60px] font-normal leading-[120%] mt-20">
                   Signal Alignment
