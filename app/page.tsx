@@ -2848,7 +2848,7 @@ export default function Home() {
               <div
                 id="perform"
                 ref={layerRef}
-                className="sticky top-40 w-full min-h-screen h-auto flex flex-col items-center gap-25 xl:px-12.5 md:px-12.5 py-25! "
+                className="sticky top-30 w-full min-h-screen h-auto flex flex-col items-center gap-25 xl:px-12.5 md:px-12.5 py-25! "
               >
                 <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
                   The Missing Layer in Modern Market Tools
