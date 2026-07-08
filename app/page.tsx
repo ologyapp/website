@@ -1373,7 +1373,7 @@ export default function Home() {
                     Timing Intelligence for Modern Investors
                   </h1>
 
-                  <p className="text-[#F8F7FC] text-[18px] md:text-[24.7px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
+                  <p className="text-[#F8F7FC] text-[18px] md:text-[24px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
                     Ology is a market timing platform that synthesizes celestial
                     cycles, behavioral psychology, and live market data into a
                     personalized timing profile. Active traders and investors
@@ -3113,7 +3113,7 @@ export default function Home() {
                   Ancient Patterns. Modern Lens.
                 </h2>
 
-                <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[26.643px]">
+                <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[24px]">
                   Ology delivers personalized timing guidance by aligning your
                   chart, collective sentiment, and live market conditions into
                   clear daily signals designed to support real decision-making.
