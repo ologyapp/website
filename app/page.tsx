@@ -1341,13 +1341,13 @@ export default function Home() {
                       src={iphone}
                       alt=""
                       className="
-      block
-      w-[120px]
-      md:w-[160px]
-      h-auto
-      object-contain
-      z-0!
-    "
+                    block
+                    w-[120px]
+                    md:w-[160px]
+                    h-auto
+                    object-contain
+                    z-0!
+                  "
                     />
                   </motion.div>
                 </div>
