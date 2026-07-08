@@ -867,7 +867,7 @@ export default function Home() {
 
       const rect = formRef.current.getBoundingClientRect();
 
-      setShowForm(rect.bottom <= window.innerHeight);
+      setShowForm(rect.bottom <= window.innerHeight * 1.2);
     };
 
     onScroll();
@@ -1944,7 +1944,7 @@ export default function Home() {
                   }
                   transition={{ duration: 0.3 }}
                   id="archetype-form"
-                  className="hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-18! z-20 px-4 md:px-0 max-w-225"
+                  className="hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-225"
                 >
                   <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
                     Access the Beta
@@ -1966,6 +1966,7 @@ export default function Home() {
 
                       overflow-hidden
                       transition-all duration-500
+                      mt-10
 
                     "
                   >
