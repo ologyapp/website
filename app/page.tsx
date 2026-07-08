@@ -584,7 +584,7 @@ export default function Home() {
   }, []);
 
   const activeLines = useMemo(() => {
-    return Array.from({ length: LINES }).map(() => Math.random() > 0.7);
+    return Array.from({ length: LINES }).map(() => Math.random() > 0.4);
   }, []);
 
   const [result, setResult] = useState<any>(null);
@@ -978,7 +978,10 @@ export default function Home() {
         ref={heroRef}
         className="relative h-screen w-full! flex flex-col items-center! z-40! "
       >
-        <motion.div style={{ opacity }}>
+        <motion.div
+          style={{ opacity }}
+          className="w-full! flex justify-center px-8"
+        >
           <div className="absolute inset-0 bg-[#0d1220]" />
 
           <div
@@ -1122,7 +1125,7 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <div className=" relative z-20 max-w-360 lg:max-w-245.5 xl:max-w-360 w-full px-5 md:px-10 py-6 md:py-10 gap-15 flex flex-col items-center">
+          <div className=" relative z-20 max-w-360 lg:max-w-245.5 xl:max-w-360 w-full px-5 md:px-14 py-6 md:py-10 gap-15 flex flex-col items-center">
             <div
               className="
                 fixed
