@@ -929,7 +929,7 @@ export default function Home() {
         {Array.from({ length: BLOCKS }).map((_, block) => (
           <div
             key={block}
-            className="absolute left-0 right-0 flex h-[860vh] lg:h-[280vh]"
+            className="absolute left-0 right-0 flex h-[860vh] lg:h-[220vh]"
             style={{ top: `${block * 100}vh` }}
           >
             {Array.from({ length: LINES }).map((_, i) => {
@@ -1656,7 +1656,7 @@ export default function Home() {
           <SectionReveal>
             <div
               ref={sectionRef}
-              className="relative w-full! h-auto lg:h-[150vh]"
+              className="relative w-full! h-auto lg:h-[150vh] "
             >
               <div
                 id="align"
