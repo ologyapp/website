@@ -1339,7 +1339,7 @@ export default function Home() {
                   >
                     <Image
                       src={iphone}
-                      alt=""
+                      alt="phone mock"
                       className="
                     block
                     w-[120px]
@@ -3083,7 +3083,7 @@ export default function Home() {
                       <div className="relative w-full h-full scale-[1]">
                         <Image
                           src={img}
-                          alt=""
+                          alt="grid image"
                           fill
                           priority
                           sizes="17vw"
