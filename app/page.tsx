@@ -1704,7 +1704,7 @@ export default function Home() {
                     Where Cycles Meet the Tape
                   </h2>
 
-                  <h4 className="text-[#F8F7FC] text-center font-Recoleta text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
+                  <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
                     Major market moments have long clustered around measurable
                     celestial alignments. Ology keeps that record in real time.
                   </h4>
@@ -1995,7 +1995,7 @@ export default function Home() {
                       Access the Beta
                     </h2>
 
-                    <h4 className="text-[#F8F7FC] text-start font-Recoleta text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
+                    <h4 className="text-[#F8F7FC] text-start font-Satoshi text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
                       Generate your behavioral market profile and claim your
                       spot.
                     </h4>
@@ -2004,7 +2004,7 @@ export default function Home() {
                   <motion.div
                     className="
                       relative
-                      flex w-90 h-auto lg:h-[320px] md:w-[800px]
+                      flex w-90 h-auto lg:h-[300px] md:w-[800px]
                       flex-col justify-evenly items-start
                       p-[18px_31.381px]
 
@@ -2027,10 +2027,10 @@ export default function Home() {
                           <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[28px] font-normal leading-[150%]">
                             Discover your investor timing profile
                           </h3>
-                          <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
+                          {/* <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Generate your behavioral market profile and claim
                             your spot.
-                          </h3>
+                          </h3> */}
                         </>
                       ) : (
                         <>
@@ -2423,7 +2423,7 @@ export default function Home() {
                   <motion.div
                     className="
                       relative
-                      flex w-90 h-auto lg:h-[320px] md:w-[800px]
+                      flex w-90 h-auto lg:h-[300px] md:w-[800px]
                       flex-col justify-evenly items-start
                       p-[18px_31.381px]
 
@@ -2445,10 +2445,10 @@ export default function Home() {
                           <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[28px] font-normal leading-[150%]">
                             Discover your investor timing profile
                           </h3>
-                          <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
+                          {/* <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Generate your behavioral market profile and claim
                             your spot.
-                          </h3>
+                          </h3> */}
                         </>
                       ) : (
                         <>
@@ -2903,7 +2903,7 @@ export default function Home() {
                     The Missing Layer in Modern Market Tools
                   </h2>
 
-                  <h4 className="text-[#F8F7FC] text-center font-Recoleta text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
+                  <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
                     Modern platforms measure everything about the market and
                     almost nothing about the forces moving through it.
                   </h4>

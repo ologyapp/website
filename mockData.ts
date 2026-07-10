@@ -227,21 +227,21 @@
 export const missingLayers = [
   {
     heading: "MARKET SENTIMENT",
-    imgPath: "/card1.svg",
+    imgPath: "/card01.svg",
     title: "Read the psychology behind every market move.",
     subtitle:
       "Markets do not operate in isolation. Price action reflects market sentiment shaped by confidence, uncertainty, speculation, and restraint. Without that layer in view, the numbers lose their meaning.",
   },
   {
     heading: "Behavioral Context",
-    imgPath: "/card2.svg",
+    imgPath: "/card02.svg",
     title: "Connect fragmented signals into a clear story.",
     subtitle:
       "Charts, headlines, and cycles arrive disconnected, and the work of making sense of them is left to you. Ology threads these inputs across time and through the lens of behavior, so timing insight arrives as one coherent narrative rather than a stream of contradictions.",
   },
   {
     heading: "Cycle interpretation",
-    imgPath: "/card3.svg",
+    imgPath: "/card03.svg",
     title: "See the cycles at work beneath the noise.",
     subtitle:
       "Most timing tools describe motion after it happens. Ology interprets the longer cycles and behavioral forces shaping price action, so the context is already present while the window is still open.",
