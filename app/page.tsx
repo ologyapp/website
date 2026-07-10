@@ -846,7 +846,7 @@ export default function Home() {
       const rect = sectionRef.current.getBoundingClientRect();
 
       // Trigger when the bottom reaches 80% of the viewport height
-      setShowCards(rect.bottom <= window.innerHeight);
+      setShowCards(rect.bottom <= window.innerHeight * 1.2);
     };
 
     onScroll();
@@ -1206,8 +1206,8 @@ export default function Home() {
                     <ul className="flex items-around gap-[65px]">
                       {[
                         { label: "Align", id: "align" },
-                        { label: "Decode", id: "decode" },
                         { label: "Perform", id: "perform" },
+                        { label: "Decode", id: "decode" },
                       ].map((item) => (
                         <li
                           key={item.id}
@@ -1268,12 +1268,12 @@ export default function Home() {
                       <ul className="flex flex-col gap-6 z-50!">
                         {[
                           { label: "Align", id: "align" },
-                          { label: "Decode", id: "decode" },
                           { label: "Perform", id: "perform" },
+                          { label: "Decode", id: "decode" },
                         ].map((item) => (
                           <li
                             key={item.id}
-                            onClick={(item) => {
+                            onClick={(item: any) => {
                               document.getElementById(item.id)?.scrollIntoView({
                                 behavior: "smooth",
                                 block: "start",
@@ -1595,8 +1595,8 @@ export default function Home() {
                 <ul className="flex items-center gap-[65px]">
                   {[
                     { label: "Align", id: "align" },
-                    { label: "Decode", id: "decode" },
                     { label: "Perform", id: "perform" },
+                    { label: "Decode", id: "decode" },
                   ].map((item) => (
                     <li
                       key={item.id}
@@ -1657,8 +1657,8 @@ export default function Home() {
                   <ul className="flex flex-col gap-6 z-50!">
                     {[
                       { label: "Align", id: "align" },
-                      { label: "Decode", id: "decode" },
                       { label: "Perform", id: "perform" },
+                      { label: "Decode", id: "decode" },
                     ].map((item) => (
                       <li
                         key={item.id}
@@ -1697,11 +1697,18 @@ export default function Home() {
             <div ref={sectionRef} className="relative w-full! lg:h-[150vh]">
               <div
                 id="align"
-                className="relative xl:sticky xl:top-30 w-full flex flex-col items-center justify-start gap-8 xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
+                className=" relative xl:sticky xl:top-20 w-full flex flex-col items-center justify-start gap-[120px] xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
-                <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[60px] font-normal leading-[120%] mt-20">
-                  Signal Alignment
-                </h2>
+                <div className="flex flex-col gap-[30px] mt-20">
+                  <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[36px] md:text-[60px] font-normal leading-[120%]">
+                    Where Cycles Meet the Tape
+                  </h2>
+
+                  <h4 className="text-[#F8F7FC] text-center font-Recoleta text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
+                    Major market moments have long clustered around measurable
+                    celestial alignments. Ology keeps that record in real time.
+                  </h4>
+                </div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
@@ -1709,7 +1716,7 @@ export default function Home() {
                     showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  className="hidden xl:block flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px]"
+                  className="hidden xl:block flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px] mt-8"
                 >
                   {/* AHEAD */}
                   <div className=" flex flex-col w-full gap-[30px]">
@@ -1970,7 +1977,7 @@ export default function Home() {
           <SectionReveal>
             <div className="relative w-full h-screen lg:h-[100vh] xl:h-[150vh]">
               <div
-                id="decode"
+                id="perform"
                 ref={formRef}
                 className="relative xl:sticky xl:top-5 w-full flex flex-col xl:flex-row justify-center xl:justify-between h-[100vh] items-center py-40.25 md:px-[50px]"
               >
@@ -1983,9 +1990,16 @@ export default function Home() {
                   id="archetype-form"
                   className="hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-225"
                 >
-                  <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
-                    Access the Beta
-                  </h2>
+                  <div className="flex flex-col gap-[30px]">
+                    <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
+                      Access the Beta
+                    </h2>
+
+                    <h4 className="text-[#F8F7FC] text-start font-Recoleta text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
+                      Generate your behavioral market profile and claim your
+                      spot.
+                    </h4>
+                  </div>
 
                   <motion.div
                     className="
@@ -2003,7 +2017,7 @@ export default function Home() {
 
                       overflow-hidden
                       transition-all duration-500
-                      mt-10
+                      mt-18
 
                     "
                   >
@@ -2880,13 +2894,20 @@ export default function Home() {
           <SectionReveal>
             <div className="relative w-full sm:h-auto lg:h-[150vh]">
               <div
-                id="perform"
+                id="decode"
                 ref={layerRef}
-                className="sticky top-30 w-full min-h-screen h-auto flex flex-col items-center gap-25 xl:px-12.5 md:px-12.5 py-25! "
+                className="sticky top-30 w-full min-h-screen h-auto flex flex-col items-center gap-[60px] xl:px-12.5 md:px-12.5 py-25! "
               >
-                <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
-                  The Missing Layer in Modern Market Tools
-                </h2>
+                <div className="flex flex-col gap-[30px]">
+                  <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
+                    The Missing Layer in Modern Market Tools
+                  </h2>
+
+                  <h4 className="text-[#F8F7FC] text-center font-Recoleta text-[24.71px] md:text-[24.71px] font-normal leading-[120%]">
+                    Modern platforms measure everything about the market and
+                    almost nothing about the forces moving through it.
+                  </h4>
+                </div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
@@ -2894,7 +2915,7 @@ export default function Home() {
                     showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  className="hidden w-full xl:flex lg:flex-wrap xl:flex-nowrap lg:gap-2 items-center xl:justify-between md:justify-evenly"
+                  className="hidden w-full xl:flex lg:flex-wrap xl:flex-nowrap lg:gap-2 items-center xl:justify-between md:justify-evenly mt-8"
                 >
                   {missingLayers.map((data, id) => (
                     <React.Fragment key={id}>
@@ -3149,9 +3170,10 @@ export default function Home() {
                 </h2>
 
                 <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[24px]">
-                  Ology delivers personalized timing guidance by aligning your
-                  chart, collective sentiment, and live market conditions into
-                  clear daily signals designed to support real decision-making.
+                  Ology aligns your birth chart, collective sentiment, and live
+                  market conditions into a single personalized timing layer. It
+                  brings context to real decisions and leaves the decisions
+                  where they belong, with you.
                 </p>
 
                 <button
