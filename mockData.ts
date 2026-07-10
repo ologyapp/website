@@ -224,6 +224,7 @@
 //     ],
 //   },
 // ];
+
 export const missingLayers = [
   {
     heading: "MARKET SENTIMENT",
@@ -232,6 +233,7 @@ export const missingLayers = [
     subtitle:
       "Markets do not operate in isolation. Price action reflects market sentiment shaped by confidence, uncertainty, speculation, and restraint. Without that layer in view, the numbers lose their meaning.",
   },
+
   {
     heading: "Behavioral Context",
     imgPath: "/card02.svg",
@@ -239,6 +241,7 @@ export const missingLayers = [
     subtitle:
       "Charts, headlines, and cycles arrive disconnected, and the work of making sense of them is left to you. Ology threads these inputs across time and through the lens of behavior, so timing insight arrives as one coherent narrative rather than a stream of contradictions.",
   },
+
   {
     heading: "Cycle interpretation",
     imgPath: "/card03.svg",
