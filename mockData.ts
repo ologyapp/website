@@ -239,7 +239,7 @@ export const missingLayers = [
     imgPath: "/Card02.svg",
     title: "Connect fragmented signals into a clear story.",
     subtitle:
-      "Charts, headlines, and cycles arrive disconnected, and the work of making sense of them is left to you. Ology threads these inputs across time and through the lens of behavior, so timing insight arrives as one coherent narrative rather than a stream of contradictions.",
+      "Charts, headlines, and cycles arrive disconnected, and the sense-making is left to you. Ology threads them through the lens of behavior, so timing insight arrives as one coherent narrative.",
   },
 
   {
