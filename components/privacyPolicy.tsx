@@ -292,7 +292,7 @@ function privacyPolicy() {
 
                   {Array.isArray(section.content) ? (
                     <ul className="flex flex-col gap-[16px] list-disc list-inside">
-                      {section.content.map((item, i) => (
+                      {section.content.map((item: any, i: any) => (
                         <li
                           key={i}
                           className="text-[#F8F7FC] font-Satoshi font-Manrope text-[22px] font-medium leading-[150%]"
