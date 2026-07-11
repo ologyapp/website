@@ -3306,12 +3306,16 @@ export default function Home() {
                   </div>
                 </a>
                 <div className="flex justify-start items-center gap-10 relative -left-10">
-                  <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
-                    Privacy
-                  </h5>
-                  <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
-                    Terms
-                  </h5>
+                  <a href="/privacy-policy">
+                    <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
+                      Privacy
+                    </h5>
+                  </a>
+                  <a href="/Terms-of-service">
+                    <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
+                      Terms
+                    </h5>
+                  </a>
 
                   <a
                     href="mailto:hello@ologyapp.com?subject=Ology%20Inquiry"
