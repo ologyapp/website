@@ -2031,7 +2031,7 @@ export default function Home() {
                       relative
                       flex w-90 h-auto lg:max-h-[300px] md:w-[800px]
                       flex-col justify-evenly items-start
-                      p-[18px_31.381px]
+                      p-[31.381px]
 
                       rounded-[16.912px]
 
@@ -2947,25 +2947,20 @@ export default function Home() {
                       {/* Card */}
                       <div
                         className="
-                      relative
-                      xl:w-130 lg:w-100
-                      flex
-                      flex-col
-                      gap-[31.381px]
-                      p-[31.381px]
-
-                      rounded-[16.912px]
-
-                      bg-[rgba(30,37,64,0.24)]
-                      backdrop-blur-[2px]
-
-                    border border-white/20
-                      shadow-inner
-
-                      overflow-hidden
-                      transition-all duration-500
-
-                    "
+                        relative
+                        xl:w-130 lg:w-100
+                        flex
+                        flex-col
+                        gap-[31.381px]
+                        p-[27.09px]
+                        rounded-[16.912px]
+                        bg-[rgba(30,37,64,0.24)]
+                        backdrop-blur-[2px]
+                        border border-white/20
+                        shadow-inner
+                        overflow-hidden
+                        transition-all duration-500
+                      "
                       >
                         <div className="flex justify-center">
                           <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[12px] font-bold leading-[140%] tabular-nums uppercase">
@@ -3120,18 +3115,18 @@ export default function Home() {
           </SectionReveal>
 
           <SectionReveal>
-            <div className="relative w-full sm:h-auto lg:h-[150vh]">
+            <div className="relative w-full sm:h-auto lg:h-[150vh] -mt-80">
               <div
                 id="ask"
                 ref={faqsRef}
-                className="sticky top-30 w-full min-h-screen h-auto flex justify-between items-center gap-[60px] xl:px-12.5 md:px-12.5 py-25! "
+                className="sticky top-10 w-full min-h-screen h-auto flex justify-between items-center gap-[60px] xl:px-12.5 md:px-12.5 py-25!"
               >
                 <div className="flex flex-col gap-[30px]">
                   <h2 className="text-[#F8F7FC] text-start font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%]">
                     FAQs
                   </h2>
 
-                  <h4 className="text-[#F8F7FC] text-start font-Satoshi text-[22px] md:text-[22px] font-normal leading-[120%]">
+                  <h4 className="text-[#F8F7FC] text-start font-Satoshi text-[22px] md:text-[22px] font-normal leading-[140%]">
                     Plain answers on the profile, the method, and what Ology
                     will never do. No astrology knowledge required.
                   </h4>
