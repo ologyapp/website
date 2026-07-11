@@ -3252,14 +3252,22 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <div
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{
+                duration: 0.8,
+                delay: 1.5,
+                ease: [0.22, 1, 0.36, 1],
+              }}
               className="
               w-full
             absolute
             bottom-10
             left-0
             flex
-            w-[1633px]
+            w-full
             flex-col
             items-start
             gap-[30px]
@@ -3268,7 +3276,7 @@ export default function Home() {
             pb-[10px]
             px-[80px]
             z-50!
-            flex flex-col
+            flex flex-col items-center!
           
             "
             >
@@ -3297,7 +3305,7 @@ export default function Home() {
                     </h4>
                   </div>
                 </a>
-                <div className="flex justify-start items-center gap-10">
+                <div className="flex justify-start items-center gap-10 relative -left-10">
                   <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
                     Privacy
                   </h5>
@@ -3394,7 +3402,7 @@ export default function Home() {
                   Intelligence, Inc.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
             {/* Dark overlay */}
             <motion.div
