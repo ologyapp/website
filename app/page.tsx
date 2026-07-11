@@ -779,7 +779,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const sections = ["align", "decode", "perform"];
+    const sections = ["align", "decode", "perform", "ask"];
 
     const observer = new IntersectionObserver(
       (entries) => {
