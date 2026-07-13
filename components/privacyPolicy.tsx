@@ -2,6 +2,8 @@
 import { Menu, X } from "lucide-react";
 import React, { useState } from "react";
 import Footer from "./Footer";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 const policy = [
   {
@@ -98,10 +100,11 @@ const policy = [
 function privacyPolicy() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-
+  const router = useRouter();
+  const pathname = usePathname();
   return (
-    <div className="relative flex flex-col items-center  w-full! p-[40px] ">
-      <main className="relative max-w-360 flex flex-col items-center mt-[116px]">
+    <div className="relative flex flex-col items-center  w-full! xl:p-10 p-2 ">
+      <main className="relative max-w-360 flex flex-col items-center mt-29">
         <div
           className="
                         fixed
@@ -134,7 +137,7 @@ function privacyPolicy() {
                     "
           >
             <div className="flex w-full items-center justify-between p-4 md:px-4 z-50!">
-              <a href="/">
+              <Link href="/">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="70"
@@ -167,7 +170,7 @@ function privacyPolicy() {
                     fill="#F8F7FC"
                   />
                 </svg>
-              </a>
+              </Link>
 
               <nav className="hidden md:block">
                 <ul className="flex items-around gap-[65px]">
@@ -179,12 +182,24 @@ function privacyPolicy() {
                   ].map((item) => (
                     <li
                       key={item.id}
-                      onClick={() =>
-                        document.getElementById(item.id)?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        })
-                      }
+                      onClick={() => {
+                        if (pathname === "/") {
+                          // already home — just scroll + update hash
+                          const el = document.getElementById(item.id);
+                          if (el) {
+                            el.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                          }
+                          history.pushState(null, "", `#${item.id}`);
+                        } else {
+                          // navigate to home with the hash
+                          router.push(`/#${item.id}`);
+                        }
+
+                        setMobileMenuOpen(false);
+                      }}
                       className={`
                                   cursor-pointer
                                   text-[17px]
@@ -242,11 +257,21 @@ function privacyPolicy() {
                     ].map((item) => (
                       <li
                         key={item.id}
-                        onClick={(item: any) => {
-                          document.getElementById(item.id)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
+                        onClick={() => {
+                          if (pathname === "/") {
+                            // already home — just scroll + update hash
+                            const el = document.getElementById(item.id);
+                            if (el) {
+                              el.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
+                            }
+                            history.pushState(null, "", `#${item.id}`);
+                          } else {
+                            // navigate to home with the hash
+                            router.push(`/#${item.id}`);
+                          }
 
                           setMobileMenuOpen(false);
                         }}
@@ -270,7 +295,7 @@ function privacyPolicy() {
           </header>
         </div>
 
-        <div className="flex flex-col px-12.5 gap-[101px] mb-[101px]">
+        <div className="flex flex-col xl:px-12.5 px-4 gap-[101px] mb-[101px]">
           <div className="flex flex-col items-center gap-12.5">
             <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[60px] font-normal leading-[120%]">
               Privacy Policy
@@ -289,7 +314,7 @@ function privacyPolicy() {
             {policy.map((section: any, index) => (
               <div key={section.title}>
                 <div className="flex flex-col gap-[30px] mb-[20px]">
-                  <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[22px]">
+                  <h3 className="text-[#F8F7FC] font-Recoleta text-[24px] font-normal leading-[22px]">
                     {section.title}
                   </h3>
 

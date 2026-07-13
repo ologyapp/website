@@ -15,7 +15,7 @@ function Footer() {
         z-50!
     "
     >
-      <div className="w-full flex justify-between items-center">
+      <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center mt-2! xl:mt-0">
         <a href="/">
           <div className="flex justify-start items-center gap-5">
             <svg
@@ -40,7 +40,7 @@ function Footer() {
             </h4>
           </div>
         </a>
-        <div className="flex justify-start items-center gap-10 relative -left-10">
+        <div className="flex justify-start items-center gap-10 relative xl:-left-10">
           <a href="/privacy-policy">
             <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
               Privacy
