@@ -94,7 +94,7 @@ export default function FAQAccordion() {
           </AccordionTrigger>
 
           <AccordionContent className="px-7 pb-7">
-            <p className="max-w-3xl text-[18px] leading-8 text-[#F8F7FC]">
+            <p className="max-w-3xl font-Satoshi text-[18px] leading-8 text-[#F8F7FC]">
               {item.answer}
             </p>
           </AccordionContent>

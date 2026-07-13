@@ -40,10 +40,14 @@ import Cookies from "js-cookie";
 
 import { signalAhead, confirmedSignals, missingLayers } from "@/mockData";
 import {
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   CloudDownload,
   Loader2,
   Menu,
@@ -610,6 +614,14 @@ export default function Home() {
     dob: string;
     time: string;
   } | null>(null);
+
+  const [visibleCount, setVisibleCount] = useState(3);
+  const CARDS_PER_LOAD = 3;
+  const INITIAL_COUNT = 3;
+  const visibleCards = signalAhead.slice(0, visibleCount);
+  const hasMore = visibleCount < signalAhead.length;
+  const isExpanded = visibleCount >= signalAhead.length;
+  const shouldShowToggle = signalAhead.length > INITIAL_COUNT;
 
   useEffect(() => {
     if (window.location.hash) {
@@ -1826,10 +1838,10 @@ export default function Home() {
                     use it to recognize patterns and time entries with context.
                   </p>
                 </div>
-
-                <button
-                  type="button"
-                  className="
+                <Link href="#archetype-form">
+                  <button
+                    type="button"
+                    className="
                       cursor-pointer
                       inline-flex
                       flex
@@ -1847,14 +1859,13 @@ export default function Home() {
                       duration-500
                       
                     "
-                >
-                  {" "}
-                  <Link href="#archetype-form">
+                  >
+                    {" "}
                     <span className=" text-[#F8F7FC] font-Satoshi text-[16px] lg:text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
                       Access the Beta
                     </span>
-                  </Link>
-                </button>
+                  </button>
+                </Link>
               </motion.div>
 
               <motion.div
@@ -2314,36 +2325,31 @@ export default function Home() {
                   </motion.div>
                 </div>
 
-                <div className="relative block lg:hidden w-full! gap-7.5">
+                <div className="relative block lg:hidden w-full! gap-7.5 flex flex-col items-center">
                   <motion.div className="w-full! flex justify-around max-h-auto lg:max-h-[75vh] overflow-y-auto  flex-wrap gap-[20px] sm:mt-40  xl:mt-0">
-                    {signalAhead.map((data, id) => (
+                    {visibleCards.map((data, id) => (
                       <div
                         className="
-                            
-                                relative
-                                flex h-auto lg:h-[343px] w-[415px] max-w-[415px]
-                                p-5.5 md:p-[27.23px]
-                                flex-col justify-between
-                                rounded-[16.912px]
+  relative
+  flex h-auto lg:h-[343px] w-[415px] max-w-[415px]
+  p-5.5 md:p-[27.23px]
+  flex-col justify-between
+  rounded-[16.912px]
 
-                                bg-[rgba(30,37,64,0.24)]
+  bg-[#1E2540]
 
-                                backdrop-blur-[2px]
+  border border-white/20
 
-                                border border-white/20
-
-                                overflow-hidden
-                                transition-all duration-500
-
-                              
-                              "
+  overflow-hidden
+  transition-all duration-500  
+"
                       >
                         <div className="w-full flex justify-between items-center ">
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
                             {data.date}
                           </h3>
 
-                          <div className="flex justify-start items-center gap-[12.55px]">
+                          <div className="flex justify-start items-center gap-[8px]">
                             <div
                               className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
                               style={{ backgroundColor: data.buttonColor }}
@@ -2354,7 +2360,7 @@ export default function Home() {
                               />
                             </div>
 
-                            <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                            <p className="text-[#F8F7FC] font-Satoshi text-[8.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
                               {data.signal}
                             </p>
                           </div>
@@ -2435,6 +2441,33 @@ export default function Home() {
                       </div>
                     ))}
                   </motion.div>
+
+                  {/* counter + show more */}
+                  <div className="w-full flex flex-col items-center gap-4 mt-8">
+                    <p className="text-[#F8F7FC]/60 font-Satoshi text-[13px] tracking-[2px] uppercase">
+                      Showing {visibleCards.length} of {signalAhead.length}{" "}
+                      signals
+                    </p>
+
+                    {shouldShowToggle && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setVisibleCount(
+                            isExpanded ? INITIAL_COUNT : signalAhead.length,
+                          )
+                        }
+                        className="flex items-center gap-2 px-6 py-3 rounded-[16.16px] border border-white/20 bg-[rgba(127,168,212,0.1)] text-[#F8F7FC] font-Satoshi text-[12.148px] font-bold uppercase tracking-[1px] transition-colors hover:bg-[rgba(127,168,212,0.2)]"
+                      >
+                        {isExpanded ? "View Less Signals" : "View More Signals"}
+                        {isExpanded ? (
+                          <ArrowUp size={16} />
+                        ) : (
+                          <ArrowDown size={16} />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -2487,7 +2520,7 @@ export default function Home() {
           </SectionReveal>
 
           {/* COSMIC RHYTHM */}
-          <section>
+          <section className="relative w-full flex justify-center">
             <div className="relative w-full min-h-[100dvh] lg:h-[100vh] xl:h-[150vh]">
               <div
                 id="perform"
@@ -2501,8 +2534,8 @@ export default function Home() {
                     showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  id="archetype-form-desktop"
-                  className="hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-225"
+                  id="archetype-form"
+                  className="x hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-360"
                 >
                   <div className="flex flex-col gap-[30px]">
                     <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
@@ -2898,7 +2931,7 @@ export default function Home() {
 
                 {/* MOBILE / TABLET FORM (< xl) */}
                 <div
-                  id="archetype-form-mobile"
+                  id="archetype-form"
                   className="block flex relative xl:hidden flex-1 min-w-0 flex-col items-center md:items-start gap-10 md:gap-18! z-20 px-1 md:px-0 max-w-auto mt-10 md:mt-20"
                 >
                   <h3 className="text-[#F8F7FC] font-Recoleta text-[32px] sm:text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px] text-center md:text-start">
