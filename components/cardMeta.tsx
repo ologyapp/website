@@ -1,4 +1,4 @@
-export const READ_HUE = {
+export const READ_HUE: Record<string, string> = {
   "Cyclical Read": "#E89B7F", // Planetary/Mars Ember
   "Structural Shift": "#7A849A", // Planetary/Saturn Stone
   "Behavioral Divergence": "#9B8FD4", // Planetary/Jupiter Wisdom
@@ -31,7 +31,7 @@ export function sortedRails(cards: any, now = new Date()) {
 }
 
 // Style. Derived from read and status. No card carries a color.
-export function cardStyle(read: keyof typeof READ_HUE) {
+export function cardStyle(read: any) {
   const hue = READ_HUE[read];
   return {
     dot: { background: hue },
