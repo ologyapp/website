@@ -7,7 +7,7 @@ export const READ_HUE = {
 // Planetary/Moon Glow. Outcome tags and the scroll rail. Never a class color.
 export const NEUTRAL = "#D8DAE8";
 
-export function statusOf(card, now = new Date()) {
+export function statusOf(card: any, now = new Date()) {
   if (!card || !card.date_start || !card.date_end) return "RECORD";
   const start = new Date(card.date_start + "T00:00:00");
   const end = new Date(card.date_end + "T23:59:59");
@@ -16,11 +16,11 @@ export function statusOf(card, now = new Date()) {
   return "RECORD";
 }
 
-export function railOf(card, now = new Date()) {
+export function railOf(card: any, now = new Date()) {
   return statusOf(card, now) === "RECORD" ? "Record" : "Ahead";
 }
 
-export function sortedRails(cards, now = new Date()) {
+export function sortedRails(cards: any, now = new Date()) {
   const ahead = cards
     .filter((c) => railOf(c, now) === "Ahead")
     .sort((a, b) => a.date_start.localeCompare(b.date_start));
@@ -31,7 +31,7 @@ export function sortedRails(cards, now = new Date()) {
 }
 
 // Style. Derived from read and status. No card carries a color.
-export function cardStyle(read) {
+export function cardStyle(read: any) {
   const hue = READ_HUE[read];
   return {
     dot: { background: hue },
@@ -50,7 +50,7 @@ export function cardStyle(read) {
 }
 
 // The scroll rail carries no class hue. Color means class. State means shape.
-export function railDotStyle(status) {
+export function railDotStyle(status: any) {
   if (status === "ACTIVE")
     return { size: 16, background: NEUTRAL, border: "none" };
   if (status === "AHEAD")
