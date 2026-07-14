@@ -38,7 +38,19 @@ import iphone from "../public/iphoneMockup.svg";
 import useReferralCapture from "../hooks/useReferralCapture";
 import Cookies from "js-cookie";
 
-import { signalAhead, confirmedSignals, missingLayers } from "@/mockData";
+import {
+  signalAhead,
+  cyclesCards,
+  confirmedSignals,
+  missingLayers,
+} from "@/mockData";
+import {
+  statusOf,
+  cardStyle,
+  railDotStyle,
+  sortedRails,
+} from "../components/cardMeta";
+
 import {
   ArrowDown,
   ArrowLeft,
@@ -112,6 +124,7 @@ import {
 } from "lucide-react";
 import FAQAccordion from "../components/FaqAccordion";
 import Link from "next/link";
+import CardCarousel from "../components/CardCarousel";
 
 const images = [
   a1,
@@ -174,190 +187,6 @@ const SectionReveal = ({ children }: { children: React.ReactNode }) => (
   </motion.section>
 );
 
-const renderCardsOld = (items: any[]) => {
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
-
-  return (
-    <div className="relative w-full flex items-center gap-2 md:gap-8 overflow-hidden ">
-      {/* <button
-        ref={prevRef}
-        className="cursor-pointer shrink-0 z-30 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
-      >
-        <ArrowLeft className="text-white" size={22} />
-      </button> */}
-      <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
-        <Swiper
-          modules={[Navigation, Mousewheel, EffectCoverflow, Scrollbar]}
-          slidesPerView="auto"
-          centeredSlides
-          loop
-          scrollbar={{
-            draggable: true,
-            hide: false,
-          }}
-          spaceBetween={30}
-          effect="coverflow"
-          coverflowEffect={{
-            rotate: 0,
-            stretch: 0,
-            depth: 120,
-            scale: 0.9, // side slides scale
-            modifier: 1,
-            slideShadows: false,
-          }}
-          onBeforeInit={(swiper) => {
-            // @ts-ignore
-            swiper.params.navigation.prevEl = prevRef.current;
-            // @ts-ignore
-            swiper.params.navigation.nextEl = nextRef.current;
-          }}
-          navigation={{
-            prevEl: prevRef.current,
-            nextEl: nextRef.current,
-          }}
-          speed={700}
-          freeMode={{
-            enabled: true,
-            sticky: true,
-          }}
-          mousewheel={{
-            forceToAxis: true,
-            sensitivity: 0.5,
-            releaseOnEdges: true,
-          }}
-          className="pb-8 overflow-visible max-w-[calc(100%)] h-auto flex justify-center"
-        >
-          {items.map((data, id) => (
-            <SwiperSlide key={id} className="!w-[360px] md:!w-[465px] ">
-              <div
-                className="
-  swiper-card
-  relative
-  flex h-auto md:h-[313px]
-  p-[22px] md:p-[27.23px]
-  flex-col justify-between
-  rounded-[16.912px]
-
-  bg-[rgba(30,37,64,0.24)]
-
-  backdrop-blur-[2px]
-
-  border-[0.5px] border-white/20
-
-  overflow-hidden
-  transition-all duration-500
-
-"
-              >
-                <div className="w-full flex justify-between items-center ">
-                  <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                    {data.date}
-                  </h3>
-
-                  <div className="flex justify-start items-center gap-[12.55px]">
-                    <div
-                      className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                      style={{ backgroundColor: data.buttonColor }}
-                    >
-                      <div
-                        className="w-[14.64px] h-[14.64px] rounded-full"
-                        style={{ backgroundColor: data.statusColor }}
-                      />
-                    </div>
-
-                    <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                      {data.signal}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                  <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-                    {data.title}
-                  </h2>
-
-                  <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-                    {data.content}
-                  </p>
-                </div>
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="537"
-                  height="1"
-                  viewBox="0 0 537 1"
-                  fill="none"
-                  className="mt-4 md:mt-0"
-                >
-                  <path
-                    d="M-1.52588e-05 0.484375L536.619 0.484375"
-                    stroke="#6C8BA4"
-                    strokeOpacity="0.1"
-                    strokeWidth="0.968858"
-                  />
-                </svg>
-
-                <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-                  <button
-                    type="button"
-                    className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-                    style={{ backgroundColor: data.buttonColor }}
-                  >
-                    <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-                      {data.button_text}
-                    </span>
-                  </button>
-
-                  <div className="flex flex-col items-start justify-between gap-[17.26px]">
-                    {data.status && data.status == "UPCOMING" && (
-                      <p
-                        className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                        style={{ color: data.statusColor }}
-                      >
-                        {data.status}
-                      </p>
-                    )}
-
-                    <div className="flex text-white items-center gap-[14.5px]">
-                      {data.icon.map((svg: any, i: number) => {
-                        if (i !== 1) {
-                          return (
-                            <div
-                              key={i}
-                              className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
-                              dangerouslySetInnerHTML={{ __html: svg }}
-                            />
-                          );
-                        }
-
-                        return (
-                          <div
-                            key={i}
-                            className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-                            dangerouslySetInnerHTML={{ __html: svg }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-
-      {/* <button
-        ref={prevRef}
-        className="cursor-pointer shrink-0 z-30 flex h-[30.6px] w-[30.6px] items-center justify-center rounded-full bg-[rgba(127,168,212,0.10)] backdrop-blur transition"
-      >
-        <ArrowRight className="text-white" size={22} />
-      </button> */}
-    </div>
-  );
-};
-
 function getTemporalState(status?: string): "past" | "current" | "future" {
   if (status === "ACTIVE") return "current";
   if (status === "COMING" || status === "UPCOMING") return "future";
@@ -373,228 +202,6 @@ function getStatusColor(state: "past" | "current" | "future") {
     case "past":
       return "rgba(248, 247, 252, 0.45)"; // dimmed neutral
   }
-}
-
-function CardCarousel({ items }: { items: any[] }) {
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
-
-  const initialIndex = useMemo(() => {
-    const idx = items.findIndex((i) => i.status === "ACTIVE");
-    return idx !== -1 ? idx : 0;
-  }, [items]);
-
-  const [activeIndex, setActiveIndex] = useState(initialIndex);
-
-  return (
-    <div className="relative w-full flex flex-col items-center gap-2 md:gap-8 overflow-hidden">
-      <div className="w-full flex items-center gap-2 md:gap-8">
-        <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
-          <Swiper
-            modules={[Navigation, Mousewheel, EffectCoverflow, Scrollbar]}
-            slidesPerView="auto"
-            centeredSlides
-            loop
-            initialSlide={initialIndex}
-            scrollbar={{ draggable: true, hide: false }}
-            spaceBetween={30}
-            effect="coverflow"
-            coverflowEffect={{
-              rotate: 0,
-              stretch: 0,
-              depth: 120,
-              scale: 0.9,
-              modifier: 1,
-              slideShadows: false,
-            }}
-            onBeforeInit={(swiper) => {
-              // @ts-ignore
-              swiper.params.navigation.prevEl = prevRef.current;
-              // @ts-ignore
-              swiper.params.navigation.nextEl = nextRef.current;
-            }}
-            navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
-            speed={700}
-            freeMode={{ enabled: true, sticky: true }}
-            mousewheel={{
-              forceToAxis: true,
-              sensitivity: 0.5,
-              releaseOnEdges: true,
-            }}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            onSwiper={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="pb-8 overflow-visible max-w-[calc(100%)] h-auto flex justify-center"
-          >
-            {items.map((data, id) => (
-              <SwiperSlide key={id} className="!w-[360px] md:!w-[465px] ">
-                <div
-                  className="
-  swiper-card
-  relative
-  flex h-auto md:h-[313px]
-  p-[22px] md:p-[27.23px]
-  flex-col justify-between
-  rounded-[16.912px]
-
-  bg-[rgba(30,37,64,0.24)]
-
-  backdrop-blur-[2px]
-
-  border-[0.5px] border-white/20
-
-  overflow-hidden
-  transition-all duration-500
-
-"
-                >
-                  <div className="w-full flex justify-between items-center ">
-                    <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                      {data.date}
-                    </h3>
-
-                    <div className="flex justify-start items-center gap-[12.55px]">
-                      <div
-                        className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                        style={{ backgroundColor: data.buttonColor }}
-                      >
-                        <div
-                          className="w-[14.64px] h-[14.64px] rounded-full"
-                          style={{ backgroundColor: data.statusColor }}
-                        />
-                      </div>
-
-                      <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                        {data.signal}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                    <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-                      {data.title}
-                    </h2>
-
-                    <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-                      {data.content}
-                    </p>
-                  </div>
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="537"
-                    height="1"
-                    viewBox="0 0 537 1"
-                    fill="none"
-                    className="mt-4 md:mt-0"
-                  >
-                    <path
-                      d="M-1.52588e-05 0.484375L536.619 0.484375"
-                      stroke="#6C8BA4"
-                      strokeOpacity="0.1"
-                      strokeWidth="0.968858"
-                    />
-                  </svg>
-
-                  <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-                    <button
-                      type="button"
-                      className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-                      style={{ backgroundColor: data.buttonColor }}
-                    >
-                      <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-                        {data.button_text}
-                      </span>
-                    </button>
-
-                    <div className="flex flex-col items-start justify-between gap-[17.26px]">
-                      {data.status && data.status == "UPCOMING" && (
-                        <p
-                          className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                          style={{ color: data.statusColor }}
-                        >
-                          {data.status}
-                        </p>
-                      )}
-
-                      <div className="flex text-white items-center gap-[14.5px]">
-                        {data.icon.map((svg: any, i: number) => {
-                          if (i !== 1) {
-                            return (
-                              <div
-                                key={i}
-                                className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
-                                dangerouslySetInnerHTML={{ __html: svg }}
-                              />
-                            );
-                          }
-
-                          return (
-                            <div
-                              key={i}
-                              className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-                              dangerouslySetInnerHTML={{ __html: svg }}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </div>
-
-      {/* dots */}
-      <div className="flex flex-col items-center gap-3 mt-2">
-        <div className="flex items-center gap-[10px]">
-          {items.map((item, i) => {
-            const isActive = i === activeIndex;
-            const state = getTemporalState(item.status);
-            const color = getStatusColor(state);
-
-            return (
-              <div
-                key={i}
-                className="rounded-full transition-all duration-300"
-                style={{
-                  width: isActive ? 10 : 6,
-                  height: isActive ? 10 : 6,
-                  backgroundColor: color,
-                  opacity: isActive ? 1 : 0.6,
-                  boxShadow: isActive
-                    ? `0 0 0 3px rgba(248,247,252,0.15)`
-                    : "none",
-                }}
-              />
-            );
-          })}
-        </div>
-
-        {/* active label */}
-        <div className="h-[16px] relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={activeIndex}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className="font-Satoshi text-[11px] font-bold tracking-[2px] uppercase whitespace-nowrap"
-              style={{
-                color: getStatusColor(
-                  getTemporalState(items[activeIndex]?.status),
-                ),
-              }}
-            >
-              {getTemporalState(items[activeIndex]?.status)}
-            </motion.p>
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default function Home() {
@@ -618,10 +225,10 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState(3);
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
-  const visibleCards = signalAhead.slice(0, visibleCount);
-  const hasMore = visibleCount < signalAhead.length;
-  const isExpanded = visibleCount >= signalAhead.length;
-  const shouldShowToggle = signalAhead.length > INITIAL_COUNT;
+  const visibleCards = cyclesCards.slice(0, visibleCount);
+  const hasMore = visibleCount < cyclesCards.length;
+  const isExpanded = visibleCount >= cyclesCards.length;
+  const shouldShowToggle = cyclesCards.length > INITIAL_COUNT;
 
   useEffect(() => {
     if (window.location.hash) {
@@ -2197,256 +1804,288 @@ export default function Home() {
                 >
                   {/* AHEAD */}
                   <div className=" flex flex-col w-full gap-[30px]">
-                    {/* {renderCards(signalAhead)} */}
-                    <CardCarousel items={signalAhead} />
+                    <CardCarousel items={cyclesCards} />
                   </div>
                 </motion.div>
 
                 <div className="hidden lg:block xl:hidden w-full! gap-7.5">
                   <motion.div className="w-full! flex justify-around max-h-[100vh] overflow-y-auto  flex-wrap gap-[20px] mt-40 xl:mt-0">
-                    {signalAhead.map((data, id) => (
-                      <div
-                        className="
+                    {cyclesCards.map((data, id) => {
+                      const status = statusOf(data);
+                      const style = cardStyle(data.read);
+
+                      return (
+                        <div
+                          key={id}
+                          className="
                             
                                 relative
                                 flex h-[343px] w-[415px] max-w-[415px]
                                 p-5.5 md:p-[27.23px]
                                 flex-col justify-between
                                 rounded-[16.912px]
-
+                  
                                 bg-[rgba(30,37,64,0.24)]
-
+                  
                                 backdrop-blur-[2px]
-
+                  
                                 border border-white/20
-
+                  
                                 overflow-hidden
                                 transition-all duration-500
-
+                  
                               
                               "
-                      >
-                        <div className="w-full flex justify-between items-center ">
-                          <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                            {data.date}
-                          </h3>
+                        >
+                          <div className="w-full flex justify-between items-center ">
+                            <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                              {data.date}
+                            </h3>
 
-                          <div className="flex justify-start items-center gap-[12.55px]">
-                            <div
-                              className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                              style={{ backgroundColor: data.buttonColor }}
-                            >
+                            <div className="flex justify-start items-center gap-[12.55px]">
                               <div
-                                className="w-[14.64px] h-[14.64px] rounded-full"
-                                style={{ backgroundColor: data.statusColor }}
-                              />
-                            </div>
+                                className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
+                                style={style.button}
+                              >
+                                <div
+                                  className="w-[14.64px] h-[14.64px] rounded-full"
+                                  style={{ background: style.dot.background }}
+                                />
+                              </div>
 
-                            <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                              {data.signal}
+                              <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                                {data.read}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
+                            <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
+                              {data.title}
+                            </h2>
+
+                            <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
+                              {data.content}
                             </p>
                           </div>
-                        </div>
 
-                        <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                          <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-                            {data.title}
-                          </h2>
-
-                          <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-                            {data.content}
-                          </p>
-                        </div>
-
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="537"
-                          height="1"
-                          viewBox="0 0 537 1"
-                          fill="none"
-                          className="mt-4 md:mt-0"
-                        >
-                          <path
-                            d="M-1.52588e-05 0.484375L536.619 0.484375"
-                            stroke="#6C8BA4"
-                            strokeOpacity="0.1"
-                            strokeWidth="0.968858"
-                          />
-                        </svg>
-
-                        <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-                          <button
-                            type="button"
-                            className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-                            style={{ backgroundColor: data.buttonColor }}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="537"
+                            height="1"
+                            viewBox="0 0 537 1"
+                            fill="none"
+                            className="mt-4 md:mt-0"
                           >
-                            <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-                              {data.button_text}
-                            </span>
-                          </button>
+                            <path
+                              d="M-1.52588e-05 0.484375L536.619 0.484375"
+                              stroke="#6C8BA4"
+                              strokeOpacity="0.1"
+                              strokeWidth="0.968858"
+                            />
+                          </svg>
 
-                          <div className="flex flex-col items-start justify-between gap-[17.26px]">
-                            {data.status && data.status == "UPCOMING" && (
-                              <p
-                                className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                                style={{ color: data.statusColor }}
-                              >
-                                {data.status}
-                              </p>
-                            )}
+                          <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
+                            <button
+                              type="button"
+                              className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
+                              style={style.button}
+                            >
+                              <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
+                                {data.button_text}
+                              </span>
+                            </button>
 
-                            <div className="flex text-white items-center gap-[14.5px]">
-                              {data.icon.map((svg: any, i: number) => {
-                                if (i !== 1) {
+                            <div className="flex flex-col items-end justify-between gap-[17.26px]">
+                              {status === "AHEAD" && (
+                                <p
+                                  className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
+                                  style={{ color: style.label.color }}
+                                >
+                                  AHEAD
+                                </p>
+                              )}
+
+                              {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
+                              {data.outcome_tag && (
+                                <p
+                                  className="font-mono text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase px-2 py-[2px] rounded-[4px]"
+                                  style={style.outcome}
+                                >
+                                  {data.outcome_tag}
+                                </p>
+                              )}
+
+                              <div className="flex text-white items-center gap-[14.5px]">
+                                {data.icon.map((svg: any, i: number) => {
+                                  if (i !== 1) {
+                                    return (
+                                      <div
+                                        key={i}
+                                        className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
+                                        dangerouslySetInnerHTML={{
+                                          __html: svg,
+                                        }}
+                                      />
+                                    );
+                                  }
+
                                   return (
                                     <div
                                       key={i}
-                                      className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
-                                      dangerouslySetInnerHTML={{
-                                        __html: svg,
-                                      }}
+                                      className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
+                                      dangerouslySetInnerHTML={{ __html: svg }}
                                     />
                                   );
-                                }
-
-                                return (
-                                  <div
-                                    key={i}
-                                    className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-                                    dangerouslySetInnerHTML={{ __html: svg }}
-                                  />
-                                );
-                              })}
+                                })}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </motion.div>
                 </div>
 
                 <div className="relative block lg:hidden w-full! gap-7.5 flex flex-col items-center">
                   <motion.div className="w-full! flex justify-around max-h-auto lg:max-h-[75vh] overflow-y-auto  flex-wrap gap-[20px] sm:mt-40  xl:mt-0">
-                    {visibleCards.map((data, id) => (
-                      <div
-                        className="
-  relative
-  flex h-auto lg:h-[343px] w-[415px] max-w-[415px]
-  p-5.5 md:p-[27.23px]
-  flex-col justify-between
-  rounded-[16.912px]
+                    {visibleCards.map((data, id) => {
+                      // Computed per card, per render. A window that closes updates itself.
+                      const status = statusOf(data);
+                      const style = cardStyle(data.read);
 
-  bg-[#1E2540]
+                      return (
+                        <div
+                          key={id}
+                          className="
+                 relative
+                 flex h-auto lg:h-[343px] w-[415px] max-w-[415px]
+                 p-5.5 md:p-[27.23px]
+                 flex-col justify-between
+                 rounded-[16.912px]
+               
+                 bg-[#1E2540]
+               
+                 border border-white/20
+               
+                 overflow-hidden
+                 transition-all duration-500  
+               "
+                        >
+                          <div className="w-full flex justify-between items-center ">
+                            <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
+                              {data.date}
+                            </h3>
 
-  border border-white/20
-
-  overflow-hidden
-  transition-all duration-500  
-"
-                      >
-                        <div className="w-full flex justify-between items-center ">
-                          <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                            {data.date}
-                          </h3>
-
-                          <div className="flex justify-start items-center gap-[8px]">
-                            <div
-                              className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                              style={{ backgroundColor: data.buttonColor }}
-                            >
+                            <div className="flex justify-start items-center gap-[8px]">
                               <div
-                                className="w-[14.64px] h-[14.64px] rounded-full"
-                                style={{ backgroundColor: data.statusColor }}
-                              />
-                            </div>
+                                className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
+                                style={style.button}
+                              >
+                                <div
+                                  className="w-[14.64px] h-[14.64px] rounded-full"
+                                  style={{ background: style.dot.background }}
+                                />
+                              </div>
 
-                            <p className="text-[#F8F7FC] font-Satoshi text-[8.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                              {data.signal}
+                              <p className="text-[#F8F7FC] font-Satoshi text-[8.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                                {data.read}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
+                            <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
+                              {data.title}
+                            </h2>
+
+                            <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
+                              {data.content}
                             </p>
                           </div>
-                        </div>
 
-                        <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                          <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-                            {data.title}
-                          </h2>
-
-                          <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-                            {data.content}
-                          </p>
-                        </div>
-
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="537"
-                          height="1"
-                          viewBox="0 0 537 1"
-                          fill="none"
-                          className="mt-4 md:mt-0"
-                        >
-                          <path
-                            d="M-1.52588e-05 0.484375L536.619 0.484375"
-                            stroke="#6C8BA4"
-                            strokeOpacity="0.1"
-                            strokeWidth="0.968858"
-                          />
-                        </svg>
-
-                        <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-                          <button
-                            type="button"
-                            className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-                            style={{ backgroundColor: data.buttonColor }}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="537"
+                            height="1"
+                            viewBox="0 0 537 1"
+                            fill="none"
+                            className="mt-4 md:mt-0"
                           >
-                            <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-                              {data.button_text}
-                            </span>
-                          </button>
+                            <path
+                              d="M-1.52588e-05 0.484375L536.619 0.484375"
+                              stroke="#6C8BA4"
+                              strokeOpacity="0.1"
+                              strokeWidth="0.968858"
+                            />
+                          </svg>
 
-                          <div className="flex flex-col items-start justify-between gap-[17.26px]">
-                            {data.status && data.status == "UPCOMING" && (
-                              <p
-                                className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                                style={{ color: data.statusColor }}
-                              >
-                                {data.status}
-                              </p>
-                            )}
+                          <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
+                            <button
+                              type="button"
+                              className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
+                              style={style.button}
+                            >
+                              <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
+                                {data.button_text}
+                              </span>
+                            </button>
 
-                            <div className="flex text-white items-center gap-[14.5px]">
-                              {data.icon.map((svg: any, i: number) => {
-                                if (i !== 1) {
+                            <div className="flex flex-col items-end justify-between gap-[17.26px]">
+                              {status === "AHEAD" && (
+                                <p
+                                  className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
+                                  style={{ color: style.label.color }}
+                                >
+                                  AHEAD
+                                </p>
+                              )}
+
+                              {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
+                              {data.outcome_tag && (
+                                <p
+                                  className="font-mono text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase px-2 py-[2px] rounded-[4px]"
+                                  style={style.outcome}
+                                >
+                                  {data.outcome_tag}
+                                </p>
+                              )}
+
+                              <div className="flex text-white items-center gap-[14.5px]">
+                                {data.icon.map((svg: any, i: number) => {
+                                  if (i !== 1) {
+                                    return (
+                                      <div
+                                        key={i}
+                                        className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
+                                        dangerouslySetInnerHTML={{
+                                          __html: svg,
+                                        }}
+                                      />
+                                    );
+                                  }
+
                                   return (
                                     <div
                                       key={i}
-                                      className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
-                                      dangerouslySetInnerHTML={{
-                                        __html: svg,
-                                      }}
+                                      className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
+                                      dangerouslySetInnerHTML={{ __html: svg }}
                                     />
                                   );
-                                }
-
-                                return (
-                                  <div
-                                    key={i}
-                                    className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-                                    dangerouslySetInnerHTML={{ __html: svg }}
-                                  />
-                                );
-                              })}
+                                })}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </motion.div>
 
                   {/* counter + show more */}
                   <div className="w-full flex flex-col items-center gap-4 mt-8">
                     <p className="text-[#F8F7FC]/60 font-Satoshi text-[13px] tracking-[2px] uppercase">
-                      Showing {visibleCards.length} of {signalAhead.length}{" "}
-                      signals
+                      Showing {visibleCards.length} of {cyclesCards.length}{" "}
+                      alignments
                     </p>
 
                     {shouldShowToggle && (
@@ -2454,12 +2093,12 @@ export default function Home() {
                         type="button"
                         onClick={() =>
                           setVisibleCount(
-                            isExpanded ? INITIAL_COUNT : signalAhead.length,
+                            isExpanded ? INITIAL_COUNT : cyclesCards.length,
                           )
                         }
                         className="flex items-center gap-2 px-6 py-3 rounded-[16.16px] border border-white/20 bg-[rgba(127,168,212,0.1)] text-[#F8F7FC] font-Satoshi text-[12.148px] font-bold uppercase tracking-[1px] transition-colors hover:bg-[rgba(127,168,212,0.2)]"
                       >
-                        {isExpanded ? "View Less Signals" : "View More Signals"}
+                        {isExpanded ? "Show Fewer" : "View the full record"}
                         {isExpanded ? (
                           <ArrowUp size={16} />
                         ) : (
@@ -2941,7 +2580,7 @@ export default function Home() {
                   <div
                     className="
             relative
-            flex  w-100 h-auto lg:h-[300px]
+            flex w-[330px] h-auto lg:h-[300px]
             flex-col justify-evenly items-start
             p-6 sm:p-[31.381px]
             rounded-[16.912px]
@@ -3753,24 +3392,25 @@ export default function Home() {
               }}
               className="
               w-full
-            absolute
-            bottom-10
-            left-0
-            flex
-            w-full
-            flex-col
-            items-start
-            gap-[30px]
-            pt-[28px]
-          
-            pb-[10px]
-            px-[80px]
-            z-50!
-            flex flex-col items-center!
+              absolute
+              bottom-10
+              left-0
+              flex
+              w-full
+              flex-col
+              items-start
+              gap-[30px]
+              pt-[28px]
+            
+              pb-[10px]
+              px-[80px]
+              z-50!
+              flex flex-col items-center!
+              mt-10!
           
             "
             >
-              <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center mt-10! xl:mt-0">
+              <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center mt-15! xl:mt-0">
                 <Link href="#hero">
                   <div className="flex justify-start items-center gap-5">
                     <svg
