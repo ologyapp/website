@@ -22,11 +22,11 @@ export function railOf(card: any, now = new Date()) {
 
 export function sortedRails(cards: any, now = new Date()) {
   const ahead = cards
-    .filter((c:any) => railOf(c:any, now:any) === "Ahead")
-    .sort((a:any, b:any) => a.date_start.localeCompare(b.date_start));
+    .filter((c: any) => railOf(c, now) === "Ahead")
+    .sort((a: any, b: any) => a.date_start.localeCompare(b.date_start));
   const record = cards
-    .filter((c:any) => railOf(c:any, now:any) === "Record")
-    .sort((a:any, b:any) => (a.order ?? 0) - (b.order ?? 0));
+    .filter((c: any) => railOf(c, now) === "Record")
+    .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
   return { ahead, record };
 }
 
