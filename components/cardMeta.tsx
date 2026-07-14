@@ -31,7 +31,7 @@ export function sortedRails(cards: any, now = new Date()) {
 }
 
 // Style. Derived from read and status. No card carries a color.
-export function cardStyle(read: any) {
+export function cardStyle(read: keyof typeof READ_HUE) {
   const hue = READ_HUE[read];
   return {
     dot: { background: hue },
