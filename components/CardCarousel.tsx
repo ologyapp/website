@@ -147,15 +147,6 @@ function CardCarousel({ items }: { items: any[] }) {
                       </button>
 
                       <div className="flex flex-col items-end justify-between gap-[17.26px]">
-                        {status === "AHEAD" && (
-                          <p
-                            className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                            style={{ color: style.label.color }}
-                          >
-                            AHEAD
-                          </p>
-                        )}
-
                         {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
                         {data.outcome_tag && (
                           <p
