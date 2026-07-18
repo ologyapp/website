@@ -72,7 +72,7 @@ export default function FAQAccordion() {
         >
           <AccordionTrigger className="group pt-[25px] pb-[27px] pl-[28px] pr-[33px] hover:no-underline [&>svg]:hidden">
             <div className="flex w-full items-start justify-between gap-8">
-              <h3 className="text-left font-Recoleta text-[22.57px] leading-[130%] text-white">
+              <h3 className="text-left font-Recoleta text-[18px] lg:text-[22.57px] leading-[130%] text-white">
                 {item.question}
               </h3>
 

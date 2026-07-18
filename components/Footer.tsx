@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 function Footer() {
@@ -16,7 +17,7 @@ function Footer() {
     "
     >
       <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center mt-2! xl:mt-0">
-        <a href="/">
+        <Link href="/">
           <div className="flex justify-start items-center gap-5">
             <svg
               width="20"
@@ -39,7 +40,7 @@ function Footer() {
               Pattern over prediction.
             </h4>
           </div>
-        </a>
+        </Link>
         <div className="flex justify-start items-center gap-10 relative xl:-left-10">
           <a href="/privacy-policy">
             <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
