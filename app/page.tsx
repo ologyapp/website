@@ -222,7 +222,7 @@ export default function Home() {
     time: string;
   } | null>(null);
 
-  const [visibleCount, setVisibleCount] = useState(3);
+  const [visibleCount, setVisibleCount] = useState(18);
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
   const visibleCards = cyclesCards.slice(0, visibleCount);
@@ -244,6 +244,24 @@ export default function Home() {
       return () => clearTimeout(timeout);
     }
   }, []);
+
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const cardScrollRef = useRef<HTMLDivElement>(null);
+
+  const handleCardScroll = () => {
+    if (!cardScrollRef.current) return;
+    const { scrollLeft, clientWidth } = cardScrollRef.current;
+    const index = Math.round(scrollLeft / clientWidth);
+    setActiveCardIndex(index);
+  };
+
+  // Reset active index if visibleCards shrinks (e.g. "Show Fewer")
+  useEffect(() => {
+    if (activeCardIndex > visibleCards.length - 1) {
+      setActiveCardIndex(0);
+      cardScrollRef.current?.scrollTo({ left: 0 });
+    }
+  }, [visibleCards.length, activeCardIndex]);
 
   const [copied, setCopied] = useState(false);
 
@@ -647,6 +665,16 @@ export default function Home() {
     }
   };
 
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const index = Math.round(scrollLeft / clientWidth);
+    setActiveIndex(index);
+  };
+
   const astro = {
     sun: data?.astroResult?.archetypeData?.header.sun?.sign?.toLowerCase(),
     moon: data?.astroResult?.archetypeData?.header.moon?.sign?.toLowerCase(),
@@ -812,8 +840,19 @@ export default function Home() {
   const heroRef = useRef(null);
   const { scrollY } = useScroll(); // whole-page scroll, not section-relative
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const opacity = useTransform(scrollY, [0, isMobile ? 1000 : 120], [1, 0]);
+
   // Fade out fast over a very light first scroll — no blur
-  const opacity = useTransform(scrollY, [0, 120], [1, 0]);
+  // const opacity = useTransform(scrollY, [0, 600], [1, 0]);
 
   //pin section to top
 
@@ -1291,7 +1330,7 @@ export default function Home() {
             </div>
 
             {/* Mockup on mobile */}
-            <div className=" w-full! px-0 xl:px-4.5 flex flex-col lg:flex-row justify-between items-center gap-10 pt-20 md:pt-24 mt-15">
+            <div className=" w-full! px-0 xl:px-4.5 flex flex-col lg:flex-row justify-between items-center gap-5 md:gap-10 pt-20 md:pt-24 mt-10 md:mt-15">
               <motion.div
                 className="
                 relative
@@ -1385,14 +1424,14 @@ export default function Home() {
                   delay: 3,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="w-full xl:w-[100%] flex flex-col gap-[52px] items-center lg:items-start mt-5 lg:mt-30"
+                className="w-full xl:w-[100%] flex flex-col gap-[30px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30"
               >
-                <div className="flex flex-col gap-[40px] md:gap-[60px] text-center md:text-left">
+                <div className="flex flex-col gap-[20px] md:gap-[60px] text-center md:text-left">
                   <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] font-normal leading-[115%]">
                     Timing Intelligence for Modern Investors
                   </h1>
 
-                  <p className="text-[#F8F7FC] text-[18px] md:text-[24px] font-normal leading-[140%] max-w-[800px] font-Satoshi">
+                  <p className="text-[#F8F7FC] text-[16px] md:text-[24px] font-normal leading-[140%] max-w-full lg:max-w-[800px] font-Satoshi">
                     Ology is a market timing platform that synthesizes celestial
                     cycles, behavioral psychology, and live market data into a
                     personalized timing profile. Active traders and investors
@@ -1902,9 +1941,12 @@ export default function Home() {
                 </div>
 
                 <div className="relative block lg:hidden w-full! gap-7.5 flex flex-col items-center">
-                  <motion.div className="w-full! flex justify-around max-h-auto lg:max-h-[75vh] overflow-y-auto  flex-wrap gap-[20px] sm:mt-40  xl:mt-0">
+                  <motion.div
+                    ref={cardScrollRef}
+                    onScroll={handleCardScroll}
+                    className="w-full! flex overflow-x-auto snap-x snap-mandatory scrollbar-none max-h-auto lg:max-h-[75vh] gap-[20px] sm:mt-40 xl:mt-0"
+                  >
                     {visibleCards.map((data, id) => {
-                      // Computed per card, per render. A window that closes updates itself.
                       const status = statusOf(data);
                       const style = cardStyle(data.read);
 
@@ -1912,23 +1954,21 @@ export default function Home() {
                         <div
                           key={id}
                           className="
-                
-relative
-flex h-auto md:h-[313px]
-p-[22px] md:p-[27.23px]
-flex-col justify-between
+              relative
+              flex h-auto md:h-[313px]
+              w-full shrink-0 snap-center
+              p-[22px] md:p-[27.23px]
+              flex-col justify-between
 
+              bg-[#0D1220]/95
+              rounded-[9.757px]
+              border-[0.61px] border-[#2A2933]
+              backdrop-blur-xl
 
-bg-[#0D1220]/95
-rounded-[9.757px]
-border-[0.61px] border-[#2A2933]
-backdrop-blur-xl
-
-
-overflow-hidden
-transition-all duration-500
-z-30
-               "
+              overflow-hidden
+              transition-all duration-500
+              z-30
+            "
                         >
                           <div className="w-full flex justify-between items-center ">
                             <h3 className="text-[#8B8996] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
@@ -1999,7 +2039,6 @@ z-30
                                 </p>
                               )}
 
-                              {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
                               {data.outcome_tag && (
                                 <p
                                   className="font-mono text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase px-2 py-[2px] rounded-[4px]"
@@ -2039,8 +2078,59 @@ z-30
                     })}
                   </motion.div>
 
+                  {/* Dot indicator pill */}
+                  <div className="flex justify-center">
+                    <div
+                      className="inline-flex items-start"
+                      style={{
+                        height: "20px",
+                        padding: "4px 4px 4px 5px",
+                        gap: "3px",
+                        borderRadius: "23px",
+                        background: "rgba(92, 92, 92, 0.60)",
+                      }}
+                    >
+                      {visibleCards.map((_, id) => (
+                        <div
+                          key={id}
+                          className="h-[12px] w-[12px]"
+                          style={
+                            id === activeCardIndex
+                              ? { borderRadius: "12px", background: "#D9D9D9" }
+                              : {
+                                  borderRadius: "12px",
+                                  border: "1px solid #D9D9D9",
+                                }
+                          }
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* active label — ACTIVE / AHEAD / RECORD, printed straight from statusOf() */}
+                  <div className="h-[16px] relative overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={activeCardIndex}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.25 }}
+                        className="font-Satoshi text-[11px] font-bold tracking-[2px] uppercase whitespace-nowrap"
+                        style={{ color: "#D8DAE8" }}
+                      >
+                        {statusOf(visibleCards[activeCardIndex])}
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Index counter e.g. 1/18 */}
+                  <p className="text-[#F8F7FC] font-Satoshi text-[10.485px] tracking-[2px]">
+                    {activeCardIndex + 1} // {visibleCards.length}
+                  </p>
+
                   {/* counter + show more */}
-                  <div className="w-full flex flex-col items-center gap-4 mt-8">
+                  {/* <div className="w-full flex flex-col items-center gap-4 mt-8">
                     <p className="text-[#F8F7FC]/60 font-Satoshi text-[13px] tracking-[2px] uppercase">
                       Showing {visibleCards.length} of {cyclesCards.length}{" "}
                       alignments
@@ -2064,7 +2154,7 @@ z-30
                         )}
                       </button>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -2577,7 +2667,7 @@ z-30
             flex-col justify-evenly items-start
             p-6 sm:p-[31.381px]
             rounded-[16.912px]
-            bg-[rgba(30,37,64,0.24)]
+            bg-[rgba(0,0,0,0)]
             backdrop-blur-[2px]
             border border-white/20
             overflow-visible
@@ -3067,32 +3157,39 @@ z-30
                   ))}
                 </motion.div>
 
-                <motion.div className="block flex lg:hidden w-full flex-col items-center gap-4 ">
-                  {missingLayers.map((data, id) => (
-                    <React.Fragment key={id}>
-                      {/* Card */}
+                <>
+                  {/* Scrollable cards - mobile only */}
+                  <motion.div
+                    ref={scrollRef}
+                    onScroll={handleScroll}
+                    className="flex lg:hidden w-full snap-x snap-mandatory overflow-x-auto gap-4 scrollbar-none"
+                  >
+                    {missingLayers.map((data, id) => (
                       <div
+                        key={id}
                         className="
-                      relative
-                      xl:w-130 lg:w-100
-                      flex
-                      flex-col
-                      gap-[31.381px]
-                      p-[31.381px]
-
-                      rounded-[16.912px]
-
-                      bg-[rgba(30,37,64,0.24)]
-                      backdrop-blur-[2px]
-
-                    border border-white/20
-                      shadow-inner
-
-                      overflow-hidden
-                      transition-all duration-500
-
-                    "
+            relative
+            w-full
+            shrink-0
+            snap-center
+            flex
+            flex-col
+            gap-[31.381px]
+            p-[31.381px]
+            rounded-[16.912px]
+            bg-[rgba(30,37,64,0.24)]
+            backdrop-blur-[2px]
+            border border-white/20
+            shadow-inner
+            overflow-hidden
+            transition-all duration-500
+          "
                       >
+                        <div className="flex justify-center">
+                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[8.84px] font-bold leading-[140%] tabular-nums uppercase">
+                            {data.heading}
+                          </h4>
+                        </div>
                         <img src={data.imgPath} />
 
                         <div className="flex flex-col gap-4 items-center">
@@ -3105,36 +3202,41 @@ z-30
                           </p>
                         </div>
                       </div>
+                    ))}
+                  </motion.div>
 
-                      {/* Divider */}
-                      {id < missingLayers.length - 1 && (
-                        <div className="hidden xl:block flex justify-center items-center px-6 shrink-0">
-                          <svg
-                            width="31"
-                            height="47"
-                            viewBox="0 0 31 47"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <rect
-                              y="8.28125"
-                              width="30.6382"
-                              height="30"
-                              rx="15"
-                              fill="#7FA8D4"
-                              fillOpacity="0.1"
-                            />
-                            <path
-                              d="M11.0478 22.9958L14.7883 22.9958L14.7883 19.2553L15.8473 19.2553L15.8473 22.9958L19.5878 22.9958L19.5878 24.0548L15.8473 24.0548L15.8473 27.8124L14.7883 27.8124L14.7883 24.0548L11.0478 24.0548L11.0478 22.9958Z"
-                              fill="white"
-                              fillOpacity="0.8"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </motion.div>
+                  {/* Dot indicator pill - mobile only */}
+                  <div className="flex lg:hidden justify-center mt-4">
+                    <div
+                      className="inline-flex items-start"
+                      style={{
+                        height: "20px",
+                        padding: "4px 4px 4px 5px",
+                        gap: "12px",
+                        borderRadius: "23px",
+                        background: "rgba(92, 92, 92, 0.60)",
+                      }}
+                    >
+                      {missingLayers.map((_, id) => (
+                        <div
+                          key={id}
+                          className="h-[12px] w-[12px]"
+                          style={
+                            id === activeIndex
+                              ? {
+                                  borderRadius: "12px",
+                                  background: "#D9D9D9",
+                                }
+                              : {
+                                  borderRadius: "12px",
+                                  border: "1px solid #D9D9D9",
+                                }
+                          }
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
 
                 {/* <div className="absolute inset-0 flex ">
               {Array.from({ length: LINES }).map((_, i) => {
@@ -3217,11 +3319,11 @@ z-30
           </SectionReveal>
 
           <SectionReveal>
-            <div className="relative w-full sm:h-auto lg:h-[150vh] xl:-mt-80 mt-10">
+            <div className="relative w-full sm:h-auto lg:h-[150vh] xl:-mt-60 mt-10">
               <div
                 id="ask"
                 ref={faqsRef}
-                className="sticky top-10 w-full min-h-screen h-auto flex xl:flex-row flex-col justify-between items-center gap-[60px] xl:px-12.5 md:px-12.5 py-25!"
+                className="sticky top-10 w-full min-h-screen h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center lg:gap-[60px] gap-[85px] xl:px-12.5 md:px-12.5 py-25!"
               >
                 <div className="flex flex-col gap-[30px] items-center xl:items-start">
                   <h2 className="text-[#F8F7FC] text-start font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -3240,7 +3342,7 @@ z-30
                     showFaqs ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  className="hidden xl:block w-full flex flex-col gap-4 items-center mt-8"
+                  className="hidden xl:block w-full flex flex-col gap-4 items-center mt-1 lg:mt-8"
                 >
                   <FAQAccordion />
                 </motion.div>
@@ -3344,12 +3446,19 @@ z-30
                     type="button"
                     className="inline-flex w-auto cursor-pointer items-center justify-center rounded-[20px] border border-white/10 bg-[rgba(30,37,64,0.30)] p-[16px] backdrop-blur-xl transition-all duration-500 hover:bg-white/10"
                   >
-                    <a
+                    <Link
                       href="#archetype-form"
-                      className="font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
+                      className="hidden lg:block font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
                     >
                       REQUEST EARLY ACCESS
-                    </a>
+                    </Link>
+
+                    <Link
+                      href="#archetype-form"
+                      className="block lg:hidden font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
+                    >
+                      Access the Beta
+                    </Link>
                   </button>
                 </div>
               </motion.div>

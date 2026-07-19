@@ -301,3 +301,11 @@ body {
 .swiper-scrollbar.swiper-scrollbar-horizontal {
   bottom: -10px !important;
 }
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
