@@ -159,6 +159,27 @@ const images = [
   e6,
 ];
 
+const mobileImages = [
+  a4,
+  e2,
+  a6,
+  b6,
+  a1,
+  b3,
+  e1,
+  d4,
+  d1,
+  e3,
+  d2,
+  b2,
+  c5,
+  d6,
+  b5,
+  c6,
+  e4,
+  a2,
+];
+
 const SectionReveal = ({ children }: { children: React.ReactNode }) => (
   <motion.section
     initial={{
@@ -1013,10 +1034,58 @@ export default function Home() {
             className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
             style={{ perspective: "2600px" }}
           >
-            <div className="absolute inset-0 grid grid-cols-3 grid-rows-10 lg:grid-cols-6 lg:grid-rows-5 w-full h-full">
-              {images.slice(0, 30).map((img, index) => {
-                const cols = 6;
+            {/* Mobile grid - 3 cols x 10 rows, fixed 342px row height */}
+            <div
+              className="grid grid-cols-3 lg:hidden w-full h-screen"
+              style={{ gridTemplateRows: "repeat(6, 1fr)" }}
+            >
+              {mobileImages.map((img, index) => {
+                const cols = 3;
+                const col = index % cols;
+                const row = Math.floor(index / cols);
 
+                const baseDelay = 1;
+                const staggerStep = 0.045;
+                const order = row + col;
+                const itemDelay = baseDelay + order * staggerStep;
+
+                return (
+                  <motion.div
+                    key={index}
+                    className="relative w-full h-full overflow-hidden"
+                    initial={{ opacity: 0, scale: 1, filter: "blur(1px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    transition={{
+                      duration: 1.4,
+                      delay: itemDelay,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    style={{
+                      transformStyle: "preserve-3d",
+                      willChange: "transform, opacity, filter",
+                      backfaceVisibility: "hidden",
+                    }}
+                  >
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={img}
+                        alt=""
+                        fill
+                        priority
+                        sizes="33vw"
+                        className="object-cover pointer-events-none select-none"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Desktop grid - 6 cols x 5 rows, fills parent height */}
+            <div className="absolute inset-0 hidden lg:grid lg:grid-cols-6 lg:grid-rows-5 w-full h-full">
+              {images.map((img, index) => {
+                const cols = 6;
                 const col = index % cols;
                 const row = Math.floor(index / cols);
 
@@ -1029,16 +1098,8 @@ export default function Home() {
                   <motion.div
                     key={index}
                     className="relative min-w-0 min-h-0 overflow-hidden"
-                    initial={{
-                      opacity: 0,
-                      scale: 1,
-                      filter: "blur(1px)",
-                    }}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                      filter: "blur(0px)",
-                    }}
+                    initial={{ opacity: 0, scale: 1, filter: "blur(1px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                     transition={{
                       duration: 1.4,
                       delay: itemDelay,
@@ -1722,7 +1783,7 @@ export default function Home() {
 
         {/* line here */}
 
-        <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-[100vh] z-5! pointer-events-none overflow-hidden">
+        {/* <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-[100vh] z-5! pointer-events-none overflow-hidden">
           {Array.from({ length: BLOCKS }).map((_, block) => (
             <div
               key={block}
@@ -1764,12 +1825,12 @@ export default function Home() {
               })}
             </div>
           ))}
-        </div>
+        </div> */}
       </section>
 
       {/* normal section */}
       <main className="flex justify-center ">
-        <section className="relative z-30! w-full max-w-360! lg:max-w-237.5! xl:max-w-360! mx-auto px-8 flex flex-col items-center! justify-evenly">
+        <section className="relative z-30! w-full max-w-360! lg:max-w-237.5! xl:max-w-360! mx-auto px-8 flex flex-col items-center! justify-between">
           <SectionReveal>
             <div ref={sectionRef} className="relative w-full! lg:h-[150vh]">
               <div
@@ -3364,10 +3425,58 @@ export default function Home() {
               className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
               style={{ perspective: "2600px" }}
             >
-              <div className="absolute inset-0 grid grid-cols-3 grid-rows-10 lg:grid-cols-6 lg:grid-rows-5 w-full h-full">
-                {images.slice(0, 30).map((img, index) => {
-                  const cols = 6;
+              {/* Mobile grid - 3 cols x 10 rows, fixed 342px row height */}
+              <div
+                className="grid grid-cols-3 lg:hidden w-full h-screen"
+                style={{ gridTemplateRows: "repeat(6, 1fr)" }}
+              >
+                {mobileImages.map((img, index) => {
+                  const cols = 3;
+                  const col = index % cols;
+                  const row = Math.floor(index / cols);
 
+                  const baseDelay = 1;
+                  const staggerStep = 0.045;
+                  const order = row + col;
+                  const itemDelay = baseDelay + order * staggerStep;
+
+                  return (
+                    <motion.div
+                      key={index}
+                      className="relative w-full h-full overflow-hidden"
+                      initial={{ opacity: 0, scale: 1, filter: "blur(1px)" }}
+                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                      transition={{
+                        duration: 1.4,
+                        delay: itemDelay,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      style={{
+                        transformStyle: "preserve-3d",
+                        willChange: "transform, opacity, filter",
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={img}
+                          alt=""
+                          fill
+                          priority
+                          sizes="33vw"
+                          className="object-cover pointer-events-none select-none"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40" />
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop grid - 6 cols x 5 rows, fills parent height */}
+              <div className="absolute inset-0 hidden lg:grid lg:grid-cols-6 lg:grid-rows-5 w-full h-full">
+                {images.map((img, index) => {
+                  const cols = 6;
                   const col = index % cols;
                   const row = Math.floor(index / cols);
 
@@ -3380,16 +3489,8 @@ export default function Home() {
                     <motion.div
                       key={index}
                       className="relative min-w-0 min-h-0 overflow-hidden"
-                      initial={{
-                        opacity: 0,
-                        scale: 1,
-                        filter: "blur(1px)",
-                      }}
-                      animate={{
-                        opacity: 1,
-                        scale: 1,
-                        filter: "blur(0px)",
-                      }}
+                      initial={{ opacity: 0, scale: 1, filter: "blur(1px)" }}
+                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                       transition={{
                         duration: 1.4,
                         delay: itemDelay,
@@ -3404,7 +3505,7 @@ export default function Home() {
                       <div className="relative w-full h-full scale-[1]">
                         <Image
                           src={img}
-                          alt="grid image"
+                          alt=""
                           fill
                           priority
                           sizes="17vw"
