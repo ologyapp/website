@@ -70,9 +70,9 @@ export default function FAQAccordion() {
             hover:bg-[rgba(30,37,64,0.42)]
         "
         >
-          <AccordionTrigger className="group lg:pt-[25px] lg:pb-[27px] pt-[19px] pb-[19px]  pl-[28px] pr-[33px] hover:no-underline [&>svg]:hidden">
+          <AccordionTrigger className="group lg:pt-[25px] lg:pb-[27px] pt-[19px] pb-[19px] pl-[24px] pr-[28px] lg:pl-[28px] lg:pr-[33px] hover:no-underline [&>svg]:hidden">
             <div className="flex w-full items-start justify-between gap-8">
-              <h3 className="text-left font-Recoleta text-[15px] lg:text-[22.57px] leading-[130%] text-white">
+              <h3 className="text-left font-Recoleta text-[14px] lg:text-[22.57px] leading-[130%] text-white">
                 {item.question}
               </h3>
 
@@ -93,8 +93,8 @@ export default function FAQAccordion() {
             </div>
           </AccordionTrigger>
 
-          <AccordionContent className="px-7 pb-7">
-            <p className="max-w-3xl font-Satoshi text-[18px] leading-8 text-[#F8F7FC]">
+          <AccordionContent className="lg:px-7 lg:pb-7 pl-[24px] pr-[28px]">
+            <p className="max-w-3xl font-Satoshi text-[11px] lg:text-[18px] lg:leading-8 leading-[18px] tracking-[-0.22px] lg:tracking-normal text-[#F8F7FC]">
               {item.answer}
             </p>
           </AccordionContent>

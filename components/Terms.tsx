@@ -290,19 +290,19 @@ function Terms() {
           </header>
         </div>
 
-        <div className="flex flex-col xl:px-12.5 px-4 gap-25.25 mb-25.25">
-          <div className="flex flex-col items-center gap-12.5">
-            <h1 className="text-[#F8F7FC] text-center font-Recoleta text-[60px] font-normal leading-[120%]">
+        <div className="flex flex-col xl:px-12.5 px-4 gap-20 lg:gap-25.25 mb-25.25">
+          <div className="flex flex-col items-start lg:items-center gap-10 lg:gap-12.5">
+            <h1 className="text-[#F8F7FC] text-start lg:text-center font-Recoleta text-[32px] lg:text-[60px] font-normal leading-[120%]">
               Terms of Service
             </h1>
-            <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[18px] font-normal leading-[150%]">
+            <h4 className="text-[#F8F7FC] text-start lg:text-center font-Satoshi text-[14px] lg:text-[18px] font-normal leading-[150%]">
               These terms are the agreement between you and Ology Intelligence,
               Inc. when you use the Ology website, app, and services. By
               creating an account or joining the waitlist, you accept them. They
               are written to be understood, because a term you did not
               understand is a term we should not enforce.
             </h4>
-            <p className="text-[#F8F7FC] text-center font-Satoshi text-[18px] font-normal leading-[150%]">
+            <p className="text-[#F8F7FC] text-center font-Satoshi text-[12px] lg:text-[18px] font-normal leading-[150%]">
               Effective July 2026
             </p>
           </div>
@@ -311,7 +311,7 @@ function Terms() {
             {terms.map((section: any, index) => (
               <div key={section.title}>
                 <div className="flex flex-col gap-[30px]">
-                  <h3 className="text-[#F8F7FC] font-Recoleta text-[24px] font-normal leading-[22px]">
+                  <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[24px] font-normal leading-[22px]">
                     {section.title}
                   </h3>
 
@@ -320,14 +320,14 @@ function Terms() {
                       {section.content.map((item: any, i: any) => (
                         <li
                           key={i}
-                          className="text-[#F8F7FC] font-Satoshi text-[18px] font-normal leading-[150%]"
+                          className="text-[#F8F7FC] font-Satoshi text-[14px] lg:text-[18px] font-normal leading-[150%]"
                         >
                           {item}
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-[#F8F7FC] font-Satoshi text-[18px] font-normal leading-[150%]">
+                    <p className="text-[#F8F7FC] font-Satoshi text-[14px] lg:text-[18px] font-normal leading-[150%]">
                       {section.content}
                     </p>
                   )}
@@ -341,7 +341,7 @@ function Terms() {
                     .map((sub, i) => (
                       <p
                         key={i}
-                        className="text-[#F8F7FC] font-Satoshi text-[18px] font-normal leading-[150%]"
+                        className="text-[#F8F7FC] font-Satoshi text-[14px] lg:text-[18px] font-normal leading-[150%]"
                       >
                         {sub}
                       </p>

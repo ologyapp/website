@@ -915,12 +915,7 @@ export default function Home() {
   }, []);
 
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
-  console.log("DROPDOWN DEBUG:", {
-    showDropdown,
-    suggestionsLen: suggestions.length,
-    dropdownPos,
-    inputRefExists: !!inputRef.current,
-  });
+
   useLayoutEffect(() => {
     if (showDropdown && suggestions.length > 0 && inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect();
@@ -1004,7 +999,7 @@ export default function Home() {
       }}
     >
       <motion.div
-        className="pointer-events-none absolute inset-0 z-9999! mix-blend-screen"
+        className="hidden lg:block pointer-events-none absolute inset-0 z-9999! mix-blend-screen"
         style={{
           background: useMotionTemplate`
           radial-gradient(
@@ -1130,7 +1125,7 @@ export default function Home() {
 
           <>
             <motion.div
-              className="absolute inset-0 z-10 bg-[rgba(16,21,36,0.75)]"
+              className="absolute inset-0 z-10 bg-[rgba(16,21,36,0.85)]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{
@@ -1161,7 +1156,7 @@ export default function Home() {
           <AnimatePresence>
             {showLogo && (
               <motion.div
-                className="z-50! absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
+                className="z-50! absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%+5em)] sm:-translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
                 initial={{
                   opacity: 0,
                   scale: 1.1,
@@ -1212,184 +1207,6 @@ export default function Home() {
           </AnimatePresence>
 
           <div className=" relative z-20 max-w-360 lg:max-w-245.5 xl:max-w-360 w-full px-5 md:px-14 py-6 md:py-10 gap-15 flex flex-col items-center">
-            <div
-              className="
-                fixed
-                top-0
-             
-                z-9999
-                w-full
-                max-w-360
-                lg:max-w-245.5
-                xl:max-w-360
-                px-5
-                md:px-10
-                py-6
-                md:py-10
-              "
-            >
-              <motion.header
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
-                transition={{
-                  delay: 3.5,
-                  duration: 0.8,
-                  ease: "easeOut",
-                }}
-                className="
-              flex
-              items-center
-              justify-between
-              // h-[65.771px]
-              p-5
-              rounded-[20px]
-              border
-              border-[#7478895c]
-              bg-[#1e2540]/5
-              backdrop-blur-xl
-              z-30!
-            "
-              >
-                <div className="flex w-full items-center justify-between p-4 md:px-4 z-50!">
-                  <Link href="/">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="70"
-                      height="29"
-                      viewBox="0 0 101 42"
-                      fill="none"
-                    >
-                      <path
-                        d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
-                        fill="#F8F7FC"
-                      />
-                    </svg>
-                  </Link>
-                  <nav className="hidden md:block">
-                    <ul className="flex items-around gap-[65px]">
-                      {[
-                        { label: "Align", id: "align" },
-                        { label: "Perform", id: "perform" },
-                        { label: "Decode", id: "decode" },
-                        { label: "Ask", id: "ask" },
-                      ].map((item) => (
-                        <li
-                          key={item.id}
-                          onClick={() =>
-                            document.getElementById(item.id)?.scrollIntoView({
-                              behavior: "smooth",
-                              block: "start",
-                            })
-                          }
-                          className={`
-                          cursor-pointer
-                          text-[17px]
-                          font-Satoshi
-                          font-normal
-                          leading-[150%]
-                          uppercase
-                          transition-colors duration-300
-                          ${
-                            activeSection === item.id
-                              ? "text-[#F8F7FC]"
-                              : "text-[#F8F7FC]/60 hover:text-[#F8F7FC]"
-                          }
-                        `}
-                        >
-                          {item.label}
-                        </li>
-                      ))}
-                    </ul>
-                  </nav>
-
-                  <div className="md:hidden">
-                    <button
-                      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                      className="text-[#F8F7FC] cursor-pointer"
-                    >
-                      {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-                    </button>
-                  </div>
-
-                  {mobileMenuOpen && (
-                    <div
-                      className="
-                      absolute
-                      top-full
-                      left-0
-                      mt-4
-                      w-full
-                      rounded-[16.912px]
-                      border
-                      border-[#7478895c]
-                      bg-[#1e2540]/90
-                      backdrop-blur-xl
-                      p-6
-                      md:hidden
-                      z-50! 
-                    "
-                    >
-                      <ul className="flex flex-col gap-6 z-50!">
-                        {[
-                          { label: "Align", id: "align" },
-                          { label: "Perform", id: "perform" },
-                          { label: "Decode", id: "decode" },
-                          { label: "Ask", id: "ask" },
-                        ].map((item) => (
-                          <li
-                            key={item.id}
-                            onClick={(item: any) => {
-                              document.getElementById(item.id)?.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start",
-                              });
-
-                              setMobileMenuOpen(false);
-                            }}
-                            className="
-                        cursor-pointer
-                        text-[#F8F7FC]/80
-                        text-[18px]
-                        font-Satoshi
-                        uppercase
-                        hover:text-[#F8F7FC]
-                        transition
-                      "
-                          >
-                            {item?.label}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </motion.header>
-            </div>
-
             {/* Mockup on mobile */}
             <div className=" w-full! px-0 xl:px-4.5 flex flex-col lg:flex-row justify-between items-center gap-5 md:gap-10 pt-20 md:pt-24 mt-10 md:mt-15">
               <motion.div
@@ -1492,7 +1309,7 @@ export default function Home() {
                     Timing Intelligence for Modern Investors
                   </h1>
 
-                  <p className="text-[#F8F7FC] text-[16px] md:text-[24px] font-normal leading-[140%] max-w-full lg:max-w-[800px] font-Satoshi">
+                  <p className="text-[#F8F7FC] text-[18px] md:text-[24px] font-normal leading-[140%] max-w-full lg:max-w-[800px] font-Satoshi">
                     Ology is a market timing platform that synthesizes celestial
                     cycles, behavioral psychology, and live market data into a
                     personalized timing profile. Active traders and investors
@@ -1503,23 +1320,28 @@ export default function Home() {
                   <button
                     type="button"
                     className="
-                      cursor-pointer
-                      inline-flex
-                      flex
-                      w-auto
-                      p-[16px]
-                      justify-center
-                      items-center
-                      rounded-[20px]
-                      bg-[rgba(30,37,64,0.30)]
-                      border
-                      border-white/10
-                      backdrop-blur-xl
-                      hover:bg-white/10
-                      transition-all
-                      duration-500
-                      
-                    "
+  cursor-pointer
+  inline-flex
+  flex
+  w-auto
+  py-[14.73px]
+    px-[18px]
+  justify-center
+  items-center
+  rounded-[20px]
+  bg-gradient-to-b
+  from-white/10
+  to-[rgba(30,37,64,0.15)]
+  border
+  border-white/20
+  backdrop-blur-xl
+  backdrop-saturate-150
+  shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
+  hover:bg-white/10
+  hover:border-white/30
+  transition-all
+  duration-500
+"
                   >
                     {" "}
                     <span className=" text-[#F8F7FC] font-Satoshi text-[16px] lg:text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
@@ -1636,8 +1458,10 @@ export default function Home() {
               flex
               items-center
               justify-between
-              // h-[65.771px]
-              p-5
+          
+              px-5
+              py-1
+              lg:py-2
               rounded-[20px]
               border
               border-[#7478895c]
@@ -1646,7 +1470,7 @@ export default function Home() {
               z-30!
             "
           >
-            <div className="flex w-full items-center justify-between p-4 md:px-4 z-50!">
+            <div className="flex w-full items-center justify-between px-4 lg:py-2 py-1 md:px-4 z-50!">
               <Link href="/">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1721,9 +1545,9 @@ export default function Home() {
               <div className="md:hidden">
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="text-[#F8F7FC] cursor-pointer"
+                  className="text-[#F8F7FC] cursor-pointer mt-2"
                 >
-                  {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                  {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
                 </button>
               </div>
 
@@ -1835,16 +1659,20 @@ export default function Home() {
             <div ref={sectionRef} className="relative w-full! lg:h-[150vh]">
               <div
                 id="align"
-                className=" relative xl:sticky xl:top-20 w-full flex flex-col items-center justify-start gap-[120px] xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
+                className=" relative xl:sticky xl:top-20 w-full flex flex-col items-center justify-start gap-[52px] lg:gap-[120px] xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
-                <div className="flex flex-col gap-[30px] mt-20">
+                <div className="flex flex-col gap-[30px] mt-20 ">
                   <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
-                    Where Cycles Meet the Tape
+                    Where Cycles
+                    <br className="md:hidden" /> Meet the Tape
                   </h2>
 
                   <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[18px] md:text-[22px] font-normal leading-[120%]">
-                    Major market moments have long clustered around measurable
-                    celestial alignments. Ology keeps that record in real time.
+                    Major market moments have long clustered
+                    <br className="md:hidden" /> around measurable celestial
+                    alignments.
+                    <br className="md:hidden" /> Ology keeps that record in real
+                    time.
                   </h4>
                 </div>
 
@@ -1951,15 +1779,6 @@ export default function Home() {
                             </button>
 
                             <div className="flex flex-col items-end justify-between gap-[17.26px]">
-                              {status === "AHEAD" && (
-                                <p
-                                  className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                                  style={{ color: style.label.color }}
-                                >
-                                  AHEAD
-                                </p>
-                              )}
-
                               {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
                               {data.outcome_tag && (
                                 <p
@@ -2015,21 +1834,21 @@ export default function Home() {
                         <div
                           key={id}
                           className="
-              relative
-              flex h-auto md:h-[313px]
-              w-full shrink-0 snap-center
-              p-[22px] md:p-[27.23px]
-              flex-col justify-between
+                        relative
+                        flex h-auto md:h-[313px]
+                        w-full shrink-0 snap-center
+                        p-[22px] md:p-[27.23px]
+                        flex-col justify-between
 
-              bg-[#0D1220]/95
-              rounded-[9.757px]
-              border-[0.61px] border-[#2A2933]
-              backdrop-blur-xl
+                        bg-[#0D1220]/95
+                        rounded-[9.757px]
+                        border-[0.61px] border-[#2A2933]
+                        backdrop-blur-xl
 
-              overflow-hidden
-              transition-all duration-500
-              z-30
-            "
+                        overflow-hidden
+                        transition-all duration-500
+                        z-30
+                      "
                         >
                           <div className="w-full flex justify-between items-center ">
                             <h3 className="text-[#8B8996] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
@@ -2038,11 +1857,11 @@ export default function Home() {
 
                             <div className="flex justify-start items-center gap-[8px]">
                               <div
-                                className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
+                                className="w-[16.96px] h-[16.96px] rounded-full flex justify-center items-center"
                                 style={style.button}
                               >
                                 <div
-                                  className="w-[14.64px] h-[14.64px] rounded-full"
+                                  className="w-[10.64px] h-[10.64px] rounded-full"
                                   style={{ background: style.dot.background }}
                                 />
                               </div>
@@ -2091,15 +1910,6 @@ export default function Home() {
                             </button>
 
                             <div className="flex flex-col items-end justify-between gap-[17.26px]">
-                              {status === "AHEAD" && (
-                                <p
-                                  className="font-Satoshi text-[10.13px] font-bold leading-[120%] tracking-[2.148px] uppercase"
-                                  style={{ color: style.label.color }}
-                                >
-                                  AHEAD
-                                </p>
-                              )}
-
                               {data.outcome_tag && (
                                 <p
                                   className="font-mono text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase px-2 py-[2px] rounded-[4px]"
@@ -2309,6 +2119,7 @@ export default function Home() {
             overflow-hidden
             transition-all duration-500
             mt-18
+            z-50!
           "
                   >
                     <div className="flex flex-col gap-[16.71px] -mt-2">
@@ -2348,6 +2159,7 @@ export default function Home() {
                               Email
                             </label>
                             <input
+                              type="email"
                               value={email}
                               onChange={(e: any) => setEmail(e.target.value)}
                               className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
@@ -2511,7 +2323,7 @@ export default function Home() {
 
                               {openDate &&
                                 createPortal(
-                                  <div className="fixed inset-0 z-999999 flex items-center justify-center p-4">
+                                  <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
                                     <div
                                       className="absolute inset-0 bg-black/10 backdrop-blur-md"
                                       onClick={() => setOpenDate(false)}
@@ -2546,7 +2358,7 @@ export default function Home() {
                                 createPortal(
                                   <div className="font-Satoshi fixed inset-0 z-[999999] flex items-center justify-center p-4">
                                     <div
-                                      className="absolute inset-0 bg-black/10 backdrop-blur-md"
+                                      className="absolute inset-0 bg-black/10"
                                       onClick={() => setOpenTime(false)}
                                     />
                                     <div
@@ -2680,7 +2492,7 @@ export default function Home() {
                 {/* MOBILE / TABLET FORM (< xl) */}
                 <div
                   id="archetype-form"
-                  className="block flex relative xl:hidden flex-1 min-w-0 flex-col items-center md:items-start gap-10 md:gap-18! z-20 px-1 md:px-0 max-w-auto mt-10 md:mt-20"
+                  className="block flex relative xl:hidden z-50! flex-1 min-w-0 flex-col items-center md:items-start gap-10 md:gap-18! z-20 px-1 md:px-0 max-w-auto mt-10 md:mt-20"
                 >
                   <div className="flex flex-col items-center gap-[40px]">
                     <h3 className="text-[#F8F7FC] font-Recoleta text-[32px] sm:text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px] text-center md:text-start">
@@ -2694,7 +2506,7 @@ export default function Home() {
                   </div>
 
                   {/* MOBILE PHONE MOCKUP */}
-                  <div className="block lg:hidden relative shrink-0 w-40 sm:w-52 mt-10 mb-10">
+                  <div className="block lg:hidden relative shrink-0 w-[91.08px] sm:w-52">
                     <video
                       autoPlay
                       muted
@@ -2726,17 +2538,17 @@ export default function Home() {
             relative
             flex w-[345px] h-auto lg:h-[300px]
             flex-col justify-evenly items-start
-            p-6 sm:p-[31.381px]
+            p-[23.12px] 
             rounded-[16.912px]
             bg-[rgba(0,0,0,0)]
             backdrop-blur-[2px]
             border border-white/20
             overflow-visible
             transition-all duration-500
-            mt-6 md:mt-10
+    
           "
                   >
-                    <div className="flex flex-col gap-[16.71px] -mt-2">
+                    <div className="flex flex-col gap-[16.71px] ">
                       {/* {!showNatalForm ? (
                         <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[28px] font-normal leading-[150%]">
                           Discover your investor timing profile
@@ -2754,15 +2566,15 @@ export default function Home() {
                       )} */}
                     </div>
 
-                    <div className="flex flex-col w-full mt-10">
+                    <div className="flex flex-col w-full">
                       {!showNatalForm && (
-                        <div className="w-full! flex gap-6.5 items-center md:items-end flex-col md:flex-row">
+                        <div className="w-full! flex gap-2.5 items-center md:items-end flex-col md:flex-row">
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                             {/* <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
                               Full Name
                             </label> */}
                             <input
-                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
+                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-[14px] text-[14px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
                               value={names}
                               placeholder="FULL NAME"
                               onChange={(e: any) => setNames(e.target.value)}
@@ -2777,7 +2589,7 @@ export default function Home() {
                               value={email}
                               placeholder="EMAIL ADDRESS"
                               onChange={(e: any) => setEmail(e.target.value)}
-                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
+                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-[14px] text-[14px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
                             />
                           </div>
 
@@ -2794,9 +2606,9 @@ export default function Home() {
                                 }, 5000);
                               }
                             }}
-                            className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                            className="cursor-pointer mb-2 flex w-[22.578px] h-[22.538px]  justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
                           >
-                            <ArrowRight />
+                            <ArrowRight size={12} />
                           </div>
                         </div>
                       )}
@@ -2826,7 +2638,7 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => setOpenDate(true)}
-                                    className="text-center w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-[13.801px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
+                                    className="text-center w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[14px] text-[14px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
                                   >
                                     {date ? (
                                       format(date, "PPP")
@@ -2843,7 +2655,7 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => setOpenTime(true)}
-                                    className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-[13.801px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
+                                    className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[14px] text-[14px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
                                   >
                                     {time || <>birth time</>}
                                   </button>
@@ -2865,7 +2677,7 @@ export default function Home() {
                                       handleChange(e.target.value)
                                     }
                                     onFocus={() => setShowDropdown(true)}
-                                    className="py-4 px-5 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-[13.801px] placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-center placeholder:text-center font-Satoshi text-[#F8F7FC] text-base font-normal tracking-[1.95px]"
+                                    className="py-4 px-5 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-[13.801px] placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-center placeholder:text-center font-Satoshi text-[#F8F7FC] placeholder:text-[14px] text-[14px] font-normal tracking-[1.95px]"
                                   />
                                   {showDropdown &&
                                     suggestions.length > 0 &&
@@ -3121,6 +2933,50 @@ export default function Home() {
                   />
                 </div>
               </div>
+
+              <div className="block lg:hidden absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-25 pointer-events-none overflow-hidden">
+                {Array.from({ length: BLOCKS }).map((_, block) => (
+                  <div
+                    key={block}
+                    className="absolute left-0 right-0 flex h-full"
+                    style={{ top: `${block * 100}vh` }}
+                  >
+                    {Array.from({ length: LINES }).map((_, i) => {
+                      const isActive = activeLines[i];
+
+                      return (
+                        <div key={i} className="relative flex-1">
+                          <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/4" />
+
+                          {isActive && (
+                            <motion.div
+                              className="absolute left-1/2 top-0 -translate-x-1/2"
+                              animate={{
+                                y: ["-15vh", "115vh"],
+                                opacity: [0, 1, 0],
+                              }}
+                              transition={{
+                                duration: 10 + (i % 3),
+                                repeat: Infinity,
+                                ease: "linear",
+                                delay: block * 0.8 + i * 0.35,
+                              }}
+                            >
+                              <div
+                                className="absolute left-1/2 -translate-x-1/2 w-px h-20"
+                                style={{
+                                  background:
+                                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
+                                }}
+                              />
+                            </motion.div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
 
@@ -3238,7 +3094,7 @@ export default function Home() {
             gap-[31.381px]
             p-[31.381px]
             rounded-[16.912px]
-            bg-[rgba(30,37,64,0.24)]
+            bg-[rgba(30,37,64,0.15)]
             backdrop-blur-[2px]
             border border-white/20
             shadow-inner
@@ -3247,7 +3103,7 @@ export default function Home() {
           "
                       >
                         <div className="flex justify-center">
-                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[8.84px] font-bold leading-[140%] tabular-nums uppercase">
+                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[8px] font-bold leading-[140%] tabular-nums uppercase">
                             {data.heading}
                           </h4>
                         </div>
@@ -3384,7 +3240,7 @@ export default function Home() {
               <div
                 id="ask"
                 ref={faqsRef}
-                className="sticky top-10 w-full min-h-screen h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center lg:gap-[60px] gap-[85px] xl:px-12.5 md:px-12.5 py-25!"
+                className="sticky top-10 w-full min-h-screen h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center lg:gap-[60px] gap-[45px] xl:px-12.5 md:px-12.5 py-25!"
               >
                 <div className="flex flex-col gap-[30px] items-center xl:items-start">
                   <h2 className="text-[#F8F7FC] text-start font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -3408,9 +3264,53 @@ export default function Home() {
                   <FAQAccordion />
                 </motion.div>
 
-                <div className="block xl:hidden w-full flex flex-col gap-4 items-center mt-8">
+                <div className="block xl:hidden w-full flex flex-col gap-4 items-center mt-8 z-50!">
                   <FAQAccordion />
                 </div>
+              </div>
+
+              <div className="block lg:hidden absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-25 pointer-events-none overflow-hidden">
+                {Array.from({ length: BLOCKS }).map((_, block) => (
+                  <div
+                    key={block}
+                    className="absolute left-0 right-0 flex h-full"
+                    style={{ top: `${block * 100}vh` }}
+                  >
+                    {Array.from({ length: LINES }).map((_, i) => {
+                      const isActive = activeLines[i];
+
+                      return (
+                        <div key={i} className="relative flex-1">
+                          <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/4" />
+
+                          {isActive && (
+                            <motion.div
+                              className="absolute left-1/2 top-0 -translate-x-1/2"
+                              animate={{
+                                y: ["-15vh", "115vh"],
+                                opacity: [0, 1, 0],
+                              }}
+                              transition={{
+                                duration: 10 + (i % 3),
+                                repeat: Infinity,
+                                ease: "linear",
+                                delay: block * 0.8 + i * 0.35,
+                              }}
+                            >
+                              <div
+                                className="absolute left-1/2 -translate-x-1/2 w-px h-20"
+                                style={{
+                                  background:
+                                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
+                                }}
+                              />
+                            </motion.div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             </div>
           </SectionReveal>
@@ -3519,9 +3419,9 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <div className="flex flex-col items-center gap-30 pt-40 lg:pt-31.25">
+            <div className="flex flex-col items-center gap-20! pt-40 lg:pt-31.25 w-auto h-[50vh] lg:h-screen">
               <motion.div
-                className="relative z-10 flex min-h-screen w-full xl:items-center items-start justify-center px-5 "
+                className="relative z-10 flex min-h-screen w-full xl:items-center items-start justify-center px-5 lg:bottom-30"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -3533,7 +3433,8 @@ export default function Home() {
               >
                 <div className="flex max-w-[1241px] flex-col items-center xl:gap-25 gap-10">
                   <h2 className="text-center font-Recoleta text-[32px] lg:text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
-                    Ancient Patterns. Modern Lens.
+                    Ancient Patterns. <br className="block lg:hidden" /> Modern
+                    Lens.
                   </h2>
 
                   <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[24px]">
@@ -3545,7 +3446,29 @@ export default function Home() {
 
                   <button
                     type="button"
-                    className="inline-flex w-auto cursor-pointer items-center justify-center rounded-[20px] border border-white/10 bg-[rgba(30,37,64,0.30)] p-[16px] backdrop-blur-xl transition-all duration-500 hover:bg-white/10"
+                    className="
+  cursor-pointer
+  inline-flex
+  flex
+  w-auto
+  py-[14.73px]
+ px-[18px]
+  justify-center
+  items-center
+  rounded-[20px]
+  bg-gradient-to-b
+  from-white/10
+  to-[rgba(30,37,64,0.15)]
+  border
+  border-white/20
+  backdrop-blur-xl
+  backdrop-saturate-150
+  shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
+  hover:bg-white/10
+  hover:border-white/30
+  transition-all
+  duration-500
+"
                   >
                     <Link
                       href="#archetype-form"
@@ -3586,7 +3509,8 @@ export default function Home() {
               pt-[28px]
             
               pb-[10px]
-              px-[80px]
+              lg:px-[80px]
+              px-[22px]
               z-50!
               flex flex-col items-center!
               
@@ -3596,24 +3520,26 @@ export default function Home() {
                 <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center xl:mt-0">
                   <Link href="#hero">
                     <div className="flex justify-start items-center gap-5">
-                      <svg
-                        width="20"
-                        height="34"
-                        viewBox="0 0 20 34"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M10.3496 25.2133C4.50781 25.2133 0.760247 20.7516 0.760247 15.7369C0.760247 10.6115 4.65477 6.77663 9.68826 6.77663C15.1994 6.77663 19.0204 10.9802 19.0204 16.1425C19.0204 21.231 15.53 25.2133 10.3496 25.2133ZM10.7905 23.9965C13.6563 23.9965 15.7872 21.3785 15.7872 17.2487C15.7872 12.0864 13.0684 7.99345 9.32085 7.99345C6.19788 7.99345 4.03018 10.5746 4.03018 14.7044C4.03018 19.4242 6.74899 23.9965 10.7905 23.9965Z"
-                          fill="#F8F7FC"
-                        />
-                        <path
-                          d="M0.495371 0.0598119C0.885003 -0.131338 1.487 0.138943 2.25581 0.823759C3.02207 1.50631 3.94193 2.59017 4.95557 3.99447C6.98242 6.80247 9.37798 10.8829 11.661 15.5701C13.9441 20.2573 15.6809 24.661 16.6438 27.991C17.1253 29.6564 17.4125 31.0506 17.4785 32.0767C17.5447 33.1062 17.3875 33.749 16.9978 33.9402C16.6082 34.1313 16.0062 33.861 15.2374 33.1762C14.5939 32.603 13.842 31.7467 13.0172 30.6553C12.8599 30.4471 12.7 30.2304 12.5376 30.0055C11.5652 28.6584 10.508 27.0183 9.41899 25.1588H9.80213C11.2132 27.4986 12.5478 29.3986 13.6592 30.6553C14.7814 31.9243 15.6759 32.5373 16.1913 32.2844C17.6546 31.5665 15.5077 24.1415 11.3961 15.7001C7.28449 7.25884 2.76518 0.997758 1.30188 1.71559C0.756021 1.9834 0.712545 3.18459 1.08604 5.02369C1.39058 6.52323 1.97232 8.44689 2.78498 10.6345L2.77393 10.613L2.56112 10.976L2.5565 10.9762C1.84983 9.1567 1.27425 7.47833 0.8494 6.00898C0.751089 5.66897 0.660858 5.34027 0.578977 5.02369C0.259813 3.78968 0.0672037 2.73989 0.0146837 1.92329C-0.0515271 0.893769 0.10574 0.250968 0.495371 0.0598119Z"
-                          fill="#F8F7FC"
-                        />
-                      </svg>
+                      <div className="hidden lg:block">
+                        <svg
+                          width="20"
+                          height="34"
+                          viewBox="0 0 20 34"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10.3496 25.2133C4.50781 25.2133 0.760247 20.7516 0.760247 15.7369C0.760247 10.6115 4.65477 6.77663 9.68826 6.77663C15.1994 6.77663 19.0204 10.9802 19.0204 16.1425C19.0204 21.231 15.53 25.2133 10.3496 25.2133ZM10.7905 23.9965C13.6563 23.9965 15.7872 21.3785 15.7872 17.2487C15.7872 12.0864 13.0684 7.99345 9.32085 7.99345C6.19788 7.99345 4.03018 10.5746 4.03018 14.7044C4.03018 19.4242 6.74899 23.9965 10.7905 23.9965Z"
+                            fill="#F8F7FC"
+                          />
+                          <path
+                            d="M0.495371 0.0598119C0.885003 -0.131338 1.487 0.138943 2.25581 0.823759C3.02207 1.50631 3.94193 2.59017 4.95557 3.99447C6.98242 6.80247 9.37798 10.8829 11.661 15.5701C13.9441 20.2573 15.6809 24.661 16.6438 27.991C17.1253 29.6564 17.4125 31.0506 17.4785 32.0767C17.5447 33.1062 17.3875 33.749 16.9978 33.9402C16.6082 34.1313 16.0062 33.861 15.2374 33.1762C14.5939 32.603 13.842 31.7467 13.0172 30.6553C12.8599 30.4471 12.7 30.2304 12.5376 30.0055C11.5652 28.6584 10.508 27.0183 9.41899 25.1588H9.80213C11.2132 27.4986 12.5478 29.3986 13.6592 30.6553C14.7814 31.9243 15.6759 32.5373 16.1913 32.2844C17.6546 31.5665 15.5077 24.1415 11.3961 15.7001C7.28449 7.25884 2.76518 0.997758 1.30188 1.71559C0.756021 1.9834 0.712545 3.18459 1.08604 5.02369C1.39058 6.52323 1.97232 8.44689 2.78498 10.6345L2.77393 10.613L2.56112 10.976L2.5565 10.9762C1.84983 9.1567 1.27425 7.47833 0.8494 6.00898C0.751089 5.66897 0.660858 5.34027 0.578977 5.02369C0.259813 3.78968 0.0672037 2.73989 0.0146837 1.92329C-0.0515271 0.893769 0.10574 0.250968 0.495371 0.0598119Z"
+                            fill="#F8F7FC"
+                          />
+                        </svg>
+                      </div>
 
-                      <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[16px] font-medium leading-[140%]">
+                      <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11.787px] lg:text-[16px] font-medium leading-[140%]">
                         Pattern over prediction.
                       </h4>
                     </div>
@@ -3643,8 +3569,8 @@ export default function Home() {
                   <div className="flex justify-start items-center gap-[28px]">
                     <Link href="https://x.com/OlogyHQ" target="_blank">
                       <svg
-                        width="23"
-                        height="23"
+                        width="18"
+                        height="18"
                         viewBox="0 0 23 23"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -3660,8 +3586,8 @@ export default function Home() {
                       target="_blank"
                     >
                       <svg
-                        width="23"
-                        height="23"
+                        width="18"
+                        height="18"
                         viewBox="0 0 23 23"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -3697,8 +3623,8 @@ export default function Home() {
                       target="_blank"
                     >
                       <svg
-                        width="23"
-                        height="23"
+                        width="18"
+                        height="18"
                         viewBox="0 0 23 23"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -3743,7 +3669,7 @@ export default function Home() {
                 delay: 1.5,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="absolute inset-0 bg-[rgba(16,21,36,0.75)]"
+              className="absolute inset-0 bg-[rgba(16,21,36,0.85)]"
             />
 
             <motion.div

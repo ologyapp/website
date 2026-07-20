@@ -5,69 +5,80 @@ function Footer() {
   return (
     <footer
       className="
-        w-full
-        flex
-        flex-col
-        items-start
-        gap-[30px]
-        pt-[28px]
-        pb-[10px]
-        px-[40px]
-        z-50!
-    "
+              w-full
+              relative
+              bottom-10
+              left-0
+              flex
+              w-full
+              flex-col
+              items-start
+              gap-[30px]
+              pt-[28px]
+            
+              pb-[10px]
+              lg:px-[80px]
+              px-[22px]
+              z-50!
+              flex flex-col items-center!
+              
+          
+            "
     >
-      <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center mt-2! xl:mt-0">
-        <Link href="/">
+      <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center xl:mt-0">
+        <Link href="#hero">
           <div className="flex justify-start items-center gap-5">
-            <svg
-              width="20"
-              height="34"
-              viewBox="0 0 20 34"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10.3496 25.2133C4.50781 25.2133 0.760247 20.7516 0.760247 15.7369C0.760247 10.6115 4.65477 6.77663 9.68826 6.77663C15.1994 6.77663 19.0204 10.9802 19.0204 16.1425C19.0204 21.231 15.53 25.2133 10.3496 25.2133ZM10.7905 23.9965C13.6563 23.9965 15.7872 21.3785 15.7872 17.2487C15.7872 12.0864 13.0684 7.99345 9.32085 7.99345C6.19788 7.99345 4.03018 10.5746 4.03018 14.7044C4.03018 19.4242 6.74899 23.9965 10.7905 23.9965Z"
-                fill="#F8F7FC"
-              />
-              <path
-                d="M0.495371 0.0598119C0.885003 -0.131338 1.487 0.138943 2.25581 0.823759C3.02207 1.50631 3.94193 2.59017 4.95557 3.99447C6.98242 6.80247 9.37798 10.8829 11.661 15.5701C13.9441 20.2573 15.6809 24.661 16.6438 27.991C17.1253 29.6564 17.4125 31.0506 17.4785 32.0767C17.5447 33.1062 17.3875 33.749 16.9978 33.9402C16.6082 34.1313 16.0062 33.861 15.2374 33.1762C14.5939 32.603 13.842 31.7467 13.0172 30.6553C12.8599 30.4471 12.7 30.2304 12.5376 30.0055C11.5652 28.6584 10.508 27.0183 9.41899 25.1588H9.80213C11.2132 27.4986 12.5478 29.3986 13.6592 30.6553C14.7814 31.9243 15.6759 32.5373 16.1913 32.2844C17.6546 31.5665 15.5077 24.1415 11.3961 15.7001C7.28449 7.25884 2.76518 0.997758 1.30188 1.71559C0.756021 1.9834 0.712545 3.18459 1.08604 5.02369C1.39058 6.52323 1.97232 8.44689 2.78498 10.6345L2.77393 10.613L2.56112 10.976L2.5565 10.9762C1.84983 9.1567 1.27425 7.47833 0.8494 6.00898C0.751089 5.66897 0.660858 5.34027 0.578977 5.02369C0.259813 3.78968 0.0672037 2.73989 0.0146837 1.92329C-0.0515271 0.893769 0.10574 0.250968 0.495371 0.0598119Z"
-                fill="#F8F7FC"
-              />
-            </svg>
+            <div className="hidden lg:block">
+              <svg
+                width="20"
+                height="34"
+                viewBox="0 0 20 34"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10.3496 25.2133C4.50781 25.2133 0.760247 20.7516 0.760247 15.7369C0.760247 10.6115 4.65477 6.77663 9.68826 6.77663C15.1994 6.77663 19.0204 10.9802 19.0204 16.1425C19.0204 21.231 15.53 25.2133 10.3496 25.2133ZM10.7905 23.9965C13.6563 23.9965 15.7872 21.3785 15.7872 17.2487C15.7872 12.0864 13.0684 7.99345 9.32085 7.99345C6.19788 7.99345 4.03018 10.5746 4.03018 14.7044C4.03018 19.4242 6.74899 23.9965 10.7905 23.9965Z"
+                  fill="#F8F7FC"
+                />
+                <path
+                  d="M0.495371 0.0598119C0.885003 -0.131338 1.487 0.138943 2.25581 0.823759C3.02207 1.50631 3.94193 2.59017 4.95557 3.99447C6.98242 6.80247 9.37798 10.8829 11.661 15.5701C13.9441 20.2573 15.6809 24.661 16.6438 27.991C17.1253 29.6564 17.4125 31.0506 17.4785 32.0767C17.5447 33.1062 17.3875 33.749 16.9978 33.9402C16.6082 34.1313 16.0062 33.861 15.2374 33.1762C14.5939 32.603 13.842 31.7467 13.0172 30.6553C12.8599 30.4471 12.7 30.2304 12.5376 30.0055C11.5652 28.6584 10.508 27.0183 9.41899 25.1588H9.80213C11.2132 27.4986 12.5478 29.3986 13.6592 30.6553C14.7814 31.9243 15.6759 32.5373 16.1913 32.2844C17.6546 31.5665 15.5077 24.1415 11.3961 15.7001C7.28449 7.25884 2.76518 0.997758 1.30188 1.71559C0.756021 1.9834 0.712545 3.18459 1.08604 5.02369C1.39058 6.52323 1.97232 8.44689 2.78498 10.6345L2.77393 10.613L2.56112 10.976L2.5565 10.9762C1.84983 9.1567 1.27425 7.47833 0.8494 6.00898C0.751089 5.66897 0.660858 5.34027 0.578977 5.02369C0.259813 3.78968 0.0672037 2.73989 0.0146837 1.92329C-0.0515271 0.893769 0.10574 0.250968 0.495371 0.0598119Z"
+                  fill="#F8F7FC"
+                />
+              </svg>
+            </div>
 
-            <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[16px] font-normal leading-[140%]">
+            <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11.787px] lg:text-[16px] font-medium leading-[140%]">
               Pattern over prediction.
             </h4>
           </div>
         </Link>
         <div className="flex justify-start items-center gap-10 relative xl:-left-10">
-          <a href="/privacy-policy">
-            <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
+          <Link href="/privacy-policy">
+            <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
               Privacy
             </h5>
-          </a>
-          <a href="/Terms-of-service">
-            <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
+          </Link>
+          <Link href="/Terms-of-service">
+            <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
               Terms
             </h5>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="mailto:hello@ologyapp.com?subject=Ology%20Inquiry"
             target="_blank"
           >
-            <h5 className="text-[#F8F7FC] font-Satoshi text-[16px] font-normal leading-normal">
+            <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
               Contact
             </h5>
-          </a>
+          </Link>
         </div>
 
         <div className="flex justify-start items-center gap-[28px]">
-          <a href="https://x.com/OlogyHQ" target="_blank">
+          <Link href="https://x.com/OlogyHQ" target="_blank">
             <svg
-              width="23"
-              height="23"
+              width="18"
+              height="18"
               viewBox="0 0 23 23"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -77,11 +88,11 @@ function Footer() {
                 fill="white"
               />
             </svg>
-          </a>
-          <a href="https://www.instagram.com/ologyapp/" target="_blank">
+          </Link>
+          <Link href="https://www.instagram.com/ologyapp/" target="_blank">
             <svg
-              width="23"
-              height="23"
+              width="18"
+              height="18"
               viewBox="0 0 23 23"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -106,12 +117,12 @@ function Footer() {
                 </clipPath>
               </defs>
             </svg>
-          </a>
+          </Link>
 
           <a href="https://www.linkedin.com/company/ologyapp/" target="_blank">
             <svg
-              width="23"
-              height="23"
+              width="18"
+              height="18"
               viewBox="0 0 23 23"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -133,7 +144,7 @@ function Footer() {
       </div>
 
       <div className="w-full text-center">
-        <p className="text-[#E8E9F3]/30 text-center font-Satoshi text-[16px] font-normal leading-[140%]">
+        <p className="text-[#E8E9F3]/30 text-center font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-[140%]">
           Ology provides behavioral and timing context for informational
           purposes only and is not an investment adviser. © 2026 Ology
           Intelligence, Inc.
