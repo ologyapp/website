@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import {
   DayPicker,
   getDefaultClassNames,
@@ -17,11 +18,122 @@ import {
 } from "lucide-react";
 import { isSameDay } from "date-fns";
 
+function CalendarDropdown({ options, value, onChange, className }: any) {
+  const [open, setOpen] = React.useState(false);
+  const [coords, setCoords] = React.useState({ top: 0, left: 0 });
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  // NEW — proves whether this is the same instance or a fresh one
+  const instanceId = React.useRef(Math.random().toString(36).slice(2, 8));
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    function handleOutside(e: MouseEvent | TouchEvent) {
+      const target = e.target as Node;
+      const insideTrigger = triggerRef.current?.contains(target);
+      const insideList = listRef.current?.contains(target);
+
+      if (insideTrigger || insideList) {
+        return;
+      }
+
+      setOpen(false);
+    }
+
+    const id = window.setTimeout(() => {
+      document.addEventListener("mousedown", handleOutside);
+      document.addEventListener("touchstart", handleOutside);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(id);
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [open]);
+
+  // fires on every render — tells you if this component is remounting
+
+  const openMenu = () => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) {
+      setCoords({
+        top: rect.bottom + 8,
+        left: rect.left + rect.width / 2,
+      });
+    }
+
+    setOpen((o) => !o);
+  };
+
+  const selected = options?.find((o: any) => String(o.value) === String(value));
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          openMenu();
+        }}
+        className={cn(
+          "flex items-center gap-1 text-[#F8F7FC] font-Recoleta text-[19.184px] font-normal",
+          className,
+        )}
+      >
+        {selected?.label}
+        <ChevronDownIcon className="size-3.5 text-white/60" />
+      </button>
+
+      {open &&
+        createPortal(
+          <div
+            ref={listRef}
+            style={{
+              position: "fixed",
+              top: coords.top,
+              left: coords.left,
+              transform: "translateX(-50%)",
+            }}
+            className="z-[9999999] max-h-56 w-28 overflow-y-auto scrollbar-none rounded-xl border border-white/10 bg-[#1a2036] shadow-2xl"
+          >
+            {options?.map((option: any) => (
+              <button
+                key={option.value}
+                type="button"
+                disabled={option.disabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  onChange?.({
+                    target: { value: String(option.value) },
+                  } as React.ChangeEvent<HTMLSelectElement>);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "block w-full px-3 py-2 text-left text-sm text-white/70 hover:bg-white/10 transition-colors",
+                  String(option.value) === String(value) &&
+                    "bg-white/10 text-white font-semibold",
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )}
+    </>
+  );
+}
+
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
-  captionLayout = "label",
+  captionLayout = "dropdown",
   buttonVariant = "ghost",
   locale,
   formatters,
@@ -60,7 +172,8 @@ function Calendar({
           defaultClassNames.month,
         ),
         nav: cn(
-          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
+          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1 pointer-events-none",
+          "[&>button]:pointer-events-auto",
           defaultClassNames.nav,
         ),
         button_previous: cn(
@@ -85,17 +198,11 @@ function Calendar({
           "relative rounded-(--cell-radius) bg-transparent",
           defaultClassNames.dropdown_root,
         ),
-
-        dropdown: cn(
-          "absolute inset-0 bg-transparent opacity-0 text-base",
-          defaultClassNames.dropdown,
-        ),
         caption_label: cn(
           "text-[#F8F7FC] text-center font-Recoleta text-[19.184px] font-normal leading-[24.939px] tracking-[-0.004px] not-italic",
           "flex items-center justify-center",
           defaultClassNames.caption_label,
         ),
-        // table: "w-full border-collapse",
         weekdays: cn(
           "flex border-t border-[rgba(248,247,252,0.1)] pt-2 mt-2 mb-4",
           defaultClassNames.weekdays,
@@ -164,7 +271,6 @@ function Calendar({
               />
             );
           }
-
           if (orientation === "right") {
             return (
               <ChevronRightIcon
@@ -173,7 +279,6 @@ function Calendar({
               />
             );
           }
-
           return (
             <ChevronDownIcon
               className={cn("size-4 text-white", className)}
@@ -184,6 +289,7 @@ function Calendar({
         DayButton: ({ ...props }) => (
           <CalendarDayButton locale={locale} {...props} />
         ),
+        Dropdown: CalendarDropdown,
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>

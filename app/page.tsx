@@ -225,6 +225,15 @@ function getStatusColor(state: "past" | "current" | "future") {
   }
 }
 
+function MouseTracker({ onMove }: { onMove: (x: number, y: number) => void }) {
+  useEffect(() => {
+    const handler = (e: MouseEvent) => onMove(e.clientX, e.clientY);
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
+  }, [onMove]);
+  return null;
+}
+
 export default function Home() {
   const [isLocked, setIsLocked] = useState(false);
   const [data, setData] = useState<any>({});
@@ -778,11 +787,6 @@ export default function Home() {
     damping: 100,
   });
 
-  useEffect(() => {
-    mouseX.set(mousePosition.x);
-    mouseY.set(mousePosition.y);
-  }, [mousePosition]);
-
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async () => {
@@ -991,24 +995,21 @@ export default function Home() {
       className="flex flex-col scroll-smooth relative cursor-pointer mb-0! w-full!"
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
-
-        setMousePosition({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        });
+        mouseX.set(e.clientX - rect.left);
+        mouseY.set(e.clientY - rect.top);
       }}
     >
       <motion.div
         className="hidden lg:block pointer-events-none absolute inset-0 z-9999! mix-blend-screen"
         style={{
           background: useMotionTemplate`
-          radial-gradient(
-            80px circle at ${mousePosition.x}px ${mousePosition.y}px,
-            rgba(210, 255, 240, 0.1),
-            rgba(180, 235, 255, 0.04),
-            transparent 90%
-          )
-        `,
+      radial-gradient(
+        80px circle at ${smoothX}px ${smoothY}px,
+        rgba(210, 255, 240, 0.1),
+        rgba(180, 235, 255, 0.04),
+        transparent 90%
+      )
+    `,
         }}
       />
 
@@ -2326,32 +2327,41 @@ export default function Home() {
 
                               {openDate &&
                                 createPortal(
-                                  <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                                  <div className="fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
                                       className="absolute inset-0 bg-black/10 backdrop-blur-md"
                                       onClick={() => setOpenDate(false)}
                                     />
                                     <div
-                                      className="font-Satoshi relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
+                                      className="relative z-10 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
                                       onClick={(e) => e.stopPropagation()}
                                     >
-                                      <button
-                                        type="button"
-                                        onClick={() => setOpenDate(false)}
-                                        className="absolute right-4 top-4 text-white/60 hover:text-white"
-                                      />
-                                      <div className="flex justify-center">
-                                        <Calendar
-                                          mode="single"
-                                          selected={date as Date}
-                                          captionLayout="dropdown"
-                                          onSelect={(d) => {
-                                            if (!d) return;
-                                            setDate(d);
-                                            console.log("d", d);
-                                            setOpenDate(false);
-                                          }}
-                                        />
+                                      {/* blur/bg layer — isolated, no interactive elements inside */}
+                                      <div className="absolute inset-0 -z-10 rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl" />
+
+                                      {/* content layer — no filter ancestor, native select works on iOS */}
+                                      <div className="font-Satoshi p-6">
+                                        <button
+                                          type="button"
+                                          onClick={() => setOpenDate(false)}
+                                          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                                        >
+                                          <X className="size-4" />
+                                        </button>
+
+                                        <div className="flex justify-center">
+                                          <Calendar
+                                            mode="single"
+                                            selected={date as Date}
+                                            captionLayout="dropdown"
+                                            required
+                                            onSelect={(d) => {
+                                              if (!d) return;
+                                              setDate(d);
+                                              setOpenDate(false);
+                                            }}
+                                          />
+                                        </div>
                                       </div>
                                     </div>
                                   </div>,
@@ -2360,7 +2370,7 @@ export default function Home() {
 
                               {openTime &&
                                 createPortal(
-                                  <div className="font-Satoshi fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                                  <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
                                       className="absolute inset-0 bg-black/10"
                                       onClick={() => setOpenTime(false)}
@@ -2740,7 +2750,7 @@ export default function Home() {
                               {openDate &&
                                 createPortal(
                                   <div
-                                    className="fixed inset-0 z-999999 flex items-center justify-center p-4"
+                                    className="fixed inset-0 z-50! flex items-center justify-center p-4"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <div
@@ -2758,9 +2768,9 @@ export default function Home() {
                                           captionLayout="dropdown"
                                           required
                                           onSelect={(d) => {
+                                            if (!d) return;
+                                            setDate(d);
                                             setOpenDate(false);
-                                            console.log("d", d);
-                                            if (d) setDate(d);
                                           }}
                                         />
                                       </div>
@@ -2771,7 +2781,7 @@ export default function Home() {
 
                               {openTime &&
                                 createPortal(
-                                  <div className="font-Satoshi fixed inset-0 z-[999999] flex items-center justify-center p-4">
+                                  <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
                                       className="absolute inset-0 bg-black/10 backdrop-blur-md"
                                       onClick={() => setOpenTime(false)}
