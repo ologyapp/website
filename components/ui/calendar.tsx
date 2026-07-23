@@ -87,7 +87,7 @@ function Calendar({
         ),
 
         dropdown: cn(
-          "absolute inset-0 bg-transparent opacity-0",
+          "absolute inset-0 bg-transparent opacity-0 text-base",
           defaultClassNames.dropdown,
         ),
         caption_label: cn(
@@ -234,7 +234,9 @@ function CalendarDayButton({
         "w-9 h-9 min-w-9 rounded-full",
         "text-[#F8F7FC] text-center font-Satoshi text-[15.547px] font-medium leading-none",
         "relative isolate z-10 border-0",
-
+        "hover:bg-white/10",
+        "data-[selected-single=true]:bg-white/20 data-[selected-single=true]:text-white",
+        "transition-colors",
         defaultClassNames.day,
         className,
       )}
