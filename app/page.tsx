@@ -4066,7 +4066,7 @@ export default function Home() {
                 </div>
               )}
 
-              {hideFooter && (
+              {showLogoOnPortal && (
                 <div className="w-full flex justify-center text-center">
                   <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
                     ologyapp.com
