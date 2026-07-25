@@ -1130,7 +1130,7 @@ export default function Home() {
       {/* HERO SECTION */}
       <section
         ref={heroRef}
-        className="relative h-screen! w-full! flex flex-col items-center! pb-10 box-border z-40!"
+        className="relative h-screen w-full! flex flex-col items-center!  z-40!"
       >
         <motion.div
           style={{ opacity }}
