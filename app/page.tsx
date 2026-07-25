@@ -4070,7 +4070,7 @@ export default function Home() {
               )}
 
               {hideFooterLogo && (
-                <div className="w-full flex justify-center text-center">
+                <div className="w-full flex justify-center text-center z-30!">
                   <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
                     ologyapp.com
                   </p>
