@@ -383,7 +383,7 @@ export default function Home() {
   // archetype,
   // imageUrl,
 
-  const [showLogoOnPortal, setShowLogoOnModal] = useState(false);
+  const [showLogoOnModal, setShowLogoOnModal] = useState(false);
   const [hideFooter, setHideFooter] = useState(false);
   const [hideDivider, setHideDivider] = useState(false);
   const [hideFooterLogo, setHideFooterLogo] = useState(false);
@@ -399,15 +399,47 @@ export default function Home() {
     });
   }
 
+  window.addEventListener(
+    "error",
+    (e) => {
+      if (e.target instanceof HTMLImageElement) {
+        console.error("IMAGE FAILED:", e.target.src);
+      }
+    },
+    true,
+  );
+
+  // Helper: converts any image URL to a data URL using a canvas (bypasses html-to-image's internal fetch entirely)
+  async function imageUrlToDataUrl(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image(); // explicitly native, not next/image
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = reject;
+      img.src = url;
+    });
+  }
+
+  const [posterDataSrc, setPosterDataSrc] = useState<string | null>(null);
+
   const handleShare = async () => {
     if (!cardRef.current) return;
-
     const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
     try {
       setIsDownloading(true);
 
+      const posterUrl = getCardPoster(cardType);
+      const dataSrc = await imageUrlToDataUrl(posterUrl);
+
       flushSync(() => {
+        setPosterDataSrc(dataSrc); // React now owns this
         setShowLogoOnModal(true);
         setHideFooter(true);
         setHideDivider(true);
@@ -415,12 +447,9 @@ export default function Home() {
       });
       await waitForPaint();
 
-      const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 2,
-      });
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
 
       const blob = await (await fetch(dataUrl)).blob();
-
       const file = new File([blob], `${names}-${archetype}-card.png`, {
         type: "image/png",
       });
@@ -442,6 +471,7 @@ export default function Home() {
     } catch (err) {
       console.error(err);
     } finally {
+      setPosterDataSrc(null);
       setShowLogoOnModal(false);
       setHideFooter(false);
       setHideDivider(false);
@@ -663,6 +693,9 @@ export default function Home() {
 
   const handleSubmitForm = async () => {
     if (!canProceed || loading) return;
+
+    // Force iOS to release any lingering zoom/scroll from a focused input
+    (document.activeElement as HTMLElement | null)?.blur();
 
     setShowSpinner(true);
 
@@ -3865,16 +3898,16 @@ export default function Home() {
               className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-6 md:gap-12.5 rounded-[16.912px] border border-white/50 bg-cover bg-center bg-no-repeat bg-lightgray overflow-y-auto max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                src={getCardBg(cardType)}
-                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
-                  showLogoOnPortal ? "hidden" : "block"
-                }`}
-              />
+              {!showLogoOnModal && (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  src={getCardBg(cardType)}
+                  className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
+                />
+              )}
 
               <img
                 src={getCardPoster(cardType)}
@@ -3883,7 +3916,7 @@ export default function Home() {
                   console.error("Poster failed to load:", e.currentTarget.src);
                 }}
                 className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
-                  showLogoOnPortal ? "block" : "hidden"
+                  showLogoOnModal ? "block" : "hidden"
                 }`}
               />
 
@@ -3901,7 +3934,7 @@ export default function Home() {
                         setNames("");
                         setEmail("");
                       }}
-                      className="text-white/60 hover:text-white cursor-pointer"
+                      className="text-white/60 hover:text-white cursor-pointer touch-manipulation"
                     >
                       <X size={20} />
                     </button>
@@ -3915,7 +3948,7 @@ export default function Home() {
                 {/* LEFT */}
                 <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
                   <div className="mb-4">
-                    {showLogoOnPortal && (
+                    {showLogoOnModal && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="70"
@@ -4050,7 +4083,7 @@ export default function Home() {
                     <div className="hidden lg:flex justify-center md:justify-start gap-4">
                       <button
                         onClick={handleShare}
-                        className="flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
+                        className="touch-manipulation flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
                       >
                         <svg
                           width="12"
@@ -4144,7 +4177,7 @@ export default function Home() {
 
                       <button
                         onClick={handleCopy}
-                        className="w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
+                        className="touch-manipulation w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
                       >
                         <svg
                           width="12"
