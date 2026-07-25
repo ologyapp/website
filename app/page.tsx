@@ -405,8 +405,6 @@ export default function Home() {
     try {
       setIsDownloading(true);
 
-      // Force these state changes to apply synchronously, then wait
-      // for the resulting DOM changes to actually paint.
       flushSync(() => {
         setShowLogoOnModal(true);
         setHideFooter(true);
@@ -415,20 +413,16 @@ export default function Home() {
       });
       await waitForPaint();
 
-      // Generate the card image — now reflects the "export" layout
       const dataUrl = await toPng(cardRef.current, {
-        cacheBust: true,
         pixelRatio: 2,
       });
 
-      // Convert dataURL to File
       const blob = await (await fetch(dataUrl)).blob();
 
       const file = new File([blob], `${names}-${archetype}-card.png`, {
         type: "image/png",
       });
 
-      // Mobile: Native share
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           title: "My Ology",
@@ -436,11 +430,9 @@ export default function Home() {
           url: referralLink,
           files: [file],
         });
-
         return;
       }
 
-      // Desktop fallback — download image
       const link = document.createElement("a");
       link.download = `${names}-${archetype}-card.png`;
       link.href = dataUrl;
@@ -448,7 +440,6 @@ export default function Home() {
     } catch (err) {
       console.error(err);
     } finally {
-      // Always restore the normal on-screen layout, even on error/early return
       setShowLogoOnModal(false);
       setHideFooter(false);
       setHideDivider(false);
@@ -771,6 +762,14 @@ export default function Home() {
 
     const fileName = type.replace(/\s+/g, "") + ".mp4";
     console.log("Calibrated Maverick", `/${fileName}`);
+    return `/${fileName}`;
+  };
+
+  const getCardPoster = (type: string) => {
+    if (!type) return "/StatBox.png";
+
+    const fileName = type.replace(/\s+/g, "") + "Card.jpg";
+    console.log("fileName", fileName);
     return `/${fileName}`;
   };
 
@@ -3822,7 +3821,20 @@ export default function Home() {
                 loop
                 playsInline
                 src={getCardBg(cardType)}
-                className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
+                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
+                  showLogoOnPortal ? "hidden" : "block"
+                }`}
+              />
+
+              <img
+                src={getCardPoster(cardType)}
+                alt=""
+                onError={(e) => {
+                  console.error("Poster failed to load:", e.currentTarget.src);
+                }}
+                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
+                  showLogoOnPortal ? "block" : "hidden"
+                }`}
               />
 
               <div className="absolute inset-0 rounded-[16.912px] bg-black/45 z-10" />
