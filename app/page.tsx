@@ -2297,7 +2297,7 @@ export default function Home() {
                                 <button
                                   type="button"
                                   onClick={() => setOpenLocation(true)}
-                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[12px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-left"
+                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-center"
                                 >
                                   <span
                                     className={
@@ -2306,7 +2306,8 @@ export default function Home() {
                                         : "text-[#F8F7FC]/40"
                                     }
                                   >
-                                    {data.location || "( CITY, COUNTRY )"}
+                                    {data.location ||
+                                      "BIRTH LOCATION ( CITY, COUNTRY )"}
                                   </span>
                                 </button>
                               </div>
@@ -2739,7 +2740,7 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => setOpenDate(true)}
-                                    className="text-center w-full py-4 px-2 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[12px] text-[12px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
+                                    className="text-center w-full py-4 px-2 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[11px] text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
                                   >
                                     {date ? (
                                       format(date, "MMM d, yyyy")
@@ -2756,7 +2757,7 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => setOpenTime(true)}
-                                    className="w-full py-4 px-2 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[12px] text-[12px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
+                                    className="w-full py-4 px-2 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[11px] text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
                                   >
                                     {time || <>birth time</>}
                                   </button>
@@ -2771,7 +2772,7 @@ export default function Home() {
                                 <button
                                   type="button"
                                   onClick={() => setOpenLocation(true)}
-                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[12px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-left"
+                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center text-center"
                                 >
                                   <span
                                     className={
@@ -2780,7 +2781,8 @@ export default function Home() {
                                         : "text-[#F8F7FC]/40"
                                     }
                                   >
-                                    {data.location || "( CITY, COUNTRY )"}
+                                    {data.location ||
+                                      "BIRTH LOCATION ( CITY, COUNTRY )"}
                                   </span>
                                 </button>
                               </div>
