@@ -128,7 +128,7 @@
 
 /* 2. Global body styles */
 body {
-  font-family: "Recoleta", "Satoshi", sans-serif; /* global font stack */
+  font-family: "Satoshi", "Recoleta", sans-serif; /* global font stack */
   background-color: #0d1220; /* dark background */
   color: white; /* default text color */
   min-height: 100vh;

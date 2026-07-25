@@ -81,6 +81,7 @@ function CalendarDropdown({ options, value, onChange, className }: any) {
         }}
         className={cn(
           "flex items-center gap-1 text-[#F8F7FC] font-Recoleta text-[19.184px] font-normal",
+          "touch-manipulation",
           className,
         )}
       >
@@ -114,7 +115,7 @@ function CalendarDropdown({ options, value, onChange, className }: any) {
                   setOpen(false);
                 }}
                 className={cn(
-                  "block w-full px-3 py-2 text-left text-sm text-white/70 hover:bg-white/10 transition-colors",
+                  "block w-full px-3 py-2 text-left text-base text-white/70 hover:bg-white/10 transition-colors touch-manipulation",
                   String(option.value) === String(value) &&
                     "bg-white/10 text-white font-semibold",
                 )}
@@ -160,11 +161,11 @@ function Calendar({
       }}
       classNames={{
         root: cn(
-          "w-full bg-transparent !bg-transparent",
+          "w-full bg-transparent !bg-transparent pb-4",
           defaultClassNames.root,
         ),
         months: cn(
-          "relative flex flex-col gap-4 md:flex-row bg-transparent",
+          "relative flex flex-col gap-4 md:flex-row bg-transparent pb-4",
           defaultClassNames.months,
         ),
         month: cn(
@@ -191,7 +192,7 @@ function Calendar({
           defaultClassNames.month_caption,
         ),
         dropdowns: cn(
-          "flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium",
+          "flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-base font-medium",
           defaultClassNames.dropdowns,
         ),
         dropdown_root: cn(
@@ -208,7 +209,7 @@ function Calendar({
           defaultClassNames.weekdays,
         ),
         weekday: cn(
-          "flex-1 text-center font-Recoleta text-[15.547px] font-normal leading-none text-[#F8F7FC] gap-8 not-italic mt-4",
+          "flex-1 text-center font-Recoleta text-[16px] font-normal leading-none text-[#F8F7FC] gap-8 not-italic mt-4",
           defaultClassNames.weekday,
         ),
         week: cn("mt-2 flex w-full", defaultClassNames.week),
@@ -338,11 +339,12 @@ function CalendarDayButton({
       className={cn(
         "flex items-center justify-center",
         "w-9 h-9 min-w-9 rounded-full",
-        "text-[#F8F7FC] text-center font-Satoshi text-[15.547px] font-medium leading-none",
+        "text-[#F8F7FC] text-center font-Satoshi text-[16px] font-medium leading-none",
         "relative isolate z-10 border-0",
         "hover:bg-white/10",
         "data-[selected-single=true]:bg-white/20 data-[selected-single=true]:text-white",
         "transition-colors",
+        "touch-manipulation",
         defaultClassNames.day,
         className,
       )}

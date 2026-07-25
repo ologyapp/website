@@ -37,6 +37,7 @@ import e6 from "../public/e6.png";
 import iphone from "../public/iphoneMockup.svg";
 import useReferralCapture from "../hooks/useReferralCapture";
 import Cookies from "js-cookie";
+import { flushSync } from "react-dom";
 
 import {
   signalAhead,
@@ -378,6 +379,21 @@ export default function Home() {
   // archetype,
   // imageUrl,
 
+  const [showLogoOnPortal, setShowLogoOnModal] = useState(false);
+  const [hideFooter, setHideFooter] = useState(false);
+  const [hideDivider, setHideDivider] = useState(false);
+
+  // Waits for the browser to actually paint the current DOM state
+  // before continuing — two rAFs is the reliable way to do this.
+
+  function waitForPaint() {
+    return new Promise<void>((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+  }
+
   const handleShare = async () => {
     if (!cardRef.current) return;
 
@@ -386,7 +402,16 @@ export default function Home() {
     try {
       setIsDownloading(true);
 
-      // Generate the card image
+      // Force these state changes to apply synchronously, then wait
+      // for the resulting DOM changes to actually paint.
+      flushSync(() => {
+        setShowLogoOnModal(true);
+        setHideFooter(true);
+        setHideDivider(true);
+      });
+      await waitForPaint();
+
+      // Generate the card image — now reflects the "export" layout
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
         pixelRatio: 2,
@@ -394,7 +419,6 @@ export default function Home() {
 
       // Convert dataURL to File
       const blob = await (await fetch(dataUrl)).blob();
-      console.log("dataUrl", blob);
 
       const file = new File([blob], `${names}-${archetype}-card.png`, {
         type: "image/png",
@@ -412,9 +436,7 @@ export default function Home() {
         return;
       }
 
-      // Desktop fallback
-
-      // Download image
+      // Desktop fallback — download image
       const link = document.createElement("a");
       link.download = `${names}-${archetype}-card.png`;
       link.href = dataUrl;
@@ -422,6 +444,10 @@ export default function Home() {
     } catch (err) {
       console.error(err);
     } finally {
+      // Always restore the normal on-screen layout, even on error/early return
+      setShowLogo(false);
+      setHideFooter(false);
+      setHideDivider(false);
       setIsDownloading(false);
     }
   };
@@ -2211,7 +2237,7 @@ export default function Home() {
                                 <button
                                   type="button"
                                   onClick={() => setOpenDate(true)}
-                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-[13.801px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
+                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-base leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
                                 >
                                   {date ? (
                                     format(date, "MMM d, yyyy")
@@ -2228,7 +2254,7 @@ export default function Home() {
                                 <button
                                   type="button"
                                   onClick={() => setOpenTime(true)}
-                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-[13.801px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
+                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-base leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
                                 >
                                   {time || "( HH : MM  AM/PM )"}
                                 </button>
@@ -2265,7 +2291,7 @@ export default function Home() {
                                         width: rect.width,
                                       });
                                     }}
-                                    className="py-4 px-5 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-[13.801px] placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-base font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]"
+                                    className="py-4 px-5 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-base placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-base font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]"
                                   />
                                   {showDropdown &&
                                     suggestions.length > 0 &&
@@ -2580,11 +2606,8 @@ export default function Home() {
                       {!showNatalForm && (
                         <div className="w-full! flex gap-2.5 items-center md:items-end flex-col md:flex-row justify-between">
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            {/* <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
-                              Full Name
-                            </label> */}
                             <input
-                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-[14px] text-[12px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
+                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-base sm:placeholder:text-[12px] text-base sm:text-[12px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
                               value={names}
                               placeholder="FULL NAME"
                               onChange={(e: any) => setNames(e.target.value)}
@@ -2592,14 +2615,11 @@ export default function Home() {
                           </div>
 
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            {/* <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
-                              Email
-                            </label> */}
                             <input
                               value={email}
                               placeholder="EMAIL ADDRESS"
                               onChange={(e: any) => setEmail(e.target.value)}
-                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-[12px] text-[14px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
+                              className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-base sm:placeholder:text-[12px] text-base sm:text-[12px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
                             />
                           </div>
 
@@ -3124,7 +3144,7 @@ export default function Home() {
           "
                       >
                         <div className="flex justify-center">
-                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[8px] font-bold leading-[140%] tabular-nums uppercase">
+                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[6px] font-bold leading-[140%] tabular-nums uppercase">
                             {data.heading}
                           </h4>
                         </div>
@@ -3440,9 +3460,9 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <div className="flex flex-col items-center gap-10 lg:gap-20! pt-40 lg:pt-31.25 w-auto h-[40vh] lg:h-screen">
+            <div className="flex flex-col items-center justify-start lg:justify-between gap-20 lg:gap-20! pt-40 lg:pt-24 w-auto h-[40vh] lg:h-[85vh]">
               <motion.div
-                className="relative z-10 flex min-h-screen w-full xl:items-center items-start justify-center px-5 lg:bottom-30"
+                className="relative z-10 mt-10 flex min-h-fit w-full xl:items-center items-start justify-center px-5"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -3470,28 +3490,28 @@ export default function Home() {
                   <button
                     type="button"
                     className="
-  cursor-pointer
-  inline-flex
-  flex
-  w-auto
-  py-[14.73px]
- px-[18px]
-  justify-center
-  items-center
-  rounded-[20px]
-  bg-gradient-to-b
-  from-white/10
-  to-[rgba(30,37,64,0.15)]
-  border
-  border-white/20
-  backdrop-blur-xl
-  backdrop-saturate-150
-  shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
-  hover:bg-white/10
-  hover:border-white/30
-  transition-all
-  duration-500
-"
+                  cursor-pointer
+                  inline-flex
+                  flex
+                  w-auto
+                  py-[14.73px]
+                px-[18px]
+                  justify-center
+                  items-center
+                  rounded-[20px]
+                  bg-gradient-to-b
+                  from-white/10
+                  to-[rgba(30,37,64,0.15)]
+                  border
+                  border-white/20
+                  backdrop-blur-xl
+                  backdrop-saturate-150
+                  shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
+                  hover:bg-white/10
+                  hover:border-white/30
+                  transition-all
+                  duration-500
+                "
                   >
                     <Link
                       href="#archetype-form"
@@ -3520,14 +3540,10 @@ export default function Home() {
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="
+             
+              
               w-full
-              absolute
-              bottom-10
-              left-0
-              flex
-              w-full
-              flex-col
-              items-start
+           
               gap-[30px]
               pt-[28px]
             
@@ -3535,6 +3551,8 @@ export default function Home() {
               lg:px-[80px]
               px-[22px]
               z-50!
+              -mt-10
+              lg:mt-20
               flex flex-col items-center!
               
           
@@ -3615,7 +3633,7 @@ export default function Home() {
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        <g clip-path="url(#clip0_453_1182)">
+                        <g clipPath="url(#clip0_453_1182)">
                           <path
                             d="M11.4146 2.05553C14.4645 2.05553 14.8256 2.0689 16.0251 2.12241C17.1398 2.17146 17.7417 2.35873 18.143 2.51479C18.6736 2.71989 19.0571 2.96959 19.4539 3.36643C19.8552 3.76772 20.1005 4.14672 20.3056 4.67732C20.4616 5.07862 20.6489 5.68502 20.6979 6.79527C20.7514 7.99916 20.7648 8.36033 20.7648 11.4057C20.7648 14.4556 20.7514 14.8167 20.6979 16.0162C20.6489 17.1309 20.4616 17.7328 20.3056 18.1341C20.1005 18.6647 19.8508 19.0482 19.4539 19.445C19.0526 19.8463 18.6736 20.0915 18.143 20.2966C17.7417 20.4527 17.1353 20.64 16.0251 20.689C14.8212 20.7425 14.46 20.7559 11.4146 20.7559C8.36479 20.7559 8.00362 20.7425 6.80419 20.689C5.68948 20.64 5.08754 20.4527 4.68624 20.2966C4.15564 20.0915 3.77218 19.8418 3.37534 19.445C2.97405 19.0437 2.72881 18.6647 2.5237 18.1341C2.36764 17.7328 2.18037 17.1264 2.13133 16.0162C2.07782 14.8123 2.06444 14.4511 2.06444 11.4057C2.06444 8.35587 2.07782 7.9947 2.13133 6.79527C2.18037 5.68056 2.36764 5.07862 2.5237 4.67732C2.72881 4.14672 2.97851 3.76326 3.37534 3.36643C3.77664 2.96513 4.15564 2.71989 4.68624 2.51479C5.08754 2.35873 5.69394 2.17146 6.80419 2.12241C8.00362 2.0689 8.36479 2.05553 11.4146 2.05553ZM11.4146 0C8.31574 0 7.92782 0.0133765 6.71056 0.0668826C5.49775 0.120389 4.66395 0.316578 3.94162 0.597485C3.18807 0.891768 2.55046 1.27969 1.9173 1.9173C1.27969 2.55046 0.891768 3.18807 0.597485 3.93716C0.316578 4.66395 0.120389 5.49329 0.0668826 6.7061C0.0133765 7.92782 0 8.31574 0 11.4146C0 14.5135 0.0133765 14.9014 0.0668826 16.1187C0.120389 17.3315 0.316578 18.1653 0.597485 18.8877C0.891768 19.6412 1.27969 20.2788 1.9173 20.912C2.55046 21.5451 3.18807 21.9375 3.93716 22.2273C4.66395 22.5082 5.49329 22.7044 6.7061 22.7579C7.92336 22.8114 8.31128 22.8248 11.4102 22.8248C14.5091 22.8248 14.897 22.8114 16.1143 22.7579C17.3271 22.7044 18.1609 22.5082 18.8832 22.2273C19.6323 21.9375 20.2699 21.5451 20.903 20.912C21.5362 20.2788 21.9286 19.6412 22.2184 18.8921C22.4993 18.1653 22.6955 17.336 22.749 16.1232C22.8025 14.9059 22.8159 14.518 22.8159 11.4191C22.8159 8.3202 22.8025 7.93228 22.749 6.71502C22.6955 5.50221 22.4993 4.66841 22.2184 3.94607C21.9375 3.18807 21.5496 2.55046 20.912 1.9173C20.2788 1.28415 19.6412 0.891768 18.8921 0.601944C18.1653 0.321037 17.336 0.124848 16.1232 0.0713415C14.9014 0.0133765 14.5135 0 11.4146 0Z"
                             fill="white"
@@ -3640,7 +3658,6 @@ export default function Home() {
                         </defs>
                       </svg>
                     </Link>
-
                     <a
                       href="https://www.linkedin.com/company/ologyapp/"
                       target="_blank"
@@ -3652,7 +3669,7 @@ export default function Home() {
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        <g clip-path="url(#clip0_453_1183)">
+                        <g clipPath="url(#clip0_453_1183)">
                           <path
                             d="M21.1394 0H1.68544C0.753544 0 0 0.735709 0 1.64531V21.1795C0 22.0891 0.753544 22.8293 1.68544 22.8293H21.1394C22.0713 22.8293 22.8293 22.0891 22.8293 21.184V1.64531C22.8293 0.735709 22.0713 0 21.1394 0ZM6.77298 19.4539H3.38426V8.55652H6.77298V19.4539ZM5.07862 7.07172C3.99066 7.07172 3.11227 6.19333 3.11227 5.10983C3.11227 4.02633 3.99066 3.14794 5.07862 3.14794C6.16212 3.14794 7.04051 4.02633 7.04051 5.10983C7.04051 6.18887 6.16212 7.07172 5.07862 7.07172ZM19.4539 19.4539H16.0697V14.1568C16.0697 12.895 16.0474 11.2675 14.3084 11.2675C12.5472 11.2675 12.2796 12.6453 12.2796 14.0676V19.4539H8.89985V8.55652H12.1459V10.0458H12.1905C12.6408 9.18967 13.7466 8.28453 15.3919 8.28453C18.8208 8.28453 19.4539 10.5407 19.4539 13.4746V19.4539Z"
                             fill="white"
@@ -3778,6 +3795,42 @@ export default function Home() {
               <div className="flex flex-col md:flex-row w-full justify-start items-center md:items-center z-20 gap-6 md:gap-20">
                 {/* LEFT */}
                 <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
+                  <div className="mb-4">
+                    {showLogoOnPortal && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="70"
+                        height="29"
+                        viewBox="0 0 101 42"
+                        fill="none"
+                      >
+                        <path
+                          d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
+                          fill="#F8F7FC"
+                        />
+                        <path
+                          d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
+                          fill="#F8F7FC"
+                        />
+                        <path
+                          d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
+                          fill="#F8F7FC"
+                        />
+                        <path
+                          d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
+                          fill="#F8F7FC"
+                        />
+                        <path
+                          d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
+                          fill="#F8F7FC"
+                        />
+                        <path
+                          d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
+                          fill="#F8F7FC"
+                        />
+                      </svg>
+                    )}
+                  </div>
                   <p className="lg:mb-[36.54px] text-center md:text-left flex w-auto h-auto md:h-[22.84px] flex-col justify-center items-center md:items-start text-[#F8F7FC] font-Recoleta text-[26px] md:text-[35px] font-normal leading-[150%]">
                     {archetype && archetype}
                   </p>
@@ -3832,13 +3885,13 @@ export default function Home() {
               {/* CARDS — 2 cols full width on mobile, side-by-side on desktop */}
               <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
                 <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[28%] md:basis-auto">
+                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
                     Best Market Conditions
                   </p>
 
                   <div className="flex flex-col gap-2 h-auto md:h-[80px] flex-1">
                     {bestMarketConditions?.map((con: any) => (
-                      <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px]">
+                      <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] font-Satoshi">
                         ✦ {con}
                       </p>
                     ))}
@@ -3846,168 +3899,180 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[25%] md:basis-auto">
+                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
                     Shadow
                   </p>
 
-                  <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] h-auto md:h-[80px] flex-1">
+                  <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] h-auto md:h-[80px] flex-1 font-Satoshi">
                     {ShadowText}
                   </p>
                 </div>
               </div>
 
               {/* DIVIDER */}
-              <div className="flex w-full z-20">
-                <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-              </div>
+              {!hideDivider && (
+                <div className="flex w-full z-20">
+                  <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
+                </div>
+              )}
 
               {/* FOOTER section — stacked/centered on mobile, row on desktop */}
-              <div className="relative z-20 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-0 w-full h-auto">
-                <div className="flex flex-col lg:gap-4 items-center md:items-start text-center md:text-left">
-                  <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
-                    You're on the list.{" "}
-                  </p>
-                  <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
-                    Your full Trade DNA opens when we launch.
+              {!hideFooter && (
+                <div className="relative z-20 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-0 w-full h-auto">
+                  <div className="flex flex-col lg:gap-4 items-center md:items-start text-center md:text-left">
+                    <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
+                      You're on the list.{" "}
+                    </p>
+                    <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
+                      Your full Trade DNA opens when we launch.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-[11px] items-center md:items-end">
+                    <div className="hidden lg:flex justify-center md:justify-start gap-4">
+                      <button
+                        onClick={handleShare}
+                        className="flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clipPath="url(#clip0_490_777)">
+                            <path
+                              d="M9.66659 7.33387C9.28854 7.33418 8.91625 7.42647 8.58184 7.60278C8.24743 7.77909 7.96093 8.03412 7.74709 8.34587L4.49259 6.87637C4.72374 6.31818 4.72464 5.69121 4.49509 5.13237L7.74509 3.65537C8.06202 4.11375 8.53275 4.44335 9.07189 4.58439C9.61102 4.72543 10.1828 4.66857 10.6836 4.42412C11.1844 4.17967 11.5811 3.76382 11.8015 3.252C12.022 2.74019 12.0517 2.1663 11.8853 1.63445C11.7189 1.10261 11.3673 0.648016 10.8945 0.353145C10.4216 0.0582749 9.85868 -0.0573459 9.30786 0.0272559C8.75704 0.111858 8.25479 0.391078 7.89221 0.814269C7.52962 1.23746 7.33072 1.77659 7.33159 2.33387C7.33371 2.46577 7.34709 2.59725 7.37159 2.72687L3.91659 4.29687C3.58476 3.98598 3.16934 3.77879 2.72138 3.70075C2.27341 3.62271 1.8124 3.67723 1.39499 3.8576C0.977583 4.03797 0.621951 4.33634 0.371786 4.71605C0.121622 5.09576 -0.0121789 5.54028 -0.013178 5.99499C-0.014177 6.4497 0.117669 6.89481 0.366163 7.27561C0.614656 7.65642 0.968974 7.95635 1.38559 8.13856C1.8022 8.32076 2.26296 8.3773 2.71127 8.30123C3.15957 8.22516 3.5759 8.0198 3.90909 7.71037L7.37309 9.27437C7.34903 9.40388 7.33582 9.53517 7.33359 9.66687C7.33349 10.1284 7.47028 10.5797 7.72665 10.9635C7.98302 11.3473 8.34745 11.6465 8.77387 11.8231C9.20028 11.9998 9.66951 12.0461 10.1222 11.9561C10.5749 11.866 10.9907 11.6438 11.3171 11.3174C11.6435 10.991 11.8658 10.5752 11.9558 10.1225C12.0458 9.66979 11.9995 9.20056 11.8229 8.77415C11.6462 8.34773 11.347 7.9833 10.9632 7.72693C10.5794 7.47056 10.1282 7.33377 9.66659 7.33387V7.33387ZM9.66659 1.00037C9.93035 1.00027 10.1882 1.07839 10.4076 1.22486C10.6269 1.37133 10.7979 1.57956 10.8989 1.82321C10.9999 2.06687 11.0264 2.33501 10.975 2.59371C10.9236 2.85242 10.7967 3.09007 10.6102 3.27662C10.4237 3.46316 10.1861 3.59021 9.92743 3.64171C9.66874 3.6932 9.40059 3.66682 9.1569 3.56591C8.9132 3.46499 8.70491 3.29408 8.55836 3.07477C8.41181 2.85547 8.33359 2.59763 8.33359 2.33387C8.33385 1.98037 8.47436 1.64142 8.72428 1.39141C8.97419 1.1414 9.31309 1.00077 9.66659 1.00037V1.00037ZM2.33359 7.33387C2.06983 7.33397 1.81196 7.25584 1.5926 7.10938C1.37324 6.96291 1.20224 6.75468 1.10124 6.51102C1.00023 6.26737 0.973753 5.99923 1.02515 5.74052C1.07655 5.48182 1.20351 5.24416 1.38998 5.05762C1.57646 4.87107 1.81406 4.74402 2.07275 4.69253C2.33144 4.64103 2.59959 4.66741 2.84328 4.76833C3.08698 4.86924 3.29527 5.04016 3.44182 5.25946C3.58837 5.47877 3.66659 5.73661 3.66659 6.00037C3.66619 6.35383 3.52564 6.6927 3.27575 6.94268C3.02587 7.19266 2.68705 7.33334 2.33359 7.33387ZM9.66659 11.0004C9.40285 11.0004 9.14503 10.9222 8.92574 10.7756C8.70644 10.6291 8.53552 10.4208 8.4346 10.1772C8.33367 9.93351 8.30726 9.66539 8.35871 9.40672C8.41016 9.14804 8.53717 8.91044 8.72366 8.72394C8.91015 8.53745 9.14776 8.41045 9.40644 8.35899C9.66511 8.30754 9.93323 8.33395 10.1769 8.43488C10.4206 8.53581 10.6288 8.70672 10.7754 8.92602C10.9219 9.14531 11.0001 9.40313 11.0001 9.66687C10.9998 10.0205 10.8592 10.3595 10.6092 10.6095C10.3592 10.8595 10.0202 11.0001 9.66659 11.0004V11.0004Z"
+                              fill="#E8E9F3"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_490_777">
+                              <rect width="14" height="14" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
+                          Share{" "}
+                        </p>
+                      </button>
+
+                      <button
+                        onClick={handleCopy}
+                        className="touch-manipulation flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clipPath="url(#clip0_490_772)">
+                            <path
+                              d="M6.92263 8.63347L5.29163 10.2645C4.81809 10.7253 4.18214 10.9813 3.52136 10.9768C2.86058 10.9724 2.22811 10.708 1.76079 10.2408C1.29347 9.77362 1.02888 9.14123 1.02426 8.48045C1.01965 7.81967 1.27538 7.18364 1.73613 6.70997L3.36713 5.07748C3.46089 4.98366 3.51353 4.85644 3.51348 4.7238C3.51344 4.59117 3.4607 4.46398 3.36688 4.37023C3.27306 4.27647 3.14584 4.22383 3.01321 4.22388C2.88057 4.22392 2.75339 4.27666 2.65963 4.37048L1.02913 6.00297C0.370268 6.66217 0.000253965 7.5561 0.000488393 8.4881C0.00072282 9.42011 0.371187 10.3139 1.03038 10.9727C1.68958 11.6316 2.58351 12.0016 3.51552 12.0014C4.44753 12.0011 5.34127 11.6307 6.00013 10.9715L7.63113 9.34047C7.72221 9.24617 7.77261 9.11987 7.77147 8.98877C7.77033 8.85767 7.71775 8.73226 7.62504 8.63956C7.53234 8.54686 7.40693 8.49427 7.27583 8.49313C7.14474 8.49199 7.01843 8.54239 6.92413 8.63347H6.92263Z"
+                              fill="#E8E9F3"
+                            />
+                            <path
+                              d="M10.9722 1.03076C10.6469 0.703164 10.2597 0.443396 9.83326 0.266504C9.40678 0.0896132 8.94944 -0.000884087 8.48773 0.000256461C8.02627 -0.000969404 7.56914 0.0892955 7.14277 0.265832C6.71641 0.442369 6.32926 0.701675 6.00373 1.02876L4.37023 2.66026C4.27641 2.75401 4.22368 2.8812 4.22363 3.01383C4.22359 3.14647 4.27623 3.27369 4.36998 3.36751C4.46374 3.46133 4.59092 3.51406 4.72356 3.51411C4.85619 3.51415 4.98341 3.46151 5.07723 3.36776L6.70973 1.73676C6.94251 1.50258 7.21943 1.31691 7.52445 1.19049C7.82948 1.06406 8.15655 0.999407 8.48673 1.00026C8.98387 1.00042 9.46979 1.14797 9.88308 1.42426C10.2964 1.70054 10.6185 2.09315 10.8086 2.55247C10.9988 3.01178 11.0486 3.51717 10.9516 4.00475C10.8546 4.49232 10.6152 4.9402 10.2637 5.29176L8.63273 6.92276C8.53891 7.01658 8.48621 7.14383 8.48621 7.27651C8.48621 7.40919 8.53891 7.53644 8.63273 7.63026C8.72655 7.72408 8.8538 7.77679 8.98648 7.77679C9.11917 7.77679 9.24641 7.72408 9.34023 7.63026L10.9712 6.00026C11.6293 5.34081 11.9989 4.44731 11.9991 3.51571C11.9993 2.58412 11.63 1.69047 10.9722 1.03076Z"
+                              fill="#E8E9F3"
+                            />
+                            <path
+                              d="M7.14679 4.14646L4.14678 7.14645C4.09903 7.19258 4.06094 7.24775 4.03473 7.30875C4.00853 7.36975 3.99474 7.43536 3.99416 7.50175C3.99358 7.56814 4.00623 7.63398 4.03137 7.69543C4.05651 7.75688 4.09364 7.8127 4.14059 7.85965C4.18753 7.9066 4.24336 7.94372 4.30481 7.96886C4.36626 7.994 4.4321 8.00665 4.49849 8.00608C4.56487 8.0055 4.63048 7.99171 4.69149 7.9655C4.75249 7.9393 4.80766 7.90121 4.85378 7.85345L7.85379 4.85346C7.94486 4.75916 7.99526 4.63286 7.99412 4.50176C7.99298 4.37066 7.9404 4.24525 7.84769 4.15255C7.75499 4.05985 7.62958 4.00726 7.49849 4.00612C7.36739 4.00498 7.24109 4.05538 7.14679 4.14646Z"
+                              fill="#E8E9F3"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_490_772">
+                              <rect width="14" height="14" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
+                          {copied ? "COPIED!" : "COPY LINK"}{" "}
+                        </p>
+                      </button>
+                    </div>
+
+                    <div className="lg:hidden flex justify-center md:justify-start gap-4 w-full!">
+                      <button
+                        onClick={handleShare}
+                        className="touch-manipulation w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clipPath="url(#clip0_490_777)">
+                            <path
+                              d="M9.66659 7.33387C9.28854 7.33418 8.91625 7.42647 8.58184 7.60278C8.24743 7.77909 7.96093 8.03412 7.74709 8.34587L4.49259 6.87637C4.72374 6.31818 4.72464 5.69121 4.49509 5.13237L7.74509 3.65537C8.06202 4.11375 8.53275 4.44335 9.07189 4.58439C9.61102 4.72543 10.1828 4.66857 10.6836 4.42412C11.1844 4.17967 11.5811 3.76382 11.8015 3.252C12.022 2.74019 12.0517 2.1663 11.8853 1.63445C11.7189 1.10261 11.3673 0.648016 10.8945 0.353145C10.4216 0.0582749 9.85868 -0.0573459 9.30786 0.0272559C8.75704 0.111858 8.25479 0.391078 7.89221 0.814269C7.52962 1.23746 7.33072 1.77659 7.33159 2.33387C7.33371 2.46577 7.34709 2.59725 7.37159 2.72687L3.91659 4.29687C3.58476 3.98598 3.16934 3.77879 2.72138 3.70075C2.27341 3.62271 1.8124 3.67723 1.39499 3.8576C0.977583 4.03797 0.621951 4.33634 0.371786 4.71605C0.121622 5.09576 -0.0121789 5.54028 -0.013178 5.99499C-0.014177 6.4497 0.117669 6.89481 0.366163 7.27561C0.614656 7.65642 0.968974 7.95635 1.38559 8.13856C1.8022 8.32076 2.26296 8.3773 2.71127 8.30123C3.15957 8.22516 3.5759 8.0198 3.90909 7.71037L7.37309 9.27437C7.34903 9.40388 7.33582 9.53517 7.33359 9.66687C7.33349 10.1284 7.47028 10.5797 7.72665 10.9635C7.98302 11.3473 8.34745 11.6465 8.77387 11.8231C9.20028 11.9998 9.66951 12.0461 10.1222 11.9561C10.5749 11.866 10.9907 11.6438 11.3171 11.3174C11.6435 10.991 11.8658 10.5752 11.9558 10.1225C12.0458 9.66979 11.9995 9.20056 11.8229 8.77415C11.6462 8.34773 11.347 7.9833 10.9632 7.72693C10.5794 7.47056 10.1282 7.33377 9.66659 7.33387V7.33387ZM9.66659 1.00037C9.93035 1.00027 10.1882 1.07839 10.4076 1.22486C10.6269 1.37133 10.7979 1.57956 10.8989 1.82321C10.9999 2.06687 11.0264 2.33501 10.975 2.59371C10.9236 2.85242 10.7967 3.09007 10.6102 3.27662C10.4237 3.46316 10.1861 3.59021 9.92743 3.64171C9.66874 3.6932 9.40059 3.66682 9.1569 3.56591C8.9132 3.46499 8.70491 3.29408 8.55836 3.07477C8.41181 2.85547 8.33359 2.59763 8.33359 2.33387C8.33385 1.98037 8.47436 1.64142 8.72428 1.39141C8.97419 1.1414 9.31309 1.00077 9.66659 1.00037V1.00037ZM2.33359 7.33387C2.06983 7.33397 1.81196 7.25584 1.5926 7.10938C1.37324 6.96291 1.20224 6.75468 1.10124 6.51102C1.00023 6.26737 0.973753 5.99923 1.02515 5.74052C1.07655 5.48182 1.20351 5.24416 1.38998 5.05762C1.57646 4.87107 1.81406 4.74402 2.07275 4.69253C2.33144 4.64103 2.59959 4.66741 2.84328 4.76833C3.08698 4.86924 3.29527 5.04016 3.44182 5.25946C3.58837 5.47877 3.66659 5.73661 3.66659 6.00037C3.66619 6.35383 3.52564 6.6927 3.27575 6.94268C3.02587 7.19266 2.68705 7.33334 2.33359 7.33387ZM9.66659 11.0004C9.40285 11.0004 9.14503 10.9222 8.92574 10.7756C8.70644 10.6291 8.53552 10.4208 8.4346 10.1772C8.33367 9.93351 8.30726 9.66539 8.35871 9.40672C8.41016 9.14804 8.53717 8.91044 8.72366 8.72394C8.91015 8.53745 9.14776 8.41045 9.40644 8.35899C9.66511 8.30754 9.93323 8.33395 10.1769 8.43488C10.4206 8.53581 10.6288 8.70672 10.7754 8.92602C10.9219 9.14531 11.0001 9.40313 11.0001 9.66687C10.9998 10.0205 10.8592 10.3595 10.6092 10.6095C10.3592 10.8595 10.0202 11.0001 9.66659 11.0004V11.0004Z"
+                              fill="#E8E9F3"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_490_777">
+                              <rect width="14" height="14" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <p className="font-Satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
+                          Share{" "}
+                        </p>
+                      </button>
+
+                      <button
+                        onClick={handleCopy}
+                        className="w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clipPath="url(#clip0_490_772)">
+                            <path
+                              d="M6.92263 8.63347L5.29163 10.2645C4.81809 10.7253 4.18214 10.9813 3.52136 10.9768C2.86058 10.9724 2.22811 10.708 1.76079 10.2408C1.29347 9.77362 1.02888 9.14123 1.02426 8.48045C1.01965 7.81967 1.27538 7.18364 1.73613 6.70997L3.36713 5.07748C3.46089 4.98366 3.51353 4.85644 3.51348 4.7238C3.51344 4.59117 3.4607 4.46398 3.36688 4.37023C3.27306 4.27647 3.14584 4.22383 3.01321 4.22388C2.88057 4.22392 2.75339 4.27666 2.65963 4.37048L1.02913 6.00297C0.370268 6.66217 0.000253965 7.5561 0.000488393 8.4881C0.00072282 9.42011 0.371187 10.3139 1.03038 10.9727C1.68958 11.6316 2.58351 12.0016 3.51552 12.0014C4.44753 12.0011 5.34127 11.6307 6.00013 10.9715L7.63113 9.34047C7.72221 9.24617 7.77261 9.11987 7.77147 8.98877C7.77033 8.85767 7.71775 8.73226 7.62504 8.63956C7.53234 8.54686 7.40693 8.49427 7.27583 8.49313C7.14474 8.49199 7.01843 8.54239 6.92413 8.63347H6.92263Z"
+                              fill="#E8E9F3"
+                            />
+                            <path
+                              d="M10.9722 1.03076C10.6469 0.703164 10.2597 0.443396 9.83326 0.266504C9.40678 0.0896132 8.94944 -0.000884087 8.48773 0.000256461C8.02627 -0.000969404 7.56914 0.0892955 7.14277 0.265832C6.71641 0.442369 6.32926 0.701675 6.00373 1.02876L4.37023 2.66026C4.27641 2.75401 4.22368 2.8812 4.22363 3.01383C4.22359 3.14647 4.27623 3.27369 4.36998 3.36751C4.46374 3.46133 4.59092 3.51406 4.72356 3.51411C4.85619 3.51415 4.98341 3.46151 5.07723 3.36776L6.70973 1.73676C6.94251 1.50258 7.21943 1.31691 7.52445 1.19049C7.82948 1.06406 8.15655 0.999407 8.48673 1.00026C8.98387 1.00042 9.46979 1.14797 9.88308 1.42426C10.2964 1.70054 10.6185 2.09315 10.8086 2.55247C10.9988 3.01178 11.0486 3.51717 10.9516 4.00475C10.8546 4.49232 10.6152 4.9402 10.2637 5.29176L8.63273 6.92276C8.53891 7.01658 8.48621 7.14383 8.48621 7.27651C8.48621 7.40919 8.53891 7.53644 8.63273 7.63026C8.72655 7.72408 8.8538 7.77679 8.98648 7.77679C9.11917 7.77679 9.24641 7.72408 9.34023 7.63026L10.9712 6.00026C11.6293 5.34081 11.9989 4.44731 11.9991 3.51571C11.9993 2.58412 11.63 1.69047 10.9722 1.03076Z"
+                              fill="#E8E9F3"
+                            />
+                            <path
+                              d="M7.14679 4.14646L4.14678 7.14645C4.09903 7.19258 4.06094 7.24775 4.03473 7.30875C4.00853 7.36975 3.99474 7.43536 3.99416 7.50175C3.99358 7.56814 4.00623 7.63398 4.03137 7.69543C4.05651 7.75688 4.09364 7.8127 4.14059 7.85965C4.18753 7.9066 4.24336 7.94372 4.30481 7.96886C4.36626 7.994 4.4321 8.00665 4.49849 8.00608C4.56487 8.0055 4.63048 7.99171 4.69149 7.9655C4.75249 7.9393 4.80766 7.90121 4.85378 7.85345L7.85379 4.85346C7.94486 4.75916 7.99526 4.63286 7.99412 4.50176C7.99298 4.37066 7.9404 4.24525 7.84769 4.15255C7.75499 4.05985 7.62958 4.00726 7.49849 4.00612C7.36739 4.00498 7.24109 4.05538 7.14679 4.14646Z"
+                              fill="#E8E9F3"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_490_772">
+                              <rect width="14" height="14" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <p className="font-Satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
+                          {copied ? "COPIED!" : "COPY LINK"}{" "}
+                        </p>
+                      </button>
+                    </div>
+                    <p className="font-Satoshi text-[10px] font-normal leading-[140%] tracking-[0.01em] text-center">
+                      Every friend who joins through your link moves you up.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {hideFooter && (
+                <div className="w-full flex justify-center text-center">
+                  <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
+                    ologyapp.com
                   </p>
                 </div>
-                <div className="flex flex-col gap-[11px] items-center md:items-end">
-                  <div className="hidden lg:flex justify-center md:justify-start gap-4">
-                    <button
-                      onClick={handleShare}
-                      className="flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
-                    >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <g clipPath="url(#clip0_490_777)">
-                          <path
-                            d="M9.66659 7.33387C9.28854 7.33418 8.91625 7.42647 8.58184 7.60278C8.24743 7.77909 7.96093 8.03412 7.74709 8.34587L4.49259 6.87637C4.72374 6.31818 4.72464 5.69121 4.49509 5.13237L7.74509 3.65537C8.06202 4.11375 8.53275 4.44335 9.07189 4.58439C9.61102 4.72543 10.1828 4.66857 10.6836 4.42412C11.1844 4.17967 11.5811 3.76382 11.8015 3.252C12.022 2.74019 12.0517 2.1663 11.8853 1.63445C11.7189 1.10261 11.3673 0.648016 10.8945 0.353145C10.4216 0.0582749 9.85868 -0.0573459 9.30786 0.0272559C8.75704 0.111858 8.25479 0.391078 7.89221 0.814269C7.52962 1.23746 7.33072 1.77659 7.33159 2.33387C7.33371 2.46577 7.34709 2.59725 7.37159 2.72687L3.91659 4.29687C3.58476 3.98598 3.16934 3.77879 2.72138 3.70075C2.27341 3.62271 1.8124 3.67723 1.39499 3.8576C0.977583 4.03797 0.621951 4.33634 0.371786 4.71605C0.121622 5.09576 -0.0121789 5.54028 -0.013178 5.99499C-0.014177 6.4497 0.117669 6.89481 0.366163 7.27561C0.614656 7.65642 0.968974 7.95635 1.38559 8.13856C1.8022 8.32076 2.26296 8.3773 2.71127 8.30123C3.15957 8.22516 3.5759 8.0198 3.90909 7.71037L7.37309 9.27437C7.34903 9.40388 7.33582 9.53517 7.33359 9.66687C7.33349 10.1284 7.47028 10.5797 7.72665 10.9635C7.98302 11.3473 8.34745 11.6465 8.77387 11.8231C9.20028 11.9998 9.66951 12.0461 10.1222 11.9561C10.5749 11.866 10.9907 11.6438 11.3171 11.3174C11.6435 10.991 11.8658 10.5752 11.9558 10.1225C12.0458 9.66979 11.9995 9.20056 11.8229 8.77415C11.6462 8.34773 11.347 7.9833 10.9632 7.72693C10.5794 7.47056 10.1282 7.33377 9.66659 7.33387V7.33387ZM9.66659 1.00037C9.93035 1.00027 10.1882 1.07839 10.4076 1.22486C10.6269 1.37133 10.7979 1.57956 10.8989 1.82321C10.9999 2.06687 11.0264 2.33501 10.975 2.59371C10.9236 2.85242 10.7967 3.09007 10.6102 3.27662C10.4237 3.46316 10.1861 3.59021 9.92743 3.64171C9.66874 3.6932 9.40059 3.66682 9.1569 3.56591C8.9132 3.46499 8.70491 3.29408 8.55836 3.07477C8.41181 2.85547 8.33359 2.59763 8.33359 2.33387C8.33385 1.98037 8.47436 1.64142 8.72428 1.39141C8.97419 1.1414 9.31309 1.00077 9.66659 1.00037V1.00037ZM2.33359 7.33387C2.06983 7.33397 1.81196 7.25584 1.5926 7.10938C1.37324 6.96291 1.20224 6.75468 1.10124 6.51102C1.00023 6.26737 0.973753 5.99923 1.02515 5.74052C1.07655 5.48182 1.20351 5.24416 1.38998 5.05762C1.57646 4.87107 1.81406 4.74402 2.07275 4.69253C2.33144 4.64103 2.59959 4.66741 2.84328 4.76833C3.08698 4.86924 3.29527 5.04016 3.44182 5.25946C3.58837 5.47877 3.66659 5.73661 3.66659 6.00037C3.66619 6.35383 3.52564 6.6927 3.27575 6.94268C3.02587 7.19266 2.68705 7.33334 2.33359 7.33387ZM9.66659 11.0004C9.40285 11.0004 9.14503 10.9222 8.92574 10.7756C8.70644 10.6291 8.53552 10.4208 8.4346 10.1772C8.33367 9.93351 8.30726 9.66539 8.35871 9.40672C8.41016 9.14804 8.53717 8.91044 8.72366 8.72394C8.91015 8.53745 9.14776 8.41045 9.40644 8.35899C9.66511 8.30754 9.93323 8.33395 10.1769 8.43488C10.4206 8.53581 10.6288 8.70672 10.7754 8.92602C10.9219 9.14531 11.0001 9.40313 11.0001 9.66687C10.9998 10.0205 10.8592 10.3595 10.6092 10.6095C10.3592 10.8595 10.0202 11.0001 9.66659 11.0004V11.0004Z"
-                            fill="#E8E9F3"
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_490_777">
-                            <rect width="14" height="14" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                        Share{" "}
-                      </p>
-                    </button>
-
-                    <button
-                      onClick={handleCopy}
-                      className="flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
-                    >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <g clipPath="url(#clip0_490_772)">
-                          <path
-                            d="M6.92263 8.63347L5.29163 10.2645C4.81809 10.7253 4.18214 10.9813 3.52136 10.9768C2.86058 10.9724 2.22811 10.708 1.76079 10.2408C1.29347 9.77362 1.02888 9.14123 1.02426 8.48045C1.01965 7.81967 1.27538 7.18364 1.73613 6.70997L3.36713 5.07748C3.46089 4.98366 3.51353 4.85644 3.51348 4.7238C3.51344 4.59117 3.4607 4.46398 3.36688 4.37023C3.27306 4.27647 3.14584 4.22383 3.01321 4.22388C2.88057 4.22392 2.75339 4.27666 2.65963 4.37048L1.02913 6.00297C0.370268 6.66217 0.000253965 7.5561 0.000488393 8.4881C0.00072282 9.42011 0.371187 10.3139 1.03038 10.9727C1.68958 11.6316 2.58351 12.0016 3.51552 12.0014C4.44753 12.0011 5.34127 11.6307 6.00013 10.9715L7.63113 9.34047C7.72221 9.24617 7.77261 9.11987 7.77147 8.98877C7.77033 8.85767 7.71775 8.73226 7.62504 8.63956C7.53234 8.54686 7.40693 8.49427 7.27583 8.49313C7.14474 8.49199 7.01843 8.54239 6.92413 8.63347H6.92263Z"
-                            fill="#E8E9F3"
-                          />
-                          <path
-                            d="M10.9722 1.03076C10.6469 0.703164 10.2597 0.443396 9.83326 0.266504C9.40678 0.0896132 8.94944 -0.000884087 8.48773 0.000256461C8.02627 -0.000969404 7.56914 0.0892955 7.14277 0.265832C6.71641 0.442369 6.32926 0.701675 6.00373 1.02876L4.37023 2.66026C4.27641 2.75401 4.22368 2.8812 4.22363 3.01383C4.22359 3.14647 4.27623 3.27369 4.36998 3.36751C4.46374 3.46133 4.59092 3.51406 4.72356 3.51411C4.85619 3.51415 4.98341 3.46151 5.07723 3.36776L6.70973 1.73676C6.94251 1.50258 7.21943 1.31691 7.52445 1.19049C7.82948 1.06406 8.15655 0.999407 8.48673 1.00026C8.98387 1.00042 9.46979 1.14797 9.88308 1.42426C10.2964 1.70054 10.6185 2.09315 10.8086 2.55247C10.9988 3.01178 11.0486 3.51717 10.9516 4.00475C10.8546 4.49232 10.6152 4.9402 10.2637 5.29176L8.63273 6.92276C8.53891 7.01658 8.48621 7.14383 8.48621 7.27651C8.48621 7.40919 8.53891 7.53644 8.63273 7.63026C8.72655 7.72408 8.8538 7.77679 8.98648 7.77679C9.11917 7.77679 9.24641 7.72408 9.34023 7.63026L10.9712 6.00026C11.6293 5.34081 11.9989 4.44731 11.9991 3.51571C11.9993 2.58412 11.63 1.69047 10.9722 1.03076Z"
-                            fill="#E8E9F3"
-                          />
-                          <path
-                            d="M7.14679 4.14646L4.14678 7.14645C4.09903 7.19258 4.06094 7.24775 4.03473 7.30875C4.00853 7.36975 3.99474 7.43536 3.99416 7.50175C3.99358 7.56814 4.00623 7.63398 4.03137 7.69543C4.05651 7.75688 4.09364 7.8127 4.14059 7.85965C4.18753 7.9066 4.24336 7.94372 4.30481 7.96886C4.36626 7.994 4.4321 8.00665 4.49849 8.00608C4.56487 8.0055 4.63048 7.99171 4.69149 7.9655C4.75249 7.9393 4.80766 7.90121 4.85378 7.85345L7.85379 4.85346C7.94486 4.75916 7.99526 4.63286 7.99412 4.50176C7.99298 4.37066 7.9404 4.24525 7.84769 4.15255C7.75499 4.05985 7.62958 4.00726 7.49849 4.00612C7.36739 4.00498 7.24109 4.05538 7.14679 4.14646Z"
-                            fill="#E8E9F3"
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_490_772">
-                            <rect width="14" height="14" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                        {copied ? "COPIED!" : "COPY LINK"}{" "}
-                      </p>
-                    </button>
-                  </div>
-
-                  <div className="lg:hidden flex justify-center md:justify-start gap-4 w-full!">
-                    <button
-                      onClick={handleShare}
-                      className="w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
-                    >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <g clipPath="url(#clip0_490_777)">
-                          <path
-                            d="M9.66659 7.33387C9.28854 7.33418 8.91625 7.42647 8.58184 7.60278C8.24743 7.77909 7.96093 8.03412 7.74709 8.34587L4.49259 6.87637C4.72374 6.31818 4.72464 5.69121 4.49509 5.13237L7.74509 3.65537C8.06202 4.11375 8.53275 4.44335 9.07189 4.58439C9.61102 4.72543 10.1828 4.66857 10.6836 4.42412C11.1844 4.17967 11.5811 3.76382 11.8015 3.252C12.022 2.74019 12.0517 2.1663 11.8853 1.63445C11.7189 1.10261 11.3673 0.648016 10.8945 0.353145C10.4216 0.0582749 9.85868 -0.0573459 9.30786 0.0272559C8.75704 0.111858 8.25479 0.391078 7.89221 0.814269C7.52962 1.23746 7.33072 1.77659 7.33159 2.33387C7.33371 2.46577 7.34709 2.59725 7.37159 2.72687L3.91659 4.29687C3.58476 3.98598 3.16934 3.77879 2.72138 3.70075C2.27341 3.62271 1.8124 3.67723 1.39499 3.8576C0.977583 4.03797 0.621951 4.33634 0.371786 4.71605C0.121622 5.09576 -0.0121789 5.54028 -0.013178 5.99499C-0.014177 6.4497 0.117669 6.89481 0.366163 7.27561C0.614656 7.65642 0.968974 7.95635 1.38559 8.13856C1.8022 8.32076 2.26296 8.3773 2.71127 8.30123C3.15957 8.22516 3.5759 8.0198 3.90909 7.71037L7.37309 9.27437C7.34903 9.40388 7.33582 9.53517 7.33359 9.66687C7.33349 10.1284 7.47028 10.5797 7.72665 10.9635C7.98302 11.3473 8.34745 11.6465 8.77387 11.8231C9.20028 11.9998 9.66951 12.0461 10.1222 11.9561C10.5749 11.866 10.9907 11.6438 11.3171 11.3174C11.6435 10.991 11.8658 10.5752 11.9558 10.1225C12.0458 9.66979 11.9995 9.20056 11.8229 8.77415C11.6462 8.34773 11.347 7.9833 10.9632 7.72693C10.5794 7.47056 10.1282 7.33377 9.66659 7.33387V7.33387ZM9.66659 1.00037C9.93035 1.00027 10.1882 1.07839 10.4076 1.22486C10.6269 1.37133 10.7979 1.57956 10.8989 1.82321C10.9999 2.06687 11.0264 2.33501 10.975 2.59371C10.9236 2.85242 10.7967 3.09007 10.6102 3.27662C10.4237 3.46316 10.1861 3.59021 9.92743 3.64171C9.66874 3.6932 9.40059 3.66682 9.1569 3.56591C8.9132 3.46499 8.70491 3.29408 8.55836 3.07477C8.41181 2.85547 8.33359 2.59763 8.33359 2.33387C8.33385 1.98037 8.47436 1.64142 8.72428 1.39141C8.97419 1.1414 9.31309 1.00077 9.66659 1.00037V1.00037ZM2.33359 7.33387C2.06983 7.33397 1.81196 7.25584 1.5926 7.10938C1.37324 6.96291 1.20224 6.75468 1.10124 6.51102C1.00023 6.26737 0.973753 5.99923 1.02515 5.74052C1.07655 5.48182 1.20351 5.24416 1.38998 5.05762C1.57646 4.87107 1.81406 4.74402 2.07275 4.69253C2.33144 4.64103 2.59959 4.66741 2.84328 4.76833C3.08698 4.86924 3.29527 5.04016 3.44182 5.25946C3.58837 5.47877 3.66659 5.73661 3.66659 6.00037C3.66619 6.35383 3.52564 6.6927 3.27575 6.94268C3.02587 7.19266 2.68705 7.33334 2.33359 7.33387ZM9.66659 11.0004C9.40285 11.0004 9.14503 10.9222 8.92574 10.7756C8.70644 10.6291 8.53552 10.4208 8.4346 10.1772C8.33367 9.93351 8.30726 9.66539 8.35871 9.40672C8.41016 9.14804 8.53717 8.91044 8.72366 8.72394C8.91015 8.53745 9.14776 8.41045 9.40644 8.35899C9.66511 8.30754 9.93323 8.33395 10.1769 8.43488C10.4206 8.53581 10.6288 8.70672 10.7754 8.92602C10.9219 9.14531 11.0001 9.40313 11.0001 9.66687C10.9998 10.0205 10.8592 10.3595 10.6092 10.6095C10.3592 10.8595 10.0202 11.0001 9.66659 11.0004V11.0004Z"
-                            fill="#E8E9F3"
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_490_777">
-                            <rect width="14" height="14" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <p className="font-satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                        Share{" "}
-                      </p>
-                    </button>
-
-                    <button
-                      onClick={handleCopy}
-                      className="w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
-                    >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <g clipPath="url(#clip0_490_772)">
-                          <path
-                            d="M6.92263 8.63347L5.29163 10.2645C4.81809 10.7253 4.18214 10.9813 3.52136 10.9768C2.86058 10.9724 2.22811 10.708 1.76079 10.2408C1.29347 9.77362 1.02888 9.14123 1.02426 8.48045C1.01965 7.81967 1.27538 7.18364 1.73613 6.70997L3.36713 5.07748C3.46089 4.98366 3.51353 4.85644 3.51348 4.7238C3.51344 4.59117 3.4607 4.46398 3.36688 4.37023C3.27306 4.27647 3.14584 4.22383 3.01321 4.22388C2.88057 4.22392 2.75339 4.27666 2.65963 4.37048L1.02913 6.00297C0.370268 6.66217 0.000253965 7.5561 0.000488393 8.4881C0.00072282 9.42011 0.371187 10.3139 1.03038 10.9727C1.68958 11.6316 2.58351 12.0016 3.51552 12.0014C4.44753 12.0011 5.34127 11.6307 6.00013 10.9715L7.63113 9.34047C7.72221 9.24617 7.77261 9.11987 7.77147 8.98877C7.77033 8.85767 7.71775 8.73226 7.62504 8.63956C7.53234 8.54686 7.40693 8.49427 7.27583 8.49313C7.14474 8.49199 7.01843 8.54239 6.92413 8.63347H6.92263Z"
-                            fill="#E8E9F3"
-                          />
-                          <path
-                            d="M10.9722 1.03076C10.6469 0.703164 10.2597 0.443396 9.83326 0.266504C9.40678 0.0896132 8.94944 -0.000884087 8.48773 0.000256461C8.02627 -0.000969404 7.56914 0.0892955 7.14277 0.265832C6.71641 0.442369 6.32926 0.701675 6.00373 1.02876L4.37023 2.66026C4.27641 2.75401 4.22368 2.8812 4.22363 3.01383C4.22359 3.14647 4.27623 3.27369 4.36998 3.36751C4.46374 3.46133 4.59092 3.51406 4.72356 3.51411C4.85619 3.51415 4.98341 3.46151 5.07723 3.36776L6.70973 1.73676C6.94251 1.50258 7.21943 1.31691 7.52445 1.19049C7.82948 1.06406 8.15655 0.999407 8.48673 1.00026C8.98387 1.00042 9.46979 1.14797 9.88308 1.42426C10.2964 1.70054 10.6185 2.09315 10.8086 2.55247C10.9988 3.01178 11.0486 3.51717 10.9516 4.00475C10.8546 4.49232 10.6152 4.9402 10.2637 5.29176L8.63273 6.92276C8.53891 7.01658 8.48621 7.14383 8.48621 7.27651C8.48621 7.40919 8.53891 7.53644 8.63273 7.63026C8.72655 7.72408 8.8538 7.77679 8.98648 7.77679C9.11917 7.77679 9.24641 7.72408 9.34023 7.63026L10.9712 6.00026C11.6293 5.34081 11.9989 4.44731 11.9991 3.51571C11.9993 2.58412 11.63 1.69047 10.9722 1.03076Z"
-                            fill="#E8E9F3"
-                          />
-                          <path
-                            d="M7.14679 4.14646L4.14678 7.14645C4.09903 7.19258 4.06094 7.24775 4.03473 7.30875C4.00853 7.36975 3.99474 7.43536 3.99416 7.50175C3.99358 7.56814 4.00623 7.63398 4.03137 7.69543C4.05651 7.75688 4.09364 7.8127 4.14059 7.85965C4.18753 7.9066 4.24336 7.94372 4.30481 7.96886C4.36626 7.994 4.4321 8.00665 4.49849 8.00608C4.56487 8.0055 4.63048 7.99171 4.69149 7.9655C4.75249 7.9393 4.80766 7.90121 4.85378 7.85345L7.85379 4.85346C7.94486 4.75916 7.99526 4.63286 7.99412 4.50176C7.99298 4.37066 7.9404 4.24525 7.84769 4.15255C7.75499 4.05985 7.62958 4.00726 7.49849 4.00612C7.36739 4.00498 7.24109 4.05538 7.14679 4.14646Z"
-                            fill="#E8E9F3"
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_490_772">
-                            <rect width="14" height="14" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <p className="font-satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                        {copied ? "COPIED!" : "COPY LINK"}{" "}
-                      </p>
-                    </button>
-                  </div>
-                  <p className="font-Satoshi text-[10px] font-normal leading-[140%] tracking-[0.01em] text-center">
-                    Every friend who joins through your link moves you up.
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </div>,
           document.body,
