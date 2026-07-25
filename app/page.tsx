@@ -2297,7 +2297,7 @@ export default function Home() {
                                 <button
                                   type="button"
                                   onClick={() => setOpenLocation(true)}
-                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-center"
+                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-base leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-center"
                                 >
                                   <span
                                     className={
@@ -2306,8 +2306,7 @@ export default function Home() {
                                         : "text-[#F8F7FC]/40"
                                     }
                                   >
-                                    {data.location ||
-                                      "BIRTH LOCATION ( CITY, COUNTRY )"}
+                                    {data.location || "( CITY, COUNTRY )"}
                                   </span>
                                 </button>
                               </div>
