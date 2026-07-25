@@ -253,6 +253,8 @@ export default function Home() {
     time: string;
   } | null>(null);
 
+  const [timeUnknown, setTimeUnknown] = useState(false);
+
   const [visibleCount, setVisibleCount] = useState(18);
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
@@ -1335,7 +1337,7 @@ export default function Home() {
                 className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30"
               >
                 <div className="flex flex-col gap-[30px] md:gap-[60px] text-center md:text-left">
-                  <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] font-normal leading-[115%]">
+                  <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] font-normal leading-[115%] font-Recoleta">
                     Timing Intelligence for Modern Investors
                   </h1>
 
@@ -2416,11 +2418,37 @@ export default function Home() {
                                         <X className="size-4" />
                                       </button>
 
-                                      <h3 className="mb-6 text-center font-Recoleta text-lg font-semibold text-white">
+                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-semibold text-white">
                                         Select Birth Time
                                       </h3>
 
-                                      <div className="relative flex h-52 overflow-hidden">
+                                      {/* Time unknown checkbox */}
+                                      <label className="mb-4 flex items-center justify-center gap-2 cursor-pointer select-none">
+                                        <input
+                                          type="checkbox"
+                                          checked={timeUnknown}
+                                          onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setTimeUnknown(checked);
+                                            if (checked) {
+                                              setTime("12:00 PM");
+                                              setAmpm("PM");
+                                            }
+                                          }}
+                                          className="size-4 rounded border-white/20 bg-white/5 accent-white/80 cursor-pointer"
+                                        />
+                                        <span className="text-base text-white/70 font-Satoshi">
+                                          I don&apos;t know my birth time
+                                        </span>
+                                      </label>
+
+                                      <div
+                                        className={`relative flex h-52 overflow-hidden transition-opacity ${
+                                          timeUnknown
+                                            ? "opacity-30 pointer-events-none"
+                                            : "opacity-100"
+                                        }`}
+                                      >
                                         <div className="absolute left-0 right-0 top-1/2 h-12 -translate-y-1/2 rounded-xl bg-white/5 pointer-events-none" />
 
                                         <div
@@ -2710,7 +2738,7 @@ export default function Home() {
                                       handleChange(e.target.value)
                                     }
                                     onFocus={() => setShowDropdown(true)}
-                                    className="py-4 px-2 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-[12px] placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-center placeholder:text-center font-Satoshi text-[#F8F7FC] placeholder:text-[12px] text-[12px] font-normal tracking-[1.95px]"
+                                    className="py-4 px-2 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-center placeholder:text-center font-Satoshi text-[#F8F7FC] placeholder:text-base text-base font-normal tracking-[1.95px]"
                                   />
                                   {showDropdown &&
                                     suggestions.length > 0 &&
@@ -2806,7 +2834,7 @@ export default function Home() {
                                 createPortal(
                                   <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
-                                      className="absolute inset-0 bg-black/10 backdrop-blur-md"
+                                      className="absolute inset-0 bg-black/10"
                                       onClick={() => setOpenTime(false)}
                                     />
                                     <div
@@ -2821,11 +2849,37 @@ export default function Home() {
                                         <X className="size-4" />
                                       </button>
 
-                                      <h3 className="mb-6 text-center font-Recoleta text-lg font-semibold text-white">
+                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-semibold text-white">
                                         Select Birth Time
                                       </h3>
 
-                                      <div className="relative flex h-52 overflow-hidden">
+                                      {/* Time unknown checkbox */}
+                                      <label className="mb-4 flex items-center justify-center gap-2 cursor-pointer select-none">
+                                        <input
+                                          type="checkbox"
+                                          checked={timeUnknown}
+                                          onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setTimeUnknown(checked);
+                                            if (checked) {
+                                              setTime("12:00 PM");
+                                              setAmpm("PM");
+                                            }
+                                          }}
+                                          className="size-4 rounded border-white/20 bg-white/5 accent-white/80 cursor-pointer"
+                                        />
+                                        <span className="text-base text-white/70 font-Satoshi">
+                                          I don&apos;t know my birth time
+                                        </span>
+                                      </label>
+
+                                      <div
+                                        className={`relative flex h-52 overflow-hidden transition-opacity ${
+                                          timeUnknown
+                                            ? "opacity-30 pointer-events-none"
+                                            : "opacity-100"
+                                        }`}
+                                      >
                                         <div className="absolute left-0 right-0 top-1/2 h-12 -translate-y-1/2 rounded-xl bg-white/5 pointer-events-none" />
 
                                         <div
