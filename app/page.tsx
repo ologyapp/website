@@ -418,18 +418,67 @@ export default function Home() {
 
   const [posterDataSrc, setPosterDataSrc] = useState<string | null>(null);
 
-  const handleShare = async () => {
-    if (!cardRef.current) return;
-    const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+  // const handleShare = async () => {
+  //   if (!cardRef.current) return;
+  //   const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
-    try {
-      setIsDownloading(true);
+  //   try {
+  //     setIsDownloading(true);
 
-      const posterUrl = getCardPoster(cardType);
-      const dataSrc = await imageUrlToDataUrl(posterUrl);
+  //     const posterUrl = getCardPoster(cardType);
+  //     const dataSrc = await imageUrlToDataUrl(posterUrl);
 
+  //     flushSync(() => {
+  //       setPosterDataSrc(dataSrc); // React now owns this
+  //       setShowLogoOnModal(true);
+  //       setHideFooter(true);
+  //       setHideDivider(true);
+  //       setHideFooterLogo(true);
+  //     });
+  //     await waitForPaint();
+
+  //     const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
+
+  //     const blob = await (await fetch(dataUrl)).blob();
+  //     const file = new File([blob], `${names}-${archetype}-card.png`, {
+  //       type: "image/png",
+  //     });
+
+  //     if (navigator.share && navigator.canShare?.({ files: [file] })) {
+  //       await navigator.share({
+  //         title: "My Ology",
+  //         text: shareText,
+  //         url: referralLink,
+  //         files: [file],
+  //       });
+  //       return;
+  //     }
+
+  //     const link = document.createElement("a");
+  //     link.download = `${names}-${archetype}-card.png`;
+  //     link.href = dataUrl;
+  //     link.click();
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setPosterDataSrc(null);
+  //     setShowLogoOnModal(false);
+  //     setHideFooter(false);
+  //     setHideDivider(false);
+  //     setHideFooterLogo(false);
+  //     setIsDownloading(false);
+  //   }
+  // };
+
+  // Pre-generate ahead of time (e.g. in a useEffect when showModal becomes true,
+  // or right after handleSubmitForm's fetch resolves)
+  const [preGeneratedFile, setPreGeneratedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (!showModal || !cardRef.current) return;
+
+    (async () => {
       flushSync(() => {
-        setPosterDataSrc(dataSrc); // React now owns this
         setShowLogoOnModal(true);
         setHideFooter(true);
         setHideDivider(true);
@@ -437,39 +486,47 @@ export default function Home() {
       });
       await waitForPaint();
 
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
-
+      const dataUrl = await toPng(cardRef.current!, { pixelRatio: 2 });
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `${names}-${archetype}-card.png`, {
         type: "image/png",
       });
+      setPreGeneratedFile(file);
 
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          title: "My Ology",
-          text: shareText,
-          url: referralLink,
-          files: [file],
-        });
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.download = `${names}-${archetype}-card.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setPosterDataSrc(null);
       setShowLogoOnModal(false);
       setHideFooter(false);
       setHideDivider(false);
       setHideFooterLogo(false);
-      setIsDownloading(false);
-    }
-  };
+    })();
+  }, [showModal]);
 
+  // Tap handler is now synchronous and instant
+  const handleShare = () => {
+    if (!preGeneratedFile) return; // not ready yet — disable button or show spinner until it is
+
+    const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+
+    if (
+      navigator.share &&
+      navigator.canShare?.({ files: [preGeneratedFile] })
+    ) {
+      navigator
+        .share({
+          title: "My Ology",
+          text: `${shareText}\n${referralLink}`,
+          files: [preGeneratedFile],
+        })
+        .catch((err) => {
+          if (err?.name !== "AbortError") console.error(err);
+        });
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.download = `${names}-${archetype}-card.png`;
+    link.href = URL.createObjectURL(preGeneratedFile);
+    link.click();
+  };
   const scrollToItem = (
     ref: React.RefObject<HTMLDivElement | null>,
     index: number,
@@ -1073,7 +1130,7 @@ export default function Home() {
       {/* HERO SECTION */}
       <section
         ref={heroRef}
-        className="relative h-screen w-full! flex flex-col items-center! z-40! "
+        className="relative h-dvh w-full! flex flex-col items-center! z-40! "
       >
         <motion.div
           style={{ opacity }}
@@ -1376,28 +1433,28 @@ export default function Home() {
                   <button
                     type="button"
                     className="
-  cursor-pointer
-  inline-flex
-  flex
-  w-auto
-  py-[14.73px]
-    px-[18px]
-  justify-center
-  items-center
-  rounded-[20px]
-  bg-gradient-to-b
-  from-white/10
-  to-[rgba(30,37,64,0.15)]
-  border
-  border-white/20
-  backdrop-blur-xl
-  backdrop-saturate-150
-  shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
-  hover:bg-white/10
-  hover:border-white/30
-  transition-all
-  duration-500
-"
+                    cursor-pointer
+                    inline-flex
+                    flex
+                    w-auto
+                    py-[14.73px]
+                      px-[18px]
+                    justify-center
+                    items-center
+                    rounded-[20px]
+                    bg-gradient-to-b
+                    from-white/10
+                    to-[rgba(30,37,64,0.15)]
+                    border
+                    border-white/20
+                    backdrop-blur-xl
+                    backdrop-saturate-150
+                    shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
+                    hover:bg-white/10
+                    hover:border-white/30
+                    transition-all
+                    duration-500
+                  "
                   >
                     {" "}
                     <span className=" text-[#F8F7FC] font-Satoshi text-[16px] lg:text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
@@ -1661,52 +1718,6 @@ export default function Home() {
             </div>
           </motion.header>
         </div>
-
-        {/* line here */}
-
-        {/* <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-[100vh] z-5! pointer-events-none overflow-hidden">
-          {Array.from({ length: BLOCKS }).map((_, block) => (
-            <div
-              key={block}
-              className="absolute left-0 right-0 flex h-[100vh]"
-              style={{ top: `${block * 100}vh` }}
-            >
-              {Array.from({ length: LINES }).map((_, i) => {
-                const isActive = activeLines[i];
-
-                return (
-                  <div key={i} className="relative flex-1">
-                    <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/4" />
-
-                    {isActive && (
-                      <motion.div
-                        className="absolute left-1/2 top-0 -translate-x-1/2"
-                        animate={{
-                          y: ["-15vh", "115vh"],
-                          opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                          duration: 10 + (i % 3),
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: block * 0.8 + i * 0.35,
-                        }}
-                      >
-                        <div
-                          className="absolute left-1/2 -translate-x-1/2 w-px h-20"
-                          style={{
-                            background:
-                              "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
-                          }}
-                        />
-                      </motion.div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div> */}
       </section>
 
       {/* normal section */}
