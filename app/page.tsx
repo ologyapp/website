@@ -382,6 +382,7 @@ export default function Home() {
   const [showLogoOnPortal, setShowLogoOnModal] = useState(false);
   const [hideFooter, setHideFooter] = useState(false);
   const [hideDivider, setHideDivider] = useState(false);
+  const [hideFooterLogo, setHideFooterLogo] = useState(false);
 
   // Waits for the browser to actually paint the current DOM state
   // before continuing — two rAFs is the reliable way to do this.
@@ -408,6 +409,7 @@ export default function Home() {
         setShowLogoOnModal(true);
         setHideFooter(true);
         setHideDivider(true);
+        setHideFooterLogo(true);
       });
       await waitForPaint();
 
@@ -445,9 +447,10 @@ export default function Home() {
       console.error(err);
     } finally {
       // Always restore the normal on-screen layout, even on error/early return
-      setShowLogo(false);
+      setShowLogoOnModal(false);
       setHideFooter(false);
       setHideDivider(false);
+      setHideFooterLogo(false);
       setIsDownloading(false);
     }
   };
@@ -4066,7 +4069,7 @@ export default function Home() {
                 </div>
               )}
 
-              {showLogoOnPortal && (
+              {hideFooterLogo && (
                 <div className="w-full flex justify-center text-center">
                   <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
                     ologyapp.com
