@@ -399,16 +399,6 @@ export default function Home() {
     });
   }
 
-  window.addEventListener(
-    "error",
-    (e) => {
-      if (e.target instanceof HTMLImageElement) {
-        console.error("IMAGE FAILED:", e.target.src);
-      }
-    },
-    true,
-  );
-
   // Helper: converts any image URL to a data URL using a canvas (bypasses html-to-image's internal fetch entirely)
   async function imageUrlToDataUrl(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
