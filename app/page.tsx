@@ -253,6 +253,8 @@ export default function Home() {
     time: string;
   } | null>(null);
 
+  const [openLocation, setOpenLocation] = useState(false);
+
   const [timeUnknown, setTimeUnknown] = useState(false);
 
   const [visibleCount, setVisibleCount] = useState(18);
@@ -1333,9 +1335,9 @@ export default function Home() {
                   delay: 3,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30"
+                className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30 max-md:[@supports(-webkit-hyphens:none)]:gap-[40px]"
               >
-                <div className="flex flex-col gap-[30px] md:gap-[60px] text-center md:text-left">
+                <div className="flex flex-col gap-[30px] md:gap-[60px] text-center md:text-left max-md:[@supports(-webkit-hyphens:none)]:gap-[20px]">
                   <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] font-normal leading-[115%] font-Recoleta">
                     Timing Intelligence for Modern Investors
                   </h1>
@@ -2264,89 +2266,105 @@ export default function Home() {
                                 </button>
                               </div>
 
+                              {/* TRIGGER — replaces the old inline input */}
                               <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                                <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
+                                {/* <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
                                   Birth Location
-                                </label>
-                                <div className="relative w-full">
-                                  <input
-                                    ref={inputRef}
-                                    autoComplete="off"
-                                    spellCheck={false}
-                                    placeholder="( CITY, COUNTRY )"
-                                    value={data.location || ""}
-                                    onChange={(e) => {
-                                      handleChange(e.target.value);
-                                      const rect =
-                                        e.target.getBoundingClientRect();
-                                      setDropdownPos({
-                                        top: rect.bottom + 4,
-                                        left: rect.left,
-                                        width: rect.width,
-                                      });
-                                    }}
-                                    onFocus={(e) => {
-                                      setShowDropdown(true);
-                                      const rect =
-                                        e.target.getBoundingClientRect();
-                                      setDropdownPos({
-                                        top: rect.bottom + 4,
-                                        left: rect.left,
-                                        width: rect.width,
-                                      });
-                                    }}
-                                    className="py-4 px-5 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:text-base placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-base font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]"
-                                  />
-                                  {showDropdown &&
-                                    suggestions.length > 0 &&
-                                    createPortal(
-                                      <div
-                                        style={{
-                                          position: "fixed",
-                                          top: dropdownPos.top,
-                                          left: dropdownPos.left,
-                                          width: dropdownPos.width,
-                                          zIndex: 999999,
-                                        }}
-                                        className="font-Satoshi bg-[#1c1c2c] border border-[rgba(248,247,252,0.1)] rounded-[10px] max-h-[calc(100vh-150px)] overflow-auto mt-1"
-                                      >
-                                        {suggestions.map((s) => (
-                                          <div
-                                            key={s.place_id}
-                                            className="px-4 py-2 cursor-pointer hover:bg-[#2a2a40]"
-                                            onMouseDown={(e) => {
-                                              e.preventDefault();
-                                              const placesService = new (
-                                                window as any
-                                              ).google.maps.places.PlacesService(
-                                                document.createElement("div"),
-                                              );
-                                              placesService.getDetails(
-                                                { placeId: s.place_id },
-                                                (place: any) => {
-                                                  const lat =
-                                                    place.geometry.location.lat();
-                                                  const lng =
-                                                    place.geometry.location.lng();
-                                                  setData({
-                                                    ...data,
-                                                    location: s.description,
-                                                    lat,
-                                                    lng,
-                                                  });
-                                                },
-                                              );
-                                              setShowDropdown(false);
-                                            }}
-                                          >
-                                            {s.description}
-                                          </div>
-                                        ))}
-                                      </div>,
-                                      document.body,
-                                    )}
-                                </div>
+                                </label> */}
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenLocation(true)}
+                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[12px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-left"
+                                >
+                                  <span
+                                    className={
+                                      data.location
+                                        ? "text-[#F8F7FC]/40"
+                                        : "text-[#F8F7FC]/40"
+                                    }
+                                  >
+                                    {data.location || "( CITY, COUNTRY )"}
+                                  </span>
+                                </button>
                               </div>
+
+                              {/* MODAL — input + suggestions live here now */}
+                              {openLocation &&
+                                createPortal(
+                                  <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
+                                    <div
+                                      className="absolute inset-0 bg-black/10 backdrop-blur-md"
+                                      onClick={() => setOpenLocation(false)}
+                                    />
+                                    <div
+                                      className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <button
+                                        type="button"
+                                        onClick={() => setOpenLocation(false)}
+                                        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                                      >
+                                        <X className="size-4" />
+                                      </button>
+
+                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-normal text-white">
+                                        Birth Location
+                                      </h3>
+
+                                      <input
+                                        ref={inputRef}
+                                        autoFocus
+                                        autoComplete="off"
+                                        spellCheck={false}
+                                        placeholder="( CITY, COUNTRY )"
+                                        value={data.location || ""}
+                                        onChange={(e) =>
+                                          handleChange(e.target.value)
+                                        }
+                                        className="py-4 px-5 w-full rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-[16px] font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]/40 placeholder:uppercase"
+                                      />
+
+                                      {suggestions.length > 0 && (
+                                        <div className="mt-2 font-Satoshi rounded-[10px] max-h-[40vh] overflow-auto">
+                                          {suggestions.map((s) => (
+                                            <div
+                                              key={s.place_id}
+                                              className="px-4 py-3 cursor-pointer hover:bg-[#2a2a40] text-white/90"
+                                              onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                const placesService = new (
+                                                  window as any
+                                                ).google.maps.places.PlacesService(
+                                                  document.createElement("div"),
+                                                );
+                                                placesService.getDetails(
+                                                  { placeId: s.place_id },
+                                                  (place: any) => {
+                                                    const lat =
+                                                      place.geometry.location.lat();
+                                                    const lng =
+                                                      place.geometry.location.lng();
+                                                    setData({
+                                                      ...data,
+                                                      location: s.description,
+                                                      lat,
+                                                      lng,
+                                                    });
+                                                  },
+                                                );
+                                                setOpenLocation(false);
+                                              }}
+                                            >
+                                              {s.description}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>,
+                                  document.body,
+                                )}
 
                               <button
                                 onClick={() => handleSubmitForm()}
@@ -2417,7 +2435,7 @@ export default function Home() {
                                         <X className="size-4" />
                                       </button>
 
-                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-semibold text-white">
+                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-normal text-white">
                                         Select Birth Time
                                       </h3>
 
@@ -2722,73 +2740,105 @@ export default function Home() {
                                 </div>
                               </div>
 
+                              {/* TRIGGER — replaces the old inline input */}
                               <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                                 {/* <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
                                   Birth Location
                                 </label> */}
-                                <div className="relative w-full">
-                                  <input
-                                    ref={inputRef}
-                                    autoComplete="off"
-                                    spellCheck={false}
-                                    placeholder="birth location ( CITY, COUNTRY )"
-                                    value={data.location || ""}
-                                    onChange={(e) =>
-                                      handleChange(e.target.value)
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenLocation(true)}
+                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[12px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-left"
+                                >
+                                  <span
+                                    className={
+                                      data.location
+                                        ? "text-[#F8F7FC]/40"
+                                        : "text-[#F8F7FC]/40"
                                     }
-                                    onFocus={() => setShowDropdown(true)}
-                                    className="py-4 px-2 w-full placeholder:font-Satoshi placeholder:text-[#F8F7FC]/40 placeholder:font-normal placeholder:leading-[25.48px] placeholder:tracking-[2.07px] placeholder:uppercase rounded-[10px] border border-[rgba(248,247,252,0.1)] text-center placeholder:text-center font-Satoshi text-[#F8F7FC] placeholder:text-base text-base font-normal tracking-[1.95px]"
-                                  />
-                                  {showDropdown &&
-                                    suggestions.length > 0 &&
-                                    createPortal(
-                                      <div
-                                        style={{
-                                          position: "fixed",
-                                          top: dropdownPos.top,
-                                          left: dropdownPos.left,
-                                          width: dropdownPos.width,
-                                          zIndex: 999999,
-                                        }}
-                                        className="font-Satoshi bg-[#1c1c2c] border border-[rgba(248,247,252,0.1)] rounded-[10px] max-h-[calc(100vh-150px)] overflow-auto mt-1"
-                                      >
-                                        {suggestions.map((s) => (
-                                          <div
-                                            key={s.place_id}
-                                            className="px-4 py-2 cursor-pointer hover:bg-[#2a2a40]"
-                                            onMouseDown={(e) => {
-                                              e.preventDefault();
-                                              const placesService = new (
-                                                window as any
-                                              ).google.maps.places.PlacesService(
-                                                document.createElement("div"),
-                                              );
-                                              placesService.getDetails(
-                                                { placeId: s.place_id },
-                                                (place: any) => {
-                                                  const lat =
-                                                    place.geometry.location.lat();
-                                                  const lng =
-                                                    place.geometry.location.lng();
-                                                  setData({
-                                                    ...data,
-                                                    location: s.description,
-                                                    lat,
-                                                    lng,
-                                                  });
-                                                },
-                                              );
-                                              setShowDropdown(false);
-                                            }}
-                                          >
-                                            {s.description}
-                                          </div>
-                                        ))}
-                                      </div>,
-                                      document.body,
-                                    )}
-                                </div>
+                                  >
+                                    {data.location || "( CITY, COUNTRY )"}
+                                  </span>
+                                </button>
                               </div>
+
+                              {/* MODAL — input + suggestions live here now */}
+                              {openLocation &&
+                                createPortal(
+                                  <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
+                                    <div
+                                      className="absolute inset-0 bg-black/10 backdrop-blur-md"
+                                      onClick={() => setOpenLocation(false)}
+                                    />
+                                    <div
+                                      className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#131827]/95 backdrop-blur-2xl p-6 shadow-2xl"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <button
+                                        type="button"
+                                        onClick={() => setOpenLocation(false)}
+                                        className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                                      >
+                                        <X className="size-4" />
+                                      </button>
+
+                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-normal text-white">
+                                        Birth Location
+                                      </h3>
+
+                                      <input
+                                        ref={inputRef}
+                                        autoFocus
+                                        autoComplete="off"
+                                        spellCheck={false}
+                                        placeholder="( CITY, COUNTRY )"
+                                        value={data.location || ""}
+                                        onChange={(e) =>
+                                          handleChange(e.target.value)
+                                        }
+                                        className="py-4 px-5 w-full rounded-[10px] border border-[rgba(248,247,252,0.1)] text-start font-Satoshi text-[#F8F7FC] text-[16px] font-normal tracking-[1.95px] placeholder:text-[#F8F7FC]/40 placeholder:uppercase"
+                                      />
+
+                                      {suggestions.length > 0 && (
+                                        <div className="mt-2 font-Satoshi rounded-[10px] max-h-[40vh] overflow-auto">
+                                          {suggestions.map((s) => (
+                                            <div
+                                              key={s.place_id}
+                                              className="px-4 py-3 cursor-pointer hover:bg-[#2a2a40] text-white/90"
+                                              onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                const placesService = new (
+                                                  window as any
+                                                ).google.maps.places.PlacesService(
+                                                  document.createElement("div"),
+                                                );
+                                                placesService.getDetails(
+                                                  { placeId: s.place_id },
+                                                  (place: any) => {
+                                                    const lat =
+                                                      place.geometry.location.lat();
+                                                    const lng =
+                                                      place.geometry.location.lng();
+                                                    setData({
+                                                      ...data,
+                                                      location: s.description,
+                                                      lat,
+                                                      lng,
+                                                    });
+                                                  },
+                                                );
+                                                setOpenLocation(false);
+                                              }}
+                                            >
+                                              {s.description}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>,
+                                  document.body,
+                                )}
 
                               <button
                                 onClick={() => handleSubmitForm()}
@@ -2848,7 +2898,7 @@ export default function Home() {
                                         <X className="size-4" />
                                       </button>
 
-                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-semibold text-white">
+                                      <h3 className="mb-4 text-center font-Recoleta text-lg font-normal text-white">
                                         Select Birth Time
                                       </h3>
 
@@ -3518,7 +3568,7 @@ export default function Home() {
 
             <div className="flex flex-col items-center justify-start lg:justify-between gap-20 lg:gap-20! pt-40 lg:pt-24 w-auto h-[40vh] lg:h-[85vh]">
               <motion.div
-                className="relative z-10 mt-10 flex min-h-fit w-full xl:items-center items-start justify-center px-5"
+                className="relative z-10 mt-10 lg:mt-30 flex min-h-fit w-full xl:items-center items-start justify-center px-5"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -3528,14 +3578,14 @@ export default function Home() {
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                <div className="flex max-w-[1241px] flex-col items-center xl:gap-25 gap-13">
+                <div className="flex max-w-335 flex-col items-center xl:gap-25 gap-13">
                   <div className="flex flex-col gap-[30px]">
-                    <h2 className="text-center font-Recoleta text-[32px] lg:text-[40px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
+                    <h2 className="text-center font-Recoleta text-[32px] lg:text-[60px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
                       Ancient Patterns. <br className="block lg:hidden" />{" "}
                       Modern Lens.
                     </h2>
 
-                    <p className="text-center font-Satoshi text-[18px] font-normal leading-[140%] text-[#F8F7FC] md:text-[24px]">
+                    <p className="text-center font-Satoshi text-[18px] lg:text-[22px] font-normal leading-[140%] text-[#F8F7FC] md:text-[24px]">
                       Ology aligns your birth chart, collective sentiment, and
                       live market conditions into a single personalized timing
                       layer. It brings context to real decisions and leaves the
@@ -3602,13 +3652,13 @@ export default function Home() {
            
               gap-[30px]
               pt-[28px]
-            
+              lg:absolute
               pb-[10px]
               lg:px-[80px]
               px-[22px]
               z-50!
               -mt-10
-              lg:mt-20
+              lg:bottom-10
               flex flex-col items-center!
               
           

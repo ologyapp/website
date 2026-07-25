@@ -15,8 +15,23 @@ function CardCarousel({ items }: { items: any[] }) {
   const nextRef = useRef<HTMLButtonElement>(null);
 
   const initialIndex = useMemo(() => {
-    const idx = items.findIndex((i) => statusOf(i) === "ACTIVE");
-    return idx !== -1 ? idx : 0;
+    const activeIdx = items.findIndex((i) => statusOf(i) === "ACTIVE");
+    if (activeIdx !== -1) return activeIdx;
+
+    // No ACTIVE card — fall back to the nearest upcoming AHEAD card
+    // (smallest date_start), not just the first AHEAD in array order.
+    let bestIdx = -1;
+    let bestDate = "";
+    items.forEach((item, idx) => {
+      if (statusOf(item) === "AHEAD") {
+        if (bestIdx === -1 || item.date_start < bestDate) {
+          bestIdx = idx;
+          bestDate = item.date_start;
+        }
+      }
+    });
+
+    return bestIdx !== -1 ? bestIdx : 0;
   }, [items]);
 
   const [activeIndex, setActiveIndex] = useState(initialIndex);
