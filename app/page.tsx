@@ -1380,8 +1380,8 @@ export default function Home() {
                         className="
                         absolute
                         top-[2.25%]
-                        left-[4.4%]
-                        w-[92%]
+                        left-[12%]
+                        w-[78%]
                         h-[95.4%]
                         object-cover
                         rounded-[16px]
@@ -1395,7 +1395,7 @@ export default function Home() {
                       <img
                         src={phoneMock}
                         alt=""
-                        className="relative z-20 w-full h-auto pointer-events-none"
+                        className="relative z-20 w-full h-[200px] pointer-events-none"
                       />
                     </div>
                   </motion.div>
