@@ -1380,8 +1380,8 @@ export default function Home() {
                         className="
                         absolute
                         top-[2%]
-                        left-[11%]
-                        w-[78%]
+                        left-[10.5%]
+                        w-[79.6%]
                         h-[97.4%]
                         object-cover
                         rounded-[16px]
