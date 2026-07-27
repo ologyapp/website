@@ -38,6 +38,7 @@ import iphone from "../public/iphoneMockup.svg";
 import useReferralCapture from "../hooks/useReferralCapture";
 import Cookies from "js-cookie";
 import { flushSync } from "react-dom";
+import html2canvas from "html2canvas";
 
 import {
   signalAhead,
@@ -444,46 +445,40 @@ export default function Home() {
       originalSrc = posterImg.getAttribute("src") ?? "";
 
       try {
-        let posterUrl = getCardPoster(cardType);
+        const canvas = await html2canvas(node, {
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: null,
+          scale: 2,
+          logging: true,
 
-        // Convert relative URL to absolute URL for the proxy
-        if (posterUrl.startsWith("/")) {
-          posterUrl = `${window.location.origin}${posterUrl}`;
-        }
+          width: node.scrollWidth,
+          height: node.scrollHeight,
+          windowWidth: node.scrollWidth,
+          windowHeight: node.scrollHeight,
 
-        const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(posterUrl)}`;
-        console.log("checker", proxyUrl);
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error(`proxy status ${res.status}`);
-
-        const blob = await res.blob();
-
-        const dataUrl: string = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
+          imageTimeout: 15000,
+          removeContainer: true,
         });
 
-        posterImg.src = dataUrl;
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, "image/png", 1),
+        );
 
-        await new Promise<void>((resolve) => {
-          posterImg.onload = () => resolve();
-          posterImg.onerror = () => {
-            setDebugInfo((p) => `${p} | posterLoadErr after proxy`);
-            resolve();
-          };
-        });
+        setDebugInfo(
+          (p) =>
+            `${p} | canvas:${canvas.width}x${canvas.height} | blob:${blob?.size ?? "null"} bytes`,
+        );
 
-        if (posterImg.decode) {
-          try {
-            await posterImg.decode();
-          } catch (e) {
-            setDebugInfo((p) => `${p} | decodeErr: ${e}`);
-          }
+        if (blob) {
+          setPreGeneratedFile(
+            new File([blob], `${names}-${archetype}-card.png`, {
+              type: "image/png",
+            }),
+          );
         }
-      } catch (e) {
-        setDebugInfo((p) => `${p} | proxyErr: ${e}`);
+      } catch (err) {
+        setDebugInfo((p) => `${p} | html2canvas ERROR: ${String(err)}`);
       }
     }
 
@@ -3939,7 +3934,7 @@ export default function Home() {
               className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-6 md:gap-12.5 rounded-[16.912px] border border-white/50 bg-cover bg-center bg-no-repeat bg-lightgray overflow-y-auto max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <video
+              {/* <video
                 autoPlay
                 muted
                 loop
@@ -3962,7 +3957,26 @@ export default function Home() {
                 className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] transition-opacity ${
                   showLogoOnModal ? "opacity-100" : "opacity-0"
                 }`}
-              />
+              /> */}
+
+              {showLogoOnModal ? (
+                <img
+                  ref={posterRef}
+                  src={getCardPoster(cardType)}
+                  className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
+                  crossOrigin="anonymous"
+                  alt=""
+                />
+              ) : (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  src={getCardBg(cardType)}
+                  className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
+                />
+              )}
 
               <div className="absolute inset-0 rounded-[16.912px] bg-black/45 z-10" />
 
