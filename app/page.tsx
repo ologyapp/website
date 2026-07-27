@@ -3956,7 +3956,6 @@ export default function Home() {
                 ref={posterRef}
                 src={getCardPoster(cardType)}
                 alt=""
-                crossOrigin="anonymous"
                 onError={(e) => {
                   console.error("Poster failed to load:", e.currentTarget.src);
                 }}
@@ -4031,24 +4030,7 @@ export default function Home() {
                   <p className="lg:mb-[36.54px] text-center md:text-left flex w-auto h-auto md:h-[22.84px] flex-col justify-center items-center md:items-start text-[#F8F7FC] font-Recoleta text-[26px] md:text-[35px] font-normal leading-[150%]">
                     {archetype && archetype}
                   </p>
-                  {debugInfo && (
-                    <div
-                      style={{
-                        position: "fixed",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        background: "black",
-                        color: "lime",
-                        fontSize: 10,
-                        padding: 8,
-                        zIndex: 999999,
-                        wordBreak: "break-all",
-                      }}
-                    >
-                      {debugInfo}
-                    </div>
-                  )}
+
                   <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
                     {tagline && tagline}
                   </p>
