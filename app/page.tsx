@@ -418,60 +418,6 @@ export default function Home() {
 
   const [posterDataSrc, setPosterDataSrc] = useState<string | null>(null);
 
-  // const handleShare = async () => {
-  //   if (!cardRef.current) return;
-  //   const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
-
-  //   try {
-  //     setIsDownloading(true);
-
-  //     const posterUrl = getCardPoster(cardType);
-  //     const dataSrc = await imageUrlToDataUrl(posterUrl);
-
-  //     flushSync(() => {
-  //       setPosterDataSrc(dataSrc); // React now owns this
-  //       setShowLogoOnModal(true);
-  //       setHideFooter(true);
-  //       setHideDivider(true);
-  //       setHideFooterLogo(true);
-  //     });
-  //     await waitForPaint();
-
-  //     const dataUrl = await toPng(cardRef.current, { pixelRatio: 2 });
-
-  //     const blob = await (await fetch(dataUrl)).blob();
-  //     const file = new File([blob], `${names}-${archetype}-card.png`, {
-  //       type: "image/png",
-  //     });
-
-  //     if (navigator.share && navigator.canShare?.({ files: [file] })) {
-  //       await navigator.share({
-  //         title: "My Ology",
-  //         text: shareText,
-  //         url: referralLink,
-  //         files: [file],
-  //       });
-  //       return;
-  //     }
-
-  //     const link = document.createElement("a");
-  //     link.download = `${names}-${archetype}-card.png`;
-  //     link.href = dataUrl;
-  //     link.click();
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     setPosterDataSrc(null);
-  //     setShowLogoOnModal(false);
-  //     setHideFooter(false);
-  //     setHideDivider(false);
-  //     setHideFooterLogo(false);
-  //     setIsDownloading(false);
-  //   }
-  // };
-
-  // Pre-generate ahead of time (e.g. in a useEffect when showModal becomes true,
-  // or right after handleSubmitForm's fetch resolves)
   const [preGeneratedFile, setPreGeneratedFile] = useState<File | null>(null);
   const [debugInfo, setDebugInfo] = useState("");
   const posterRef = useRef<HTMLImageElement>(null);
@@ -489,32 +435,59 @@ export default function Home() {
       setHideFooterLogo(true);
     });
 
-    // wait for fonts
     await document.fonts.ready;
 
-    // explicitly wait for the poster image itself — this is the part
-    // that was missing and is almost certainly the iPhone bug
     const posterImg = posterRef.current;
+    let originalSrc = "";
+
     if (posterImg) {
-      if (!posterImg.complete || posterImg.naturalWidth === 0) {
+      originalSrc = posterImg.getAttribute("src") ?? "";
+
+      try {
+        let posterUrl = getCardPoster(cardType);
+
+        // Convert relative URL to absolute URL for the proxy
+        if (posterUrl.startsWith("/")) {
+          posterUrl = `${window.location.origin}${posterUrl}`;
+        }
+
+        const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(posterUrl)}`;
+        console.log("checker", proxyUrl);
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error(`proxy status ${res.status}`);
+
+        const blob = await res.blob();
+
+        const dataUrl: string = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
+        posterImg.src = dataUrl;
+
         await new Promise<void>((resolve) => {
           posterImg.onload = () => resolve();
           posterImg.onerror = () => {
-            setDebugInfo((p) => `${p} | posterErr: ${posterImg.src}`);
-            resolve(); // don't hang forever, just proceed
+            setDebugInfo((p) => `${p} | posterLoadErr after proxy`);
+            resolve();
           };
         });
-      }
-      if (posterImg.decode) {
-        try {
-          await posterImg.decode();
-        } catch (e) {
-          setDebugInfo((p) => `${p} | decodeErr: ${e}`);
+
+        if (posterImg.decode) {
+          try {
+            await posterImg.decode();
+          } catch (e) {
+            setDebugInfo((p) => `${p} | decodeErr: ${e}`);
+          }
         }
+      } catch (e) {
+        setDebugInfo((p) => `${p} | proxyErr: ${e}`);
       }
     }
 
-    // wait for two paint frames so React's state changes above are actually on screen
+    // two paint frames so the state changes above are actually on screen
     await new Promise((res) =>
       requestAnimationFrame(() => requestAnimationFrame(res)),
     );
@@ -531,10 +504,12 @@ export default function Home() {
         width: node.scrollWidth,
         height: node.scrollHeight,
       });
+
       setDebugInfo(
         (p) =>
           `${p} | blob: ${blob?.size ?? "null"} bytes, h: ${node.scrollHeight}`,
       );
+
       if (blob) {
         setPreGeneratedFile(
           new File([blob], `${names}-${archetype}-card.png`, {
@@ -547,6 +522,7 @@ export default function Home() {
     } finally {
       node.style.overflow = prevOverflow;
       node.style.maxHeight = prevMaxHeight;
+      if (posterImg && originalSrc) posterImg.src = originalSrc; // restore live src
       setShowLogoOnModal(wasShowingLogo);
       setHideFooter(false);
       setHideDivider(false);
@@ -563,6 +539,7 @@ export default function Home() {
   }, [showModal]);
 
   const handleShare = () => {
+    console.log("poster url:", getCardPoster(cardType));
     if (!preGeneratedFile) return;
 
     const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
