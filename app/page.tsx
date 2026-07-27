@@ -418,6 +418,7 @@ export default function Home() {
       setHideFooter(true);
       setHideDivider(true);
       setHideFooterLogo(true);
+      setIsDownloading(true);
     });
 
     await document.fonts.ready;
@@ -461,6 +462,7 @@ export default function Home() {
       setHideFooter(false);
       setHideDivider(false);
       setHideFooterLogo(false);
+      setIsDownloading(false);
     }
   };
 
@@ -3851,48 +3853,23 @@ export default function Home() {
               ref={cardRef}
               onClick={(e) => e.stopPropagation()}
               className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-6 md:gap-12.5 rounded-[16.912px] border border-white/50 overflow-y-auto max-h-[90vh]"
-              style={{
-                backgroundImage: showLogoOnModal
-                  ? `url(${getCardPoster(cardType)})`
-                  : "none",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
+              // style={{
+              //   backgroundImage: showLogoOnModal
+              //     ? `url(${getCardPoster(cardType)})`
+              //     : "none",
+              //   backgroundSize: "cover",
+              //   backgroundPosition: "center",
+              //   backgroundRepeat: "no-repeat",
+              // }}
             >
-              {/* <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                src={getCardBg(cardType)}
-                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
-                  showLogoOnModal
-                    ? "opacity-0 pointer-events-none"
-                    : "opacity-100"
-                }`}
-              />
-
-              <img
-                ref={posterRef}
-                src={getCardPoster(cardType)}
-                alt=""
-                onError={(e) => {
-                  console.error("Poster failed to load:", e.currentTarget.src);
-                }}
-                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] transition-opacity ${
-                  showLogoOnModal ? "opacity-100" : "opacity-0"
-                }`}
-              /> */}
-
               {showLogoOnModal ? (
                 <div className="absolute inset-0 overflow-hidden rounded-[16px]">
-                  {/* <img
+                  <img
                     ref={posterRef}
                     src={getCardPoster(cardType)}
                     className="block w-full h-full object-cover"
                     alt=""
-                  /> */}
+                  />
                 </div>
               ) : (
                 <video
