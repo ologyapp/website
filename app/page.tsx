@@ -507,15 +507,17 @@ export default function Home() {
         return;
       }
 
-      try {
-        const bitmap = await createImageBitmap(blob);
+      const img = document.createElement("img");
 
-        alert(
-          `Bitmap:\n` + `width=${bitmap.width}\n` + `height=${bitmap.height}`,
-        );
-      } catch (e) {
-        alert(`createImageBitmap failed:\n${String(e)}`);
-      }
+      img.onload = () => {
+        alert(`Loaded: ${img.naturalWidth} x ${img.naturalHeight}`);
+      };
+
+      img.onerror = () => {
+        alert("Image failed to load");
+      };
+
+      img.src = URL.createObjectURL(blob);
 
       setDebugInfo(
         (p) =>
