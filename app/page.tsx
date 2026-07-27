@@ -476,11 +476,6 @@ export default function Home() {
     console.log("poster url:", getCardPoster(cardType));
     if (!preGeneratedFile) return;
 
-    const url = URL.createObjectURL(preGeneratedFile);
-    window.open(url);
-
-    console.log("logged");
-
     const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
     if (
