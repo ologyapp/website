@@ -473,45 +473,48 @@ export default function Home() {
   // Pre-generate ahead of time (e.g. in a useEffect when showModal becomes true,
   // or right after handleSubmitForm's fetch resolves)
   const [preGeneratedFile, setPreGeneratedFile] = useState<File | null>(null);
-
-  useEffect(() => {
-    if (!showModal || !cardRef.current) return;
-
-    (async () => {
-      flushSync(() => {
-        setShowLogoOnModal(true);
-        setHideFooter(true);
-        setHideDivider(true);
-        setHideFooterLogo(true);
-      });
-      await waitForPaint();
-
-      const dataUrl = await toPng(cardRef.current!, { pixelRatio: 2 });
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], `${names}-${archetype}-card.png`, {
-        type: "image/png",
-      });
-      setPreGeneratedFile(file);
-
-      setShowLogoOnModal(false);
-      setHideFooter(false);
-      setHideDivider(false);
-      setHideFooterLogo(false);
-    })();
-  }, [showModal]);
-
   const [debugInfo, setDebugInfo] = useState("");
+  const posterRef = useRef<HTMLImageElement>(null);
 
   const prepareImage = async () => {
     if (!cardRef.current) return;
     const node = cardRef.current;
 
     const wasShowingLogo = showLogoOnModal;
-    if (!wasShowingLogo) setShowLogoOnModal(true); // force poster visible, video hidden
 
-    // wait for React to re-render + browser to actually paint the new state
-    await new Promise((res) => setTimeout(res, 50));
+    flushSync(() => {
+      setShowLogoOnModal(true); // force poster visible, video hidden
+      setHideFooter(true);
+      setHideDivider(true);
+      setHideFooterLogo(true);
+    });
+
+    // wait for fonts
     await document.fonts.ready;
+
+    // explicitly wait for the poster image itself — this is the part
+    // that was missing and is almost certainly the iPhone bug
+    const posterImg = posterRef.current;
+    if (posterImg) {
+      if (!posterImg.complete || posterImg.naturalWidth === 0) {
+        await new Promise<void>((resolve) => {
+          posterImg.onload = () => resolve();
+          posterImg.onerror = () => {
+            setDebugInfo((p) => `${p} | posterErr: ${posterImg.src}`);
+            resolve(); // don't hang forever, just proceed
+          };
+        });
+      }
+      if (posterImg.decode) {
+        try {
+          await posterImg.decode();
+        } catch (e) {
+          setDebugInfo((p) => `${p} | decodeErr: ${e}`);
+        }
+      }
+    }
+
+    // wait for two paint frames so React's state changes above are actually on screen
     await new Promise((res) =>
       requestAnimationFrame(() => requestAnimationFrame(res)),
     );
@@ -524,22 +527,30 @@ export default function Home() {
     try {
       const blob = await toBlob(node, {
         cacheBust: true,
+        pixelRatio: 2,
         width: node.scrollWidth,
         height: node.scrollHeight,
       });
       setDebugInfo(
-        `blob: ${blob?.size ?? "null"} bytes, h: ${node.scrollHeight}`,
+        (p) =>
+          `${p} | blob: ${blob?.size ?? "null"} bytes, h: ${node.scrollHeight}`,
       );
-      if (blob)
+      if (blob) {
         setPreGeneratedFile(
-          new File([blob], "share-card.png", { type: "image/png" }),
+          new File([blob], `${names}-${archetype}-card.png`, {
+            type: "image/png",
+          }),
         );
+      }
     } catch (err) {
-      setDebugInfo(`ERROR: ${err}`);
+      setDebugInfo((p) => `${p} | ERROR: ${err}`);
     } finally {
       node.style.overflow = prevOverflow;
       node.style.maxHeight = prevMaxHeight;
-      if (!wasShowingLogo) setShowLogoOnModal(wasShowingLogo); // restore video for the live UI
+      setShowLogoOnModal(wasShowingLogo);
+      setHideFooter(false);
+      setHideDivider(false);
+      setHideFooterLogo(false);
     }
   };
 
@@ -549,14 +560,10 @@ export default function Home() {
       prepareImage();
     }, 500);
     return () => clearTimeout(timer);
-  }, [showModal]); // whatever data the card depends on
+  }, [showModal]);
 
-  // Tap handler is now synchronous and instant
   const handleShare = () => {
-    console.log("preGeneratedFile", preGeneratedFile);
     if (!preGeneratedFile) return;
-
-    console.log("preGeneratedFile", preGeneratedFile);
 
     const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
@@ -3969,6 +3976,7 @@ export default function Home() {
               />
 
               <img
+                ref={posterRef}
                 src={getCardPoster(cardType)}
                 alt=""
                 crossOrigin="anonymous"
@@ -4046,11 +4054,6 @@ export default function Home() {
                   <p className="lg:mb-[36.54px] text-center md:text-left flex w-auto h-auto md:h-[22.84px] flex-col justify-center items-center md:items-start text-[#F8F7FC] font-Recoleta text-[26px] md:text-[35px] font-normal leading-[150%]">
                     {archetype && archetype}
                   </p>
-
-                  <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
-                    {tagline && tagline}
-                  </p>
-
                   {debugInfo && (
                     <div
                       style={{
@@ -4062,23 +4065,26 @@ export default function Home() {
                         color: "lime",
                         fontSize: 10,
                         padding: 8,
-                        zIndex: 9999,
+                        zIndex: 999999,
                         wordBreak: "break-all",
                       }}
                     >
                       {debugInfo}
                     </div>
                   )}
+                  <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
+                    {tagline && tagline}
+                  </p>
                 </div>
 
                 {/* RIGHT */}
-                {/* <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
+                <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
                   {synopsisText && synopsisText}
-                </h2> */}
+                </h2>
               </div>
 
               {/* ASTRO ROW — 2x2 grid on mobile, single row on desktop */}
-              {/* <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
+              <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
                 <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
                   <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
                     {SunIcon && <SunIcon size={16} />} &nbsp; Sun in{" "}
@@ -4106,15 +4112,15 @@ export default function Home() {
                     {astroSigns?.saturn}
                   </p>
                 </div>
-              </div> */}
+              </div>
 
               {/* DIVIDER */}
-              {/* <div className="hidden lg:block flex w-full z-20">
+              <div className="hidden lg:block flex w-full z-20">
                 <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-              </div> */}
+              </div>
 
               {/* CARDS — 2 cols full width on mobile, side-by-side on desktop */}
-              {/* <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
+              <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
                 <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
                   <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
                     Best Market Conditions
@@ -4138,7 +4144,7 @@ export default function Home() {
                     {ShadowText}
                   </p>
                 </div>
-              </div> */}
+              </div>
 
               {/* DIVIDER */}
               {!hideDivider && (
