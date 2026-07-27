@@ -4008,24 +4008,6 @@ export default function Home() {
                 {/* LEFT */}
                 <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
                   <div className="mb-4">
-                    {debugInfo && (
-                      <div
-                        style={{
-                          position: "fixed",
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          background: "black",
-                          color: "lime",
-                          fontSize: 10,
-                          padding: 8,
-                          zIndex: 9999,
-                          wordBreak: "break-all",
-                        }}
-                      >
-                        {debugInfo}
-                      </div>
-                    )}
                     {showLogoOnModal && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -4068,16 +4050,35 @@ export default function Home() {
                   <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
                     {tagline && tagline}
                   </p>
+
+                  {debugInfo && (
+                    <div
+                      style={{
+                        position: "fixed",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        background: "black",
+                        color: "lime",
+                        fontSize: 10,
+                        padding: 8,
+                        zIndex: 9999,
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      {debugInfo}
+                    </div>
+                  )}
                 </div>
 
                 {/* RIGHT */}
-                <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
+                {/* <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
                   {synopsisText && synopsisText}
-                </h2>
+                </h2> */}
               </div>
 
               {/* ASTRO ROW — 2x2 grid on mobile, single row on desktop */}
-              <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
+              {/* <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
                 <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
                   <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
                     {SunIcon && <SunIcon size={16} />} &nbsp; Sun in{" "}
@@ -4105,15 +4106,15 @@ export default function Home() {
                     {astroSigns?.saturn}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
               {/* DIVIDER */}
-              <div className="hidden lg:block flex w-full z-20">
+              {/* <div className="hidden lg:block flex w-full z-20">
                 <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-              </div>
+              </div> */}
 
               {/* CARDS — 2 cols full width on mobile, side-by-side on desktop */}
-              <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
+              {/* <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
                 <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
                   <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
                     Best Market Conditions
@@ -4137,7 +4138,7 @@ export default function Home() {
                     {ShadowText}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
               {/* DIVIDER */}
               {!hideDivider && (
