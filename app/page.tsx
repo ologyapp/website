@@ -3984,13 +3984,14 @@ export default function Home() {
               /> */}
 
               {showLogoOnModal ? (
-                <img
-                  ref={posterRef}
-                  src={getCardPoster(cardType)}
-                  className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
-                  crossOrigin="anonymous"
-                  alt=""
-                />
+                <div className="absolute inset-0 overflow-hidden rounded-[16px]">
+                  <img
+                    ref={posterRef}
+                    src={getCardPoster(cardType)}
+                    className="block w-full h-full object-cover"
+                    alt=""
+                  />
+                </div>
               ) : (
                 <video
                   autoPlay
