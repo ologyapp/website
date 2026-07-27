@@ -3852,7 +3852,7 @@ export default function Home() {
             <div
               ref={cardRef}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 overflow-y-auto max-h-[90vh]"
+              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 "
               // style={{
               //   backgroundImage: showLogoOnModal
               //     ? `url(${getCardPoster(cardType)})`
