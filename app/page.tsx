@@ -500,6 +500,23 @@ export default function Home() {
         height: node.scrollHeight,
       });
 
+      alert(`Blob:\n` + `size=${blob?.size}\n` + `type=${blob?.type}`);
+
+      if (!blob) {
+        alert("Blob is null");
+        return;
+      }
+
+      try {
+        const bitmap = await createImageBitmap(blob);
+
+        alert(
+          `Bitmap:\n` + `width=${bitmap.width}\n` + `height=${bitmap.height}`,
+        );
+      } catch (e) {
+        alert(`createImageBitmap failed:\n${String(e)}`);
+      }
+
       setDebugInfo(
         (p) =>
           `${p} | blob: ${blob?.size ?? "null"} bytes, h: ${node.scrollHeight}`,
