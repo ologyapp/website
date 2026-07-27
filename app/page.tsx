@@ -90,7 +90,7 @@ import { Calendar } from "../components/ui/calendar";
 import { format } from "date-fns";
 import { createPortal } from "react-dom";
 import synopsis from "../components/synopsis.json";
-import { toPng } from "html-to-image";
+import { toPng, toBlob } from "html-to-image";
 import {
   Navigation,
   Pagination,
@@ -500,9 +500,63 @@ export default function Home() {
     })();
   }, [showModal]);
 
+  const [debugInfo, setDebugInfo] = useState("");
+
+  const prepareImage = async () => {
+    if (!cardRef.current) return;
+    const node = cardRef.current;
+
+    const wasShowingLogo = showLogoOnModal;
+    if (!wasShowingLogo) setShowLogoOnModal(true); // force poster visible, video hidden
+
+    // wait for React to re-render + browser to actually paint the new state
+    await new Promise((res) => setTimeout(res, 50));
+    await document.fonts.ready;
+    await new Promise((res) =>
+      requestAnimationFrame(() => requestAnimationFrame(res)),
+    );
+
+    const prevOverflow = node.style.overflow;
+    const prevMaxHeight = node.style.maxHeight;
+    node.style.overflow = "visible";
+    node.style.maxHeight = "none";
+
+    try {
+      const blob = await toBlob(node, {
+        cacheBust: true,
+        width: node.scrollWidth,
+        height: node.scrollHeight,
+      });
+      setDebugInfo(
+        `blob: ${blob?.size ?? "null"} bytes, h: ${node.scrollHeight}`,
+      );
+      if (blob)
+        setPreGeneratedFile(
+          new File([blob], "share-card.png", { type: "image/png" }),
+        );
+    } catch (err) {
+      setDebugInfo(`ERROR: ${err}`);
+    } finally {
+      node.style.overflow = prevOverflow;
+      node.style.maxHeight = prevMaxHeight;
+      if (!wasShowingLogo) setShowLogoOnModal(wasShowingLogo); // restore video for the live UI
+    }
+  };
+
+  useEffect(() => {
+    if (!showModal) return;
+    const timer = setTimeout(() => {
+      prepareImage();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [showModal]); // whatever data the card depends on
+
   // Tap handler is now synchronous and instant
   const handleShare = () => {
-    if (!preGeneratedFile) return; // not ready yet — disable button or show spinner until it is
+    console.log("preGeneratedFile", preGeneratedFile);
+    if (!preGeneratedFile) return;
+
+    console.log("preGeneratedFile", preGeneratedFile);
 
     const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
@@ -527,6 +581,7 @@ export default function Home() {
     link.href = URL.createObjectURL(preGeneratedFile);
     link.click();
   };
+
   const scrollToItem = (
     ref: React.RefObject<HTMLDivElement | null>,
     index: number,
@@ -3900,25 +3955,28 @@ export default function Home() {
               className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-6 md:gap-12.5 rounded-[16.912px] border border-white/50 bg-cover bg-center bg-no-repeat bg-lightgray overflow-y-auto max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              {!showLogoOnModal && (
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  src={getCardBg(cardType)}
-                  className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
-                />
-              )}
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                src={getCardBg(cardType)}
+                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
+                  showLogoOnModal
+                    ? "opacity-0 pointer-events-none"
+                    : "opacity-100"
+                }`}
+              />
 
               <img
                 src={getCardPoster(cardType)}
                 alt=""
+                crossOrigin="anonymous"
                 onError={(e) => {
                   console.error("Poster failed to load:", e.currentTarget.src);
                 }}
-                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] ${
-                  showLogoOnModal ? "block" : "hidden"
+                className={`absolute inset-0 w-full h-full object-cover rounded-[16.912px] transition-opacity ${
+                  showLogoOnModal ? "opacity-100" : "opacity-0"
                 }`}
               />
 
@@ -3950,6 +4008,24 @@ export default function Home() {
                 {/* LEFT */}
                 <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
                   <div className="mb-4">
+                    {debugInfo && (
+                      <div
+                        style={{
+                          position: "fixed",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          background: "black",
+                          color: "lime",
+                          fontSize: 10,
+                          padding: 8,
+                          zIndex: 9999,
+                          wordBreak: "break-all",
+                        }}
+                      >
+                        {debugInfo}
+                      </div>
+                    )}
                     {showLogoOnModal && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
