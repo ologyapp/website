@@ -3852,24 +3852,24 @@ export default function Home() {
             <div
               ref={cardRef}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 "
-              // style={{
-              //   backgroundImage: showLogoOnModal
-              //     ? `url(${getCardPoster(cardType)})`
-              //     : "none",
-              //   backgroundSize: "cover",
-              //   backgroundPosition: "center",
-              //   backgroundRepeat: "no-repeat",
-              // }}
+              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 overflow-y-auto max-h-[90vh]"
+              style={{
+                backgroundImage: showLogoOnModal
+                  ? `url(${getCardPoster(cardType)})`
+                  : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
             >
               {showLogoOnModal ? (
                 <div className="absolute inset-0 overflow-hidden rounded-[16px]">
-                  <img
+                  {/* <img
                     ref={posterRef}
                     src={getCardPoster(cardType)}
                     className="block w-full h-full object-cover"
                     alt=""
-                  />
+                  /> */}
                 </div>
               ) : (
                 <video
