@@ -91,7 +91,8 @@ import { Calendar } from "../components/ui/calendar";
 import { format } from "date-fns";
 import { createPortal } from "react-dom";
 import synopsis from "../components/synopsis.json";
-import { toPng, toBlob } from "html-to-image";
+import { domToBlob } from "modern-screenshot";
+
 import {
   Navigation,
   Pagination,
@@ -425,12 +426,12 @@ export default function Home() {
 
   const prepareImage = async () => {
     if (!cardRef.current) return;
-    const node = cardRef.current;
 
+    const node = cardRef.current;
     const wasShowingLogo = showLogoOnModal;
 
     flushSync(() => {
-      setShowLogoOnModal(true); // force poster visible, video hidden
+      setShowLogoOnModal(true);
       setHideFooter(true);
       setHideDivider(true);
       setHideFooterLogo(true);
@@ -438,69 +439,25 @@ export default function Home() {
 
     await document.fonts.ready;
 
-    const posterImg = posterRef.current;
-    let originalSrc = "";
-
-    if (posterImg) {
-      originalSrc = posterImg.getAttribute("src") ?? "";
-
-      try {
-        const canvas = await html2canvas(node, {
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: null,
-          scale: 2,
-          logging: true,
-
-          width: node.scrollWidth,
-          height: node.scrollHeight,
-          windowWidth: node.scrollWidth,
-          windowHeight: node.scrollHeight,
-
-          imageTimeout: 15000,
-          removeContainer: true,
-        });
-
-        const blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(resolve, "image/png", 1),
-        );
-
-        setDebugInfo(
-          (p) =>
-            `${p} | canvas:${canvas.width}x${canvas.height} | blob:${blob?.size ?? "null"} bytes`,
-        );
-
-        if (blob) {
-          setPreGeneratedFile(
-            new File([blob], `${names}-${archetype}-card.png`, {
-              type: "image/png",
-            }),
-          );
-        }
-      } catch (err) {
-        setDebugInfo((p) => `${p} | html2canvas ERROR: ${String(err)}`);
-      }
-    }
-
-    // two paint frames so the state changes above are actually on screen
-    await new Promise((res) =>
-      requestAnimationFrame(() => requestAnimationFrame(res)),
+    // wait for React to paint
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
 
     const prevOverflow = node.style.overflow;
     const prevMaxHeight = node.style.maxHeight;
+
     node.style.overflow = "visible";
     node.style.maxHeight = "none";
 
     try {
-      const blob = await toBlob(node, {
-        cacheBust: true,
-        pixelRatio: 2,
+      const blob = await domToBlob(node, {
+        scale: 2,
         width: node.scrollWidth,
         height: node.scrollHeight,
       });
 
-      alert(`Blob:\n` + `size=${blob?.size}\n` + `type=${blob?.type}`);
+      alert(`Blob\nsize=${blob?.size}\ntype=${blob?.type}`);
 
       if (!blob) {
         alert("Blob is null");
@@ -510,33 +467,32 @@ export default function Home() {
       const img = document.createElement("img");
 
       img.onload = () => {
-        alert(`Loaded: ${img.naturalWidth} x ${img.naturalHeight}`);
+        alert(`Image Loaded\n${img.naturalWidth} x ${img.naturalHeight}`);
       };
 
       img.onerror = () => {
-        alert("Image failed to load");
+        alert("Generated image failed to load");
       };
 
       img.src = URL.createObjectURL(blob);
 
-      setDebugInfo(
-        (p) =>
-          `${p} | blob: ${blob?.size ?? "null"} bytes, h: ${node.scrollHeight}`,
-      );
+      setDebugInfo((p) => `${p} | modern-screenshot blob:${blob.size}`);
 
-      if (blob) {
-        setPreGeneratedFile(
-          new File([blob], `${names}-${archetype}-card.png`, {
-            type: "image/png",
-          }),
-        );
-      }
+      setPreGeneratedFile(
+        new File([blob], `${names}-${archetype}-card.png`, {
+          type: "image/png",
+        }),
+      );
     } catch (err) {
-      setDebugInfo((p) => `${p} | ERROR: ${err}`);
+      console.error(err);
+
+      alert(String(err));
+
+      setDebugInfo((p) => `${p} | modern-screenshot ERROR: ${String(err)}`);
     } finally {
       node.style.overflow = prevOverflow;
       node.style.maxHeight = prevMaxHeight;
-      if (posterImg && originalSrc) posterImg.src = originalSrc; // restore live src
+
       setShowLogoOnModal(wasShowingLogo);
       setHideFooter(false);
       setHideDivider(false);
@@ -561,28 +517,28 @@ export default function Home() {
 
     console.log("logged");
 
-    // const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+    const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
-    // if (
-    //   navigator.share &&
-    //   navigator.canShare?.({ files: [preGeneratedFile] })
-    // ) {
-    //   navigator
-    //     .share({
-    //       title: "My Ology",
-    //       text: `${shareText}\n${referralLink}`,
-    //       files: [preGeneratedFile],
-    //     })
-    //     .catch((err) => {
-    //       if (err?.name !== "AbortError") console.error(err);
-    //     });
-    //   return;
-    // }
+    if (
+      navigator.share &&
+      navigator.canShare?.({ files: [preGeneratedFile] })
+    ) {
+      navigator
+        .share({
+          title: "My Ology",
+          text: `${shareText}\n${referralLink}`,
+          files: [preGeneratedFile],
+        })
+        .catch((err) => {
+          if (err?.name !== "AbortError") console.error(err);
+        });
+      return;
+    }
 
-    // const link = document.createElement("a");
-    // link.download = `${names}-${archetype}-card.png`;
-    // link.href = URL.createObjectURL(preGeneratedFile);
-    // link.click();
+    const link = document.createElement("a");
+    link.download = `${names}-${archetype}-card.png`;
+    link.href = URL.createObjectURL(preGeneratedFile);
+    link.click();
   };
 
   const scrollToItem = (
