@@ -540,6 +540,8 @@ export default function Home() {
     const url = URL.createObjectURL(preGeneratedFile);
     window.open(url);
 
+    console.log("logged");
+
     // const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
     // if (
