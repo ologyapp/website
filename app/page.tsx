@@ -537,28 +537,31 @@ export default function Home() {
     console.log("poster url:", getCardPoster(cardType));
     if (!preGeneratedFile) return;
 
-    const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+    const url = URL.createObjectURL(preGeneratedFile);
+    window.open(url);
 
-    if (
-      navigator.share &&
-      navigator.canShare?.({ files: [preGeneratedFile] })
-    ) {
-      navigator
-        .share({
-          title: "My Ology",
-          text: `${shareText}\n${referralLink}`,
-          files: [preGeneratedFile],
-        })
-        .catch((err) => {
-          if (err?.name !== "AbortError") console.error(err);
-        });
-      return;
-    }
+    // const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
-    const link = document.createElement("a");
-    link.download = `${names}-${archetype}-card.png`;
-    link.href = URL.createObjectURL(preGeneratedFile);
-    link.click();
+    // if (
+    //   navigator.share &&
+    //   navigator.canShare?.({ files: [preGeneratedFile] })
+    // ) {
+    //   navigator
+    //     .share({
+    //       title: "My Ology",
+    //       text: `${shareText}\n${referralLink}`,
+    //       files: [preGeneratedFile],
+    //     })
+    //     .catch((err) => {
+    //       if (err?.name !== "AbortError") console.error(err);
+    //     });
+    //   return;
+    // }
+
+    // const link = document.createElement("a");
+    // link.download = `${names}-${archetype}-card.png`;
+    // link.href = URL.createObjectURL(preGeneratedFile);
+    // link.click();
   };
 
   const scrollToItem = (
