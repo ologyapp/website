@@ -440,25 +440,6 @@ export default function Home() {
         height: node.scrollHeight,
       });
 
-      alert(`Blob\nsize=${blob?.size}\ntype=${blob?.type}`);
-
-      if (!blob) {
-        alert("Blob is null");
-        return;
-      }
-
-      const img = document.createElement("img");
-
-      img.onload = () => {
-        alert(`Image Loaded\n${img.naturalWidth} x ${img.naturalHeight}`);
-      };
-
-      img.onerror = () => {
-        alert("Generated image failed to load");
-      };
-
-      img.src = URL.createObjectURL(blob);
-
       setDebugInfo((p) => `${p} | modern-screenshot blob:${blob.size}`);
 
       setPreGeneratedFile(
