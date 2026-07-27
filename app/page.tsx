@@ -407,76 +407,99 @@ export default function Home() {
   const [debugInfo, setDebugInfo] = useState("");
   const posterRef = useRef<HTMLImageElement>(null);
 
-  const handleShare = async () => {
+  const prepareImage = async () => {
     if (!cardRef.current) return;
 
     const node = cardRef.current;
     const wasShowingLogo = showLogoOnModal;
 
+    flushSync(() => {
+      setShowLogoOnModal(true);
+      setHideFooter(true);
+      setHideDivider(true);
+      setHideFooterLogo(true);
+      setIsDownloading(true);
+    });
+
+    await document.fonts.ready;
+
+    // wait for React to paint
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    );
+
+    const prevOverflow = node.style.overflow;
+    const prevMaxHeight = node.style.maxHeight;
+
+    node.style.overflow = "visible";
+    node.style.maxHeight = "none";
+
     try {
-      flushSync(() => {
-        setShowLogoOnModal(true);
-        setHideFooter(true);
-        setHideDivider(true);
-        setHideFooterLogo(true);
-        setIsDownloading(true);
-      });
-
-      await document.fonts.ready;
-
-      // wait for React to repaint
-      await new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      );
-
-      const prevOverflow = node.style.overflow;
-      const prevMaxHeight = node.style.maxHeight;
-
-      node.style.overflow = "visible";
-      node.style.maxHeight = "none";
-
       const blob = await domToBlob(node, {
         scale: 2,
         width: node.scrollWidth,
         height: node.scrollHeight,
       });
 
+      setDebugInfo((p) => `${p} | modern-screenshot blob:${blob.size}`);
+
+      setPreGeneratedFile(
+        new File([blob], `${names}-${archetype}-card.png`, {
+          type: "image/png",
+        }),
+      );
+    } catch (err) {
+      console.error(err);
+
+      alert(String(err));
+
+      setDebugInfo((p) => `${p} | modern-screenshot ERROR: ${String(err)}`);
+    } finally {
       node.style.overflow = prevOverflow;
       node.style.maxHeight = prevMaxHeight;
 
-      const file = new File([blob], `${names}-${archetype}-card.png`, {
-        type: "image/png",
-      });
+      setShowLogoOnModal(wasShowingLogo);
+      setHideFooter(false);
+      setHideDivider(false);
+      setHideFooterLogo(false);
+      setIsDownloading(false);
+    }
+  };
 
-      const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+  useEffect(() => {
+    if (!showModal) return;
+    const timer = setTimeout(() => {
+      prepareImage();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [showModal]);
 
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
+  const handleShare = () => {
+    console.log("poster url:", getCardPoster(cardType));
+    if (!preGeneratedFile) return;
+
+    const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+
+    if (
+      navigator.share &&
+      navigator.canShare?.({ files: [preGeneratedFile] })
+    ) {
+      navigator
+        .share({
           title: "My Ology",
           text: `${shareText}\n${referralLink}`,
-          files: [file],
+          files: [preGeneratedFile],
+        })
+        .catch((err) => {
+          if (err?.name !== "AbortError") console.error(err);
         });
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.download = file.name;
-      link.href = URL.createObjectURL(file);
-      link.click();
-    } catch (err: any) {
-      if (err?.name !== "AbortError") {
-        console.error(err);
-        alert(String(err));
-      }
-    } finally {
-      flushSync(() => {
-        setShowLogoOnModal(wasShowingLogo);
-        setHideFooter(false);
-        setHideDivider(false);
-        setHideFooterLogo(false);
-        setIsDownloading(false);
-      });
+      return;
     }
+
+    const link = document.createElement("a");
+    link.download = `${names}-${archetype}-card.png`;
+    link.href = URL.createObjectURL(preGeneratedFile);
+    link.click();
   };
 
   const scrollToItem = (
@@ -3829,7 +3852,7 @@ export default function Home() {
             <div
               ref={cardRef}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 max-h-auto"
+              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 overflow-y-auto max-h-[90vh]"
               // style={{
               //   backgroundImage: showLogoOnModal
               //     ? `url(${getCardPoster(cardType)})`
