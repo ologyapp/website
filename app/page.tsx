@@ -401,23 +401,6 @@ export default function Home() {
     });
   }
 
-  // Helper: converts any image URL to a data URL using a canvas (bypasses html-to-image's internal fetch entirely)
-  async function imageUrlToDataUrl(url: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const img = new window.Image(); // explicitly native, not next/image
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = reject;
-      img.src = url;
-    });
-  }
-
   const [posterDataSrc, setPosterDataSrc] = useState<string | null>(null);
 
   const [preGeneratedFile, setPreGeneratedFile] = useState<File | null>(null);
@@ -914,27 +897,6 @@ export default function Home() {
   });
 
   const [isDownloading, setIsDownloading] = useState(false);
-
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    try {
-      setIsDownloading(true);
-      const dataUrl = await toPng(cardRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-      });
-
-      const link = document.createElement("a");
-      link.download = `${names}  ${archetype}-card.png`;
-      link.href = dataUrl;
-      link.click();
-    } finally {
-      setIsDownloading(false);
-      setShowNatalForm(false);
-      setNames("");
-      setEmail("");
-    }
-  };
 
   const [activeSection, setActiveSection] = useState("");
   const [hasScrolled, setHasScrolled] = useState(false);
