@@ -473,25 +473,38 @@ export default function Home() {
   //   }
   // };
 
+  const preloadImage = (src: string) =>
+    new Promise<void>((resolve, reject) => {
+      if (!src) {
+        resolve();
+        return;
+      }
+      const img = new window.Image();
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+      img.src = src;
+    });
+
   const prepareImage = async () => {
     if (!captureRef.current) return;
-
     const node = captureRef.current;
 
     await document.fonts.ready;
-
-    // wait for React to paint (still needed to ensure bg image / fonts settle)
+    await preloadImage(getCardPoster(cardType)).catch(() => {});
     await new Promise((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
 
+    // Measure actual rendered size — don't trust scrollWidth on offscreen nodes
+    const rect = node.getBoundingClientRect();
+    console.log("capture rect:", rect.width, rect.height); // remove once confirmed working
+
     try {
       const blob = await domToBlob(node, {
         scale: 2,
-        width: node.scrollWidth,
-        height: node.scrollHeight,
+        width: rect.width,
+        height: rect.height,
       });
-
       setPreGeneratedFile(
         new File([blob], `${names}-${archetype}-card.png`, {
           type: "image/png",
