@@ -324,6 +324,7 @@ export default function Home() {
   const [recordOpen, setRecordOpen] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   const [showNatalForm, setShowNatalForm] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -407,32 +408,76 @@ export default function Home() {
   const [debugInfo, setDebugInfo] = useState("");
   const posterRef = useRef<HTMLImageElement>(null);
 
+  // const prepareImage = async () => {
+  //   if (!cardRef.current) return;
+
+  //   const node = cardRef.current;
+  //   const wasShowingLogo = showLogoOnModal;
+
+  //   flushSync(() => {
+  //     setShowLogoOnModal(true);
+  //     setHideFooter(true);
+  //     setHideDivider(true);
+  //     setHideFooterLogo(true);
+  //     setIsDownloading(true);
+  //   });
+
+  //   await document.fonts.ready;
+
+  //   // wait for React to paint
+  //   await new Promise((resolve) =>
+  //     requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  //   );
+
+  //   const prevOverflow = node.style.overflow;
+  //   const prevMaxHeight = node.style.maxHeight;
+
+  //   node.style.overflow = "visible";
+  //   node.style.maxHeight = "none";
+
+  //   try {
+  //     const blob = await domToBlob(node, {
+  //       scale: 2,
+  //       width: node.scrollWidth,
+  //       height: node.scrollHeight,
+  //     });
+
+  //     setDebugInfo((p) => `${p} | modern-screenshot blob:${blob.size}`);
+
+  //     setPreGeneratedFile(
+  //       new File([blob], `${names}-${archetype}-card.png`, {
+  //         type: "image/png",
+  //       }),
+  //     );
+  //   } catch (err) {
+  //     console.error(err);
+
+  //     alert(String(err));
+
+  //     setDebugInfo((p) => `${p} | modern-screenshot ERROR: ${String(err)}`);
+  //   } finally {
+  //     node.style.overflow = prevOverflow;
+  //     node.style.maxHeight = prevMaxHeight;
+
+  //     setShowLogoOnModal(wasShowingLogo);
+  //     setHideFooter(false);
+  //     setHideDivider(false);
+  //     setHideFooterLogo(false);
+  //     setIsDownloading(false);
+  //   }
+  // };
+
   const prepareImage = async () => {
-    if (!cardRef.current) return;
+    if (!captureRef.current) return;
 
-    const node = cardRef.current;
-    const wasShowingLogo = showLogoOnModal;
-
-    flushSync(() => {
-      setShowLogoOnModal(true);
-      setHideFooter(true);
-      setHideDivider(true);
-      setHideFooterLogo(true);
-      setIsDownloading(true);
-    });
+    const node = captureRef.current;
 
     await document.fonts.ready;
 
-    // wait for React to paint
+    // wait for React to paint (still needed to ensure bg image / fonts settle)
     await new Promise((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
-
-    const prevOverflow = node.style.overflow;
-    const prevMaxHeight = node.style.maxHeight;
-
-    node.style.overflow = "visible";
-    node.style.maxHeight = "none";
 
     try {
       const blob = await domToBlob(node, {
@@ -441,8 +486,6 @@ export default function Home() {
         height: node.scrollHeight,
       });
 
-      setDebugInfo((p) => `${p} | modern-screenshot blob:${blob.size}`);
-
       setPreGeneratedFile(
         new File([blob], `${names}-${archetype}-card.png`, {
           type: "image/png",
@@ -450,19 +493,7 @@ export default function Home() {
       );
     } catch (err) {
       console.error(err);
-
       alert(String(err));
-
-      setDebugInfo((p) => `${p} | modern-screenshot ERROR: ${String(err)}`);
-    } finally {
-      node.style.overflow = prevOverflow;
-      node.style.maxHeight = prevMaxHeight;
-
-      setShowLogoOnModal(wasShowingLogo);
-      setHideFooter(false);
-      setHideDivider(false);
-      setHideFooterLogo(false);
-      setIsDownloading(false);
     }
   };
 
@@ -3862,25 +3893,14 @@ export default function Home() {
                 backgroundRepeat: "no-repeat",
               }}
             >
-              {showLogoOnModal ? (
-                <div className="absolute inset-0 overflow-hidden rounded-[16px]">
-                  {/* <img
-                    ref={posterRef}
-                    src={getCardPoster(cardType)}
-                    className="block w-full h-full object-cover"
-                    alt=""
-                  /> */}
-                </div>
-              ) : (
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  src={getCardBg(cardType)}
-                  className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
-                />
-              )}
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                src={getCardBg(cardType)}
+                className="absolute inset-0 w-full h-full object-cover rounded-[16.912px]"
+              />
 
               <div className="absolute inset-0 rounded-[16.912px] bg-black/45 z-10" />
 
@@ -4191,6 +4211,143 @@ export default function Home() {
           </div>,
           document.body,
         )}
+
+      <div
+        ref={captureRef}
+        aria-hidden
+        className="fixed top-0 left-[-99999px] w-[945.24px] flex flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 px-6 py-7 md:p-12.5"
+        style={{
+          backgroundImage: `url(${getCardPoster(cardType)})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="absolute inset-0 rounded-[16.912px] bg-black/45 z-10" />
+
+        {/* TOP SECTION */}
+        <div className="flex flex-col md:flex-row w-full justify-start items-center md:items-center z-20 gap-6 md:gap-20">
+          {/* LEFT */}
+          <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
+            <div className="mb-4">
+              {showLogoOnModal && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="70"
+                  height="29"
+                  viewBox="0 0 101 42"
+                  fill="none"
+                >
+                  <path
+                    d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
+                    fill="#F8F7FC"
+                  />
+                  <path
+                    d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
+                    fill="#F8F7FC"
+                  />
+                  <path
+                    d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
+                    fill="#F8F7FC"
+                  />
+                  <path
+                    d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
+                    fill="#F8F7FC"
+                  />
+                  <path
+                    d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
+                    fill="#F8F7FC"
+                  />
+                  <path
+                    d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
+                    fill="#F8F7FC"
+                  />
+                </svg>
+              )}
+            </div>
+            <p className="lg:mb-[36.54px] text-center md:text-left flex w-auto h-auto md:h-[22.84px] flex-col justify-center items-center md:items-start text-[#F8F7FC] font-Recoleta text-[26px] md:text-[35px] font-normal leading-[150%]">
+              {archetype && archetype}
+            </p>
+
+            <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
+              {tagline && tagline}
+            </p>
+          </div>
+
+          {/* RIGHT */}
+          <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
+            {synopsisText && synopsisText}
+          </h2>
+        </div>
+
+        {/* ASTRO ROW — 2x2 grid on mobile, single row on desktop */}
+        <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
+          <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+            <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+              {SunIcon && <SunIcon size={16} />} &nbsp; Sun in {astroSigns?.sun}
+            </p>
+          </div>
+
+          <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+            <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+              {MoonIcon && <MoonIcon size={16} />} &nbsp; Moon in{" "}
+              {astroSigns?.moon}
+            </p>
+          </div>
+
+          <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+            <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+              {MarsIcon && <MarsIcon size={16} />} &nbsp; Mars in{" "}
+              {astroSigns?.mars}
+            </p>
+          </div>
+
+          <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
+            <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
+              {SaturnIcon && <SaturnIcon size={16} />} &nbsp; Saturn in{" "}
+              {astroSigns?.saturn}
+            </p>
+          </div>
+        </div>
+
+        {/* DIVIDER */}
+        <div className="hidden lg:block flex w-full z-20">
+          <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
+        </div>
+
+        {/* CARDS — 2 cols full width on mobile, side-by-side on desktop */}
+        <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
+          <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
+            <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
+              Best Market Conditions
+            </p>
+
+            <div className="flex flex-col gap-2 h-auto md:h-[80px] flex-1">
+              {bestMarketConditions?.map((con: any) => (
+                <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] font-Satoshi">
+                  ✦ {con}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
+            <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
+              Shadow
+            </p>
+
+            <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] h-auto md:h-[80px] flex-1 font-Satoshi">
+              {ShadowText}
+            </p>
+          </div>
+        </div>
+
+        <div className="w-full flex justify-center text-center z-30!">
+          <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
+            ologyapp.com
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
