@@ -489,22 +489,23 @@ export default function Home() {
     if (!captureRef.current) return;
     const node = captureRef.current;
 
+    // Force width, bypassing any conflicting classes
+    node.style.setProperty("width", "945.24px", "important");
+    node.style.setProperty("max-width", "none", "important");
+    node.style.setProperty("min-width", "945.24px", "important");
+    node.style.setProperty("box-sizing", "border-box", "important");
+
     await document.fonts.ready;
     await preloadImage(getCardPoster(cardType)).catch(() => {});
     await new Promise((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
 
-    // Measure actual rendered size — don't trust scrollWidth on offscreen nodes
     const rect = node.getBoundingClientRect();
-    console.log("capture rect:", rect.width, rect.height); // remove once confirmed working
+    console.log("capture rect:", rect.width, rect.height);
 
     try {
-      const blob = await domToBlob(node, {
-        scale: 2,
-        width: rect.width,
-        height: rect.height,
-      });
+      const blob = await domToBlob(node, { scale: 2 }); // no explicit width/height needed now
       setPreGeneratedFile(
         new File([blob], `${names}-${archetype}-card.png`, {
           type: "image/png",
