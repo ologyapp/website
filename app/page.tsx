@@ -4235,17 +4235,19 @@ export default function Home() {
 
       {mounted &&
         createPortal(
-          <div className="fixed inset-0 flex items-center justify-center px-2  lg:p-4">
-            {/* Backdrop */}
-
+          <div
+            className="fixed inset-0 flex items-center justify-center"
+            style={{
+              top: 0,
+              left: "-99999px", // whole outer wrapper pushed off-screen
+              width: "1200px", // wide enough that 80% inner card = your target size
+            }}
+            aria-hidden
+          >
             <div
               ref={captureRef}
-              aria-hidden
               style={{
-                position: "fixed",
-                top: 0,
-                left: "-99999px", // off-screen, but still fully "visible" (opacity 1) so the lib renders it
-                width: "945.24px",
+                width: "80%",
                 backgroundImage: `url(${getCardPoster(cardType)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
