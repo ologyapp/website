@@ -489,22 +489,23 @@ export default function Home() {
     if (!captureRef.current) return;
     const node = captureRef.current;
 
+    // Force width, bypassing any conflicting classes
+    node.style.setProperty("width", "945.24px", "important");
+    node.style.setProperty("max-width", "none", "important");
+    node.style.setProperty("min-width", "945.24px", "important");
+    node.style.setProperty("box-sizing", "border-box", "important");
+
     await document.fonts.ready;
     await preloadImage(getCardPoster(cardType)).catch(() => {});
     await new Promise((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
 
-    const width = 945.24;
-    const height = node.offsetHeight;
-    console.log("capture size:", width, height);
+    const rect = node.getBoundingClientRect();
+    console.log("capture rect:", rect.width, rect.height);
 
     try {
-      const blob = await domToBlob(node, {
-        scale: 2,
-        width,
-        height,
-      });
+      const blob = await domToBlob(node, { scale: 2 }); // no explicit width/height needed now
       setPreGeneratedFile(
         new File([blob], `${names}-${archetype}-card.png`, {
           type: "image/png",
@@ -4235,19 +4236,18 @@ export default function Home() {
       {mounted &&
         createPortal(
           <div
+            className="fixed inset-0 flex items-center justify-center"
             style={{
-              position: "absolute",
               top: 0,
-              left: 0,
-              visibility: "hidden",
-              pointerEvents: "none",
+              left: "-99999px", // whole outer wrapper pushed off-screen
+              width: "1200px", // wide enough that 80% inner card = your target size
             }}
+            aria-hidden
           >
             <div
               ref={captureRef}
-              aria-hidden
               style={{
-                width: "945.24px",
+                width: "80%",
                 backgroundImage: `url(${getCardPoster(cardType)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
