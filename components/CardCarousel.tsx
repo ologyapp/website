@@ -14,24 +14,51 @@ function CardCarousel({ items }: { items: any[] }) {
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
-  const initialIndex = useMemo(() => {
-    const activeIdx = items.findIndex((i) => statusOf(i) === "ACTIVE");
-    if (activeIdx !== -1) return activeIdx;
+  console.log(new Date().toString());
 
-    // No ACTIVE card — fall back to the nearest upcoming AHEAD card
-    // (smallest date_start), not just the first AHEAD in array order.
-    let bestIdx = -1;
-    let bestDate = "";
+  const SOON_THRESHOLD_DAYS = 30;
+
+  const initialIndex = useMemo(() => {
+    if (!items.length) return 0;
+    const now = Date.now();
+    const soonMs = SOON_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+
+    // Nearest upcoming (AHEAD) card, regardless of anything else.
+    let bestAheadIdx = -1;
+    let bestAheadStart = Infinity;
     items.forEach((item, idx) => {
       if (statusOf(item) === "AHEAD") {
-        if (bestIdx === -1 || item.date_start < bestDate) {
-          bestIdx = idx;
-          bestDate = item.date_start;
+        const start = new Date(item.date_start + "T00:00:00").getTime();
+        if (start < bestAheadStart) {
+          bestAheadStart = start;
+          bestAheadIdx = idx;
         }
       }
     });
 
-    return bestIdx !== -1 ? bestIdx : 0;
+    // If it starts soon enough, it wins outright -- even over a currently active card.
+    if (bestAheadIdx !== -1 && bestAheadStart - now <= soonMs) {
+      return bestAheadIdx;
+    }
+
+    // Otherwise, an active card wins as before.
+    const activeIdx = items.findIndex((i) => statusOf(i) === "ACTIVE");
+    if (activeIdx !== -1) return activeIdx;
+
+    // No active, and nothing upcoming within the threshold -- take whatever's next.
+    if (bestAheadIdx !== -1) return bestAheadIdx;
+
+    // Nothing ahead at all -- fall back to the most recent past card.
+    let bestRecordIdx = -1;
+    let bestRecordDate = "";
+    items.forEach((item, idx) => {
+      if (statusOf(item) === "RECORD" && item.date_end > bestRecordDate) {
+        bestRecordDate = item.date_end;
+        bestRecordIdx = idx;
+      }
+    });
+
+    return bestRecordIdx !== -1 ? bestRecordIdx : 0;
   }, [items]);
 
   const [activeIndex, setActiveIndex] = useState(initialIndex);

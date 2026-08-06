@@ -268,7 +268,41 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState(18);
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
-  const visibleCards = cyclesCards.slice(0, visibleCount);
+  const SOON_THRESHOLD_DAYS = 14; // keep in sync with initialIndex's threshold
+
+  function sortForDisplay(cards: any[], now = Date.now()) {
+    const soonMs = SOON_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+
+    function priorityKey(card: any) {
+      const status = statusOf(card);
+      const start = new Date(card.date_start + "T00:00:00").getTime();
+      const end = new Date(card.date_end + "T23:59:59").getTime();
+
+      if (status === "AHEAD" && start - now <= soonMs) {
+        // Tier 0: starting soon -- earliest start first
+        return [0, start];
+      }
+      if (status === "ACTIVE") {
+        // Tier 1: currently active -- soonest-ending first
+        return [1, end];
+      }
+      if (status === "AHEAD") {
+        // Tier 2: further-out upcoming -- earliest start first
+        return [2, start];
+      }
+      // Tier 3: past -- most recently ended first
+      return [3, -end];
+    }
+
+    return [...cards].sort((a, b) => {
+      const [tierA, sortValA] = priorityKey(a);
+      const [tierB, sortValB] = priorityKey(b);
+      if (tierA !== tierB) return tierA - tierB;
+      return sortValA - sortValB;
+    });
+  }
+
+  const visibleCards = sortForDisplay(cyclesCards).slice(0, visibleCount);
   const hasMore = visibleCount < cyclesCards.length;
   const isExpanded = visibleCount >= cyclesCards.length;
   const shouldShowToggle = cyclesCards.length > INITIAL_COUNT;
@@ -3100,15 +3134,15 @@ export default function Home() {
                     loop
                     playsInline
                     className="
-            absolute
-            top-[2.25%]
-            left-[5.3%]
-            lg:w-[89%]
-            lg:h-174
-            object-cover
-            rounded-[24px]
-            z-30!
-          "
+                    absolute
+                    top-[2.25%]
+                    left-[5.3%]
+                    lg:w-[89%]
+                    lg:h-174
+                    object-cover
+                    rounded-[24px]
+                    z-30!
+                  "
                   >
                     <source src={"/archetypereel2.mp4"} type="video/mp4" />
                   </video>
@@ -3272,22 +3306,22 @@ export default function Home() {
                       <div
                         key={id}
                         className="
-            relative
-            w-full
-            shrink-0
-            snap-center
-            flex
-            flex-col
-            gap-[31.381px]
-            p-[22px]
-            rounded-[16.912px]
-            bg-[rgba(30,37,64,0.15)]
-            backdrop-blur-[2px]
-            border border-white/20
-            shadow-inner
-            overflow-hidden
-            transition-all duration-500
-          "
+                          relative
+                          w-full
+                          shrink-0
+                          snap-center
+                          flex
+                          flex-col
+                          gap-[31.381px]
+                          p-[22px]
+                          rounded-[16.912px]
+                          bg-[rgba(30,37,64,0.15)]
+                          backdrop-blur-[2px]
+                          border border-white/20
+                          shadow-inner
+                          overflow-hidden
+                          transition-all duration-500
+                        "
                       >
                         <div className="flex justify-center">
                           <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[6px] font-bold leading-[140%] tabular-nums uppercase">
