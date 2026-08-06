@@ -268,38 +268,21 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState(18);
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
-  const SOON_THRESHOLD_DAYS = 14; // keep in sync with initialIndex's threshold
 
-  function sortForDisplay(cards: any[], now = Date.now()) {
-    const soonMs = SOON_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+  function sortForDisplay(cards: any[]) {
+    const active = cards
+      .filter((c) => statusOf(c) === "ACTIVE")
+      .sort((a, b) => b.date_start.localeCompare(a.date_start)); // newest start first
 
-    function priorityKey(card: any) {
-      const status = statusOf(card);
-      const start = new Date(card.date_start + "T00:00:00").getTime();
-      const end = new Date(card.date_end + "T23:59:59").getTime();
+    const ahead = cards
+      .filter((c) => statusOf(c) === "AHEAD")
+      .sort((a, b) => a.date_start.localeCompare(b.date_start)); // soonest first
 
-      if (status === "AHEAD" && start - now <= soonMs) {
-        // Tier 0: starting soon -- earliest start first
-        return [0, start];
-      }
-      if (status === "ACTIVE") {
-        // Tier 1: currently active -- soonest-ending first
-        return [1, end];
-      }
-      if (status === "AHEAD") {
-        // Tier 2: further-out upcoming -- earliest start first
-        return [2, start];
-      }
-      // Tier 3: past -- most recently ended first
-      return [3, -end];
-    }
+    const record = cards
+      .filter((c) => statusOf(c) === "RECORD")
+      .sort((a, b) => b.date_end.localeCompare(a.date_end)); // most recently ended first
 
-    return [...cards].sort((a, b) => {
-      const [tierA, sortValA] = priorityKey(a);
-      const [tierB, sortValB] = priorityKey(b);
-      if (tierA !== tierB) return tierA - tierB;
-      return sortValA - sortValB;
-    });
+    return [...active, ...ahead, ...record];
   }
 
   const visibleCards = sortForDisplay(cyclesCards).slice(0, visibleCount);

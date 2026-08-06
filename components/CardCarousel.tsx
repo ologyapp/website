@@ -16,45 +16,44 @@ function CardCarousel({ items }: { items: any[] }) {
 
   console.log(new Date().toString());
 
-  const SOON_THRESHOLD_DAYS = 30;
-
   const initialIndex = useMemo(() => {
     if (!items.length) return 0;
-    const now = Date.now();
-    const soonMs = SOON_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
 
-    // Nearest upcoming (AHEAD) card, regardless of anything else.
-    let bestAheadIdx = -1;
-    let bestAheadStart = Infinity;
+    // Among all currently ACTIVE cards, the one that started most recently wins.
+    let bestActiveIdx = -1;
+    let bestActiveStart = "";
     items.forEach((item, idx) => {
-      if (statusOf(item) === "AHEAD") {
-        const start = new Date(item.date_start + "T00:00:00").getTime();
-        if (start < bestAheadStart) {
-          bestAheadStart = start;
-          bestAheadIdx = idx;
+      if (statusOf(item) === "ACTIVE") {
+        if (bestActiveIdx === -1 || item.date_start > bestActiveStart) {
+          bestActiveIdx = idx;
+          bestActiveStart = item.date_start;
         }
       }
     });
+    if (bestActiveIdx !== -1) return bestActiveIdx;
 
-    // If it starts soon enough, it wins outright -- even over a currently active card.
-    if (bestAheadIdx !== -1 && bestAheadStart - now <= soonMs) {
-      return bestAheadIdx;
-    }
-
-    // Otherwise, an active card wins as before.
-    const activeIdx = items.findIndex((i) => statusOf(i) === "ACTIVE");
-    if (activeIdx !== -1) return activeIdx;
-
-    // No active, and nothing upcoming within the threshold -- take whatever's next.
+    // Nothing active — nearest upcoming (AHEAD) card, soonest start first.
+    let bestAheadIdx = -1;
+    let bestAheadStart = "";
+    items.forEach((item, idx) => {
+      if (statusOf(item) === "AHEAD") {
+        if (bestAheadIdx === -1 || item.date_start < bestAheadStart) {
+          bestAheadIdx = idx;
+          bestAheadStart = item.date_start;
+        }
+      }
+    });
     if (bestAheadIdx !== -1) return bestAheadIdx;
 
-    // Nothing ahead at all -- fall back to the most recent past card.
+    // Nothing ahead either — most recently ended (RECORD) card.
     let bestRecordIdx = -1;
-    let bestRecordDate = "";
+    let bestRecordEnd = "";
     items.forEach((item, idx) => {
-      if (statusOf(item) === "RECORD" && item.date_end > bestRecordDate) {
-        bestRecordDate = item.date_end;
-        bestRecordIdx = idx;
+      if (statusOf(item) === "RECORD") {
+        if (bestRecordIdx === -1 || item.date_end > bestRecordEnd) {
+          bestRecordIdx = idx;
+          bestRecordEnd = item.date_end;
+        }
       }
     });
 
