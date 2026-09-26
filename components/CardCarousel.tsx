@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   Navigation,
@@ -8,7 +8,7 @@ import {
 } from "swiper/modules";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { statusOf, cardStyle, railDotStyle } from "./cardMeta";
+import { statusOf, cardStyle, railDotStyle, sortCards } from "./cardMeta";
 
 function CardCarousel({ items }: { items: any[] }) {
   const prevRef = useRef<HTMLButtonElement>(null);
@@ -16,49 +16,10 @@ function CardCarousel({ items }: { items: any[] }) {
 
   console.log(new Date().toString());
 
-  const initialIndex = useMemo(() => {
-    if (!items.length) return 0;
-
-    // Among all currently ACTIVE cards, the one that started most recently wins.
-    let bestActiveIdx = -1;
-    let bestActiveStart = "";
-    items.forEach((item, idx) => {
-      if (statusOf(item) === "ACTIVE") {
-        if (bestActiveIdx === -1 || item.date_start > bestActiveStart) {
-          bestActiveIdx = idx;
-          bestActiveStart = item.date_start;
-        }
-      }
-    });
-    if (bestActiveIdx !== -1) return bestActiveIdx;
-
-    // Nothing active — nearest upcoming (AHEAD) card, soonest start first.
-    let bestAheadIdx = -1;
-    let bestAheadStart = "";
-    items.forEach((item, idx) => {
-      if (statusOf(item) === "AHEAD") {
-        if (bestAheadIdx === -1 || item.date_start < bestAheadStart) {
-          bestAheadIdx = idx;
-          bestAheadStart = item.date_start;
-        }
-      }
-    });
-    if (bestAheadIdx !== -1) return bestAheadIdx;
-
-    // Nothing ahead either — most recently ended (RECORD) card.
-    let bestRecordIdx = -1;
-    let bestRecordEnd = "";
-    items.forEach((item, idx) => {
-      if (statusOf(item) === "RECORD") {
-        if (bestRecordIdx === -1 || item.date_end > bestRecordEnd) {
-          bestRecordIdx = idx;
-          bestRecordEnd = item.date_end;
-        }
-      }
-    });
-
-    return bestRecordIdx !== -1 ? bestRecordIdx : 0;
-  }, [items]);
+  // `items` arrives pre-sorted (ACTIVE, then AHEAD, then RECORD) from the
+  // shared sortCards() helper, so the first slide is always right: the
+  // first ACTIVE card, or the first AHEAD card when nothing is active.
+  const initialIndex = 0;
 
   const [activeIndex, setActiveIndex] = useState(initialIndex);
 
@@ -70,7 +31,7 @@ function CardCarousel({ items }: { items: any[] }) {
             modules={[Navigation, Mousewheel, EffectCoverflow, Scrollbar]}
             slidesPerView="auto"
             centeredSlides
-            loop
+            loop={false}
             initialSlide={initialIndex}
             scrollbar={{ draggable: true, hide: false }}
             spaceBetween={30}

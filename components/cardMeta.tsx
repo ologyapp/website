@@ -30,6 +30,28 @@ export function sortedRails(cards: any, now = new Date()) {
   return { ahead, record };
 }
 
+// Cycle cards grouped by state, for every layout (desktop carousel, tablet
+// grid, phone scroll list) — the one shared sort, so all three always agree.
+// ACTIVE first (newest date_start first), then AHEAD (soonest date_start
+// first), then RECORD (newest date_start first — date_start is the date
+// printed on the card, so sorting record on date_end puts a long-running
+// card out of order against ones whose start and end are the same day).
+export function sortCards(cards: any[], now = new Date()) {
+  const active = cards
+    .filter((c: any) => statusOf(c, now) === "ACTIVE")
+    .sort((a: any, b: any) => b.date_start.localeCompare(a.date_start));
+
+  const ahead = cards
+    .filter((c: any) => statusOf(c, now) === "AHEAD")
+    .sort((a: any, b: any) => a.date_start.localeCompare(b.date_start));
+
+  const record = cards
+    .filter((c: any) => statusOf(c, now) === "RECORD")
+    .sort((a: any, b: any) => b.date_start.localeCompare(a.date_start));
+
+  return [...active, ...ahead, ...record];
+}
+
 // Style. Derived from read and status. No card carries a color.
 export function cardStyle(read: any) {
   const hue = READ_HUE[read];

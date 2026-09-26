@@ -51,9 +51,9 @@ export const signalAhead = [
     date: "Jun 29, 2026",
     signal: "Cyclical Read",
     status: "ACTIVE",
-    title: "Mercury stations retrograde in Cancer.",
+    title: "Mercury stationed retrograde in Cancer.",
     content:
-      "Mercury runs retrograde from June 29 to July 23, with the shadow into August. These windows have historically lined up with reversals in communication and tech-heavy names.",
+      "Mercury ran retrograde from June 29 to July 23, with the shadow into August. These windows have historically lined up with reversals in communication and tech-heavy names.",
     button_text: "MERCURY RX CANCER",
     buttonColor: "#E89B7F33",
     statusColor: "#E89B7F",
@@ -82,9 +82,9 @@ export const signalAhead = [
     date: "Jul 26, 2026",
     signal: "Structural Shift",
     status: "COMING",
-    title: "Saturn stations retrograde in Aries.",
+    title: "Saturn stationed retrograde in Aries.",
     content:
-      "Saturn holds retrograde from July 26 to December 10, the first in Aries in nearly three decades. In prior stations, repricing has clustered at the bookends of the window.",
+      "Saturn holds retrograde from July 26 to December 10, its first retrograde spent entirely in Aries in nearly three decades. In prior stations, repricing has clustered at the bookends of the window.",
     button_text: "SATURN RX ARIES",
     buttonColor: "#E89B7F33",
     statusColor: "#E89B7F33",
@@ -114,9 +114,9 @@ export const signalAhead = [
     date: "Aug 12, 2026",
     signal: "Cyclical Read",
     status: "COMING",
-    title: "A total solar eclipse falls in Leo.",
+    title: "A total solar eclipse fell in Leo.",
     content:
-      "The eclipse lands at 20 degrees Leo, and the buildup runs for weeks on either side. Past eclipse closes have carried the hardest sentiment swings of their seasons.",
+      "The eclipse landed at 20 degrees Leo, and the buildup ran for weeks on either side. Past eclipse closes have carried the hardest sentiment swings of their seasons.",
     button_text: "SOLAR ECLIPSE LEO",
     buttonColor: "#E89B7F33",
     statusColor: "#E89B7F",
@@ -147,7 +147,7 @@ export const signalAhead = [
     date: "Aug 15, 2026",
     signal: "Behavioral Divergence",
     status: "COMING",
-    title: "Mercury meets Jupiter in expansive Leo.",
+    title: "Mercury met Jupiter in expansive Leo.",
     content:
       "The pairing reads as expansion in narrative and momentum, the strongest single-day pairing of the late-summer cluster and the kind of window Ology keeps score on.",
     button_text: "MERCURY-JUPITER LEO",
@@ -178,9 +178,9 @@ export const signalAhead = [
     date: "Aug 28, 2026",
     signal: "Cyclical Read",
     status: "COMING",
-    title: "A lunar eclipse closes the August axis.",
+    title: "A lunar eclipse closed the August axis.",
     content:
-      "The eclipse falls at 5 degrees Pisces. In past Pisces eclipses, conviction washed out before it clarified, and liquidity swung wide on both sides of the close.",
+      "The eclipse fell at 5 degrees Pisces. In past Pisces eclipses, conviction washed out before it clarified, and liquidity swung wide on both sides of the close.",
     button_text: "LUNAR ECLIPSE PISCES",
     buttonColor: "#E89B7F33",
     statusColor: "#E89B7F",
@@ -265,7 +265,7 @@ export const signalAhead = [
     date: "Jun 12, 2026",
     title: "SpaceX became the largest IPO in history.",
     content:
-      "Venus and Jupiter conjoined in Cancer on June 9, the year's strongest expansion signature. Three days later SpaceX priced at $150 and rose past a $2 trillion valuation.",
+      "Venus and Jupiter conjoined in Cancer on June 9, the year's strongest expansion signature. Three days later SpaceX opened at $150 and rose past a $2 trillion valuation.",
     button_text: "VENUS-JUPITER CANCER",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -298,7 +298,7 @@ export const signalAhead = [
     date: "Jan 12, 2020",
     title: "Saturn met Pluto. Then the world stopped.",
     content:
-      "The conjunction landed at 22 degrees Capricorn on January 12. Within six weeks the S&P fell 34 percent in the fastest bear market ever recorded.",
+      "The conjunction landed at 22 degrees Capricorn on January 12. The S&P peaked five weeks later, then fell 34 percent in the fastest bear market ever recorded.",
     button_text: "SATURN-PLUTO CAP",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -333,7 +333,7 @@ export const signalAhead = [
     date: "Sep 15, 2008",
     title: "Saturn opposed Uranus as the system broke.",
     content:
-      "Lehman failed on September 15 and the first exact opposition landed November 4. The S&P lost 57 percent before it bottomed the following March.",
+      "Lehman failed on September 15 and the first exact opposition landed November 4. The S&P lost 57 percent from its 2007 peak before it bottomed the following March.",
     button_text: "SATURN-URANUS AXIS",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -368,9 +368,9 @@ export const signalAhead = [
     signal: "Behavioral Divergence",
     buttonColor: "#7DD3C033",
     date: "Aug 05, 2024",
-    title: "Markets broke on a 15-point rate hike.",
+    title: "Markets broke on a 15 basis point hike.",
     content:
-      "The Nikkei fell 12.4 percent in a single session, the worst day since 1987, and the VIX spiked above 65. The retrograde midpoint landed on August 10.",
+      "The Nikkei fell 12.4 percent in a single session, the worst day since 1987, and the VIX spiked above 65. Mercury stationed retrograde in Virgo the same day.",
     button_text: "MERCURY RX VIRGO",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -405,7 +405,7 @@ export const signalAhead = [
     date: "Jan 28, 2021",
     title: "Retail broke a fund under an Aquarius sky.",
     content:
-      "Jupiter and Saturn had just entered Aquarius, the sign of crowds and networks. Weeks later GameStop ran from $17 past $500 as a collective acted as one.",
+      "Jupiter and Saturn had just entered Aquarius, the sign of crowds and networks. Weeks later GameStop ran from $17 to $483 as a collective acted as one.",
     button_text: "AQUARIUS CONJUNCTION",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -460,7 +460,7 @@ export const signalAhead = [
 </svg>
 `,
     ],
-    outcome_tag: "-76%",
+    outcome_tag: "-77%",
   },
 
   {
@@ -471,10 +471,10 @@ export const signalAhead = [
     signal: "Cyclical Read",
     buttonColor: "#E89B7F33",
     date: "Oct 06, 2025",
-    title: "Bitcoin topped the week of the eclipse.",
+    title: "Bitcoin topped two weeks after the eclipse.",
     content:
-      "The October 6 all-time high at $126,210 came one day after the partial solar eclipse axis closed. By February, Bitcoin was down 38 percent to $77K.",
-    button_text: "SOLAR ECLIPSE LIBRA",
+      "The October 6 all-time high at $126,210 came fifteen days after the September 21 partial solar eclipse at 29 degrees Virgo. By February, Bitcoin was down 39 percent to $77K.",
+    button_text: "SOLAR ECLIPSE VIRGO",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M5.90312 11.8063C2.64832 11.8063 0 9.15793 0 5.90312C0 2.64832 2.64832 0 5.90312 0C9.15793 0 11.8062 2.64832 11.8062 5.90312C11.8062 9.15793 9.15793 11.8063 5.90312 11.8063ZM5.90312 0.77288C3.07441 0.77288 0.77288 3.07441 0.77288 5.90312C0.77288 8.73183 3.07441 11.0334 5.90312 11.0334C8.73183 11.0334 11.0334 8.73183 11.0334 5.90312C11.0334 3.07441 8.73183 0.77288 5.90312 0.77288Z" fill="#F8F7FC"/>
@@ -493,7 +493,7 @@ export const signalAhead = [
 </svg>
 `,
     ],
-    outcome_tag: "-38%",
+    outcome_tag: "-39%",
   },
 
   {
@@ -507,7 +507,7 @@ export const signalAhead = [
     title: "Big Tech beat earnings. The market split.",
     content:
       "Alphabet rallied 10 percent on AI commentary while Meta fell 9 and Microsoft slid 4. The same fundamental beat drew opposite sentiment inside a single session.",
-    button_text: "MERCURY POST-SHADOW",
+    button_text: "URANUS INTO GEMINI",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M3.58586 11.8072C3.37281 11.8072 3.2002 11.6346 3.2002 11.4215V8.11229C3.2002 7.89924 3.37281 7.72662 3.58586 7.72662C3.79891 7.72662 3.97152 7.89924 3.97152 8.11229V11.4215C3.97152 11.6346 3.79891 11.8072 3.58586 11.8072Z" fill="#F8F7FC"/>
@@ -561,9 +561,9 @@ export const signalAhead = [
     signal: "Structural Shift",
     buttonColor: "#E89B7F33",
     date: "Feb 13, 2026",
-    title: "Saturn entered Aries. First since 1996.",
+    title: "Saturn returned to Aries. First run since 1996.",
     content:
-      "A 29-year structural cycle began. The last Saturn in Aries period coincided with the dot-com infrastructure buildup, and the repricing question is open again.",
+      "Saturn first touched Aries in May 2025 and returned to stay. The last Saturn in Aries period coincided with the dot-com infrastructure buildup, and the repricing question is open again.",
     button_text: "SATURN IN ARIES",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -827,7 +827,7 @@ export const confirmedSignals = [
 </svg>
 `,
     ],
-    outcome_tag: "-76%",
+    outcome_tag: "-77%",
   },
 
   {
@@ -841,7 +841,7 @@ export const confirmedSignals = [
     title: "Bitcoin hit $126,210 the week of the eclipse.",
     content:
       "The October 6 all-time high came one day after the partial solar eclipse axis closed. By February, BTC was down 38 percent to $77K.",
-    button_text: "SOLAR ECLIPSE LIBRA",
+    button_text: "SOLAR ECLIPSE VIRGO",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M5.90312 11.8063C2.64832 11.8063 0 9.15793 0 5.90312C0 2.64832 2.64832 0 5.90312 0C9.15793 0 11.8062 2.64832 11.8062 5.90312C11.8062 9.15793 9.15793 11.8063 5.90312 11.8063ZM5.90312 0.77288C3.07441 0.77288 0.77288 3.07441 0.77288 5.90312C0.77288 8.73183 3.07441 11.0334 5.90312 11.0334C8.73183 11.0334 11.0334 8.73183 11.0334 5.90312C11.0334 3.07441 8.73183 0.77288 5.90312 0.77288Z" fill="#F8F7FC"/>
@@ -860,7 +860,7 @@ export const confirmedSignals = [
 </svg>
 `,
     ],
-    outcome_tag: "-38%",
+    outcome_tag: "-39%",
   },
 
   {
@@ -874,7 +874,7 @@ export const confirmedSignals = [
     title: "Big Tech beat earnings. The market split anyway.",
     content:
       "Alphabet rallied 10 percent on AI commentary. Meta fell 9 percent on capex concerns. Microsoft slid 4 percent. Same fundamental beat. Opposite sentiment.",
-    button_text: "MERCURY POST-SHADOW",
+    button_text: "URANUS INTO GEMINI",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M3.58586 11.8072C3.37281 11.8072 3.2002 11.6346 3.2002 11.4215V8.11229C3.2002 7.89924 3.37281 7.72662 3.58586 7.72662C3.79891 7.72662 3.97152 7.89924 3.97152 8.11229V11.4215C3.97152 11.6346 3.79891 11.8072 3.58586 11.8072Z" fill="#F8F7FC"/>
@@ -994,9 +994,9 @@ export const cyclesCards = [
     date_start: "2026-06-29",
     date_end: "2026-07-23",
     read: "Cyclical Read",
-    title: "Mercury stations retrograde in Cancer.",
+    title: "Mercury stationed retrograde in Cancer.",
     content:
-      "Mercury runs retrograde from June 29 to July 23, with the shadow into August. These windows have historically lined up with reversals in communication and tech-heavy names.",
+      "Mercury ran retrograde from June 29 to July 23, with the shadow into August. These windows have historically lined up with reversals in communication and tech-heavy names.",
     button_text: "MERCURY RX CANCER",
     outcome_tag: null,
     icon: [
@@ -1025,9 +1025,9 @@ export const cyclesCards = [
     date_start: "2026-07-26",
     date_end: "2026-12-10",
     read: "Structural Shift",
-    title: "Saturn stations retrograde in Aries.",
+    title: "Saturn stationed retrograde in Aries.",
     content:
-      "Saturn holds retrograde from July 26 to December 10, the first in Aries in nearly three decades. In prior stations, repricing has clustered at the bookends of the window.",
+      "Saturn holds retrograde from July 26 to December 10, its first retrograde spent entirely in Aries in nearly three decades. In prior stations, repricing has clustered at the bookends of the window.",
     button_text: "SATURN RX ARIES",
     outcome_tag: null,
     icon: [
@@ -1054,9 +1054,9 @@ export const cyclesCards = [
     date_start: "2026-08-12",
     date_end: "2026-08-12",
     read: "Cyclical Read",
-    title: "A total solar eclipse falls in Leo.",
+    title: "A total solar eclipse fell in Leo.",
     content:
-      "The eclipse lands at 20 degrees Leo, and the buildup runs for weeks on either side. Past eclipse closes have carried the hardest sentiment swings of their seasons.",
+      "The eclipse landed at 20 degrees Leo, and the buildup ran for weeks on either side. Past eclipse closes have carried the hardest sentiment swings of their seasons.",
     button_text: "SOLAR ECLIPSE LEO",
     outcome_tag: null,
     icon: [
@@ -1084,7 +1084,7 @@ export const cyclesCards = [
     date_start: "2026-08-15",
     date_end: "2026-08-15",
     read: "Behavioral Divergence",
-    title: "Mercury meets Jupiter in expansive Leo.",
+    title: "Mercury met Jupiter in expansive Leo.",
     content:
       "The pairing reads as expansion in narrative and momentum, the strongest single-day pairing of the late-summer cluster and the kind of window Ology keeps score on.",
     button_text: "MERCURY-JUPITER LEO",
@@ -1115,9 +1115,9 @@ export const cyclesCards = [
     date_start: "2026-08-28",
     date_end: "2026-08-28",
     read: "Cyclical Read",
-    title: "A lunar eclipse closes the August axis.",
+    title: "A lunar eclipse closed the August axis.",
     content:
-      "The eclipse falls at 5 degrees Pisces. In past Pisces eclipses, conviction washed out before it clarified, and liquidity swung wide on both sides of the close.",
+      "The eclipse fell at 5 degrees Pisces. In past Pisces eclipses, conviction washed out before it clarified, and liquidity swung wide on both sides of the close.",
     button_text: "LUNAR ECLIPSE PISCES",
     outcome_tag: null,
     icon: [
@@ -1213,7 +1213,7 @@ export const cyclesCards = [
     order: 2,
     title: "SpaceX became the largest IPO in history.",
     content:
-      "Venus and Jupiter conjoined in Cancer on June 9, the year's strongest expansion signature. Three days later SpaceX priced at $150 and rose past a $2 trillion valuation.",
+      "Venus and Jupiter conjoined in Cancer on June 9, the year's strongest expansion signature. Three days later SpaceX opened at $150 and rose past a $2 trillion valuation.",
     button_text: "VENUS-JUPITER CANCER",
     outcome_tag: "$2T+",
     icon: [
@@ -1244,7 +1244,7 @@ export const cyclesCards = [
     order: 3,
     title: "Saturn met Pluto. Then the world stopped.",
     content:
-      "The conjunction landed at 22 degrees Capricorn on January 12. Within six weeks the S&P fell 34 percent in the fastest bear market ever recorded.",
+      "The conjunction landed at 22 degrees Capricorn on January 12. The S&P peaked five weeks later, then fell 34 percent in the fastest bear market ever recorded.",
     button_text: "SATURN-PLUTO CAP",
     outcome_tag: "-34%",
     icon: [
@@ -1277,7 +1277,7 @@ export const cyclesCards = [
     order: 4,
     title: "Saturn opposed Uranus as the system broke.",
     content:
-      "Lehman failed on September 15 and the first exact opposition landed November 4. The S&P lost 57 percent before it bottomed the following March.",
+      "Lehman failed on September 15 and the first exact opposition landed November 4. The S&P lost 57 percent from its 2007 peak before it bottomed the following March.",
     button_text: "SATURN-URANUS AXIS",
     outcome_tag: "-57%",
     icon: [
@@ -1310,9 +1310,9 @@ export const cyclesCards = [
     date_end: "2024-08-05",
     read: "Behavioral Divergence",
     order: 5,
-    title: "Markets broke on a 15-point rate hike.",
+    title: "Markets broke on a 15 basis point hike.",
     content:
-      "The Nikkei fell 12.4 percent in a single session, the worst day since 1987, and the VIX spiked above 65. The retrograde midpoint landed on August 10.",
+      "The Nikkei fell 12.4 percent in a single session, the worst day since 1987, and the VIX spiked above 65. Mercury stationed retrograde in Virgo the same day.",
     button_text: "MERCURY RX VIRGO",
     outcome_tag: "VIX 65",
     icon: [
@@ -1345,9 +1345,9 @@ export const cyclesCards = [
     order: 6,
     title: "Retail broke a fund under an Aquarius sky.",
     content:
-      "Jupiter and Saturn had just entered Aquarius, the sign of crowds and networks. Weeks later GameStop ran from $17 past $500 as a collective acted as one.",
+      "Jupiter and Saturn had just entered Aquarius, the sign of crowds and networks. Weeks later GameStop ran from $17 to $483 as a collective acted as one.",
     button_text: "AQUARIUS CONJUNCTION",
-    outcome_tag: "$17 TO $500",
+    outcome_tag: "$17 TO $483",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M8.11027 11.8059C7.89722 11.8059 7.72461 11.6333 7.72461 11.4203V0.38688C7.72461 0.173833 7.89722 0.0012207 8.11027 0.0012207C8.32332 0.0012207 8.49593 0.173833 8.49593 0.38688V11.4203C8.49593 11.6333 8.32332 11.8059 8.11027 11.8059Z" fill="#F8F7FC"/>
@@ -1378,7 +1378,7 @@ export const cyclesCards = [
     content:
       "The square ran exact three times through 2021. Bitcoin peaked near $69K in November and unwound to $16K across the following year as the leverage washed out.",
     button_text: "SATURN-URANUS SQUARE",
-    outcome_tag: "-76%",
+    outcome_tag: "-77%",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M8.12698 11.8059C6.91245 11.8059 5.92499 10.8185 5.92499 9.60393C5.92499 8.92591 6.31219 8.40184 6.68852 7.89644C7.09129 7.35371 7.5065 6.79388 7.5065 5.98834C7.5065 4.58876 6.36818 3.45043 4.9686 3.45043C3.56902 3.45043 2.43068 4.58876 2.43068 5.98834C2.43068 6.20139 2.25807 6.37556 2.04347 6.37556C1.82886 6.37556 1.65625 6.20294 1.65625 5.98834C1.65625 4.16266 3.14137 2.67755 4.96704 2.67755C6.79272 2.67755 8.27784 4.16266 8.27784 5.98834C8.27784 7.04891 7.73976 7.77358 7.30744 8.35674C6.97932 8.79839 6.6963 9.18094 6.6963 9.60393C6.6963 10.3908 7.33699 11.0331 8.12542 11.0331C8.91385 11.0331 9.55301 10.3924 9.55301 9.60393C9.55301 9.39088 9.72562 9.21671 9.94022 9.21671C10.1548 9.21671 10.3274 9.38932 10.3274 9.60393C10.3274 10.8185 9.33995 11.8059 8.12542 11.8059H8.12698Z" fill="#F8F7FC"/>
@@ -1407,11 +1407,11 @@ export const cyclesCards = [
     date_end: "2025-10-06",
     read: "Cyclical Read",
     order: 8,
-    title: "Bitcoin topped the week of the eclipse.",
+    title: "Bitcoin topped two weeks after the eclipse.",
     content:
-      "The October 6 all-time high at $126,210 came one day after the partial solar eclipse axis closed. By February, Bitcoin was down 38 percent to $77K.",
-    button_text: "SOLAR ECLIPSE LIBRA",
-    outcome_tag: "-38%",
+      "The October 6 all-time high at $126,210 came fifteen days after the September 21 partial solar eclipse at 29 degrees Virgo. By February, Bitcoin was down 39 percent to $77K.",
+    button_text: "SOLAR ECLIPSE VIRGO",
+    outcome_tag: "-39%",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M5.90312 11.8063C2.64832 11.8063 0 9.15793 0 5.90312C0 2.64832 2.64832 0 5.90312 0C9.15793 0 11.8062 2.64832 11.8062 5.90312C11.8062 9.15793 9.15793 11.8063 5.90312 11.8063ZM5.90312 0.77288C3.07441 0.77288 0.77288 3.07441 0.77288 5.90312C0.77288 8.73183 3.07441 11.0334 5.90312 11.0334C8.73183 11.0334 11.0334 8.73183 11.0334 5.90312C11.0334 3.07441 8.73183 0.77288 5.90312 0.77288Z" fill="#F8F7FC"/>
@@ -1441,7 +1441,7 @@ export const cyclesCards = [
     title: "Big Tech beat earnings. The market split.",
     content:
       "Alphabet rallied 10 percent on AI commentary while Meta fell 9 and Microsoft slid 4. The same fundamental beat drew opposite sentiment inside a single session.",
-    button_text: "MERCURY POST-SHADOW",
+    button_text: "URANUS INTO GEMINI",
     outcome_tag: "SPLIT TAPE",
     icon: [
       `<svg width="15" height="17" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1491,9 +1491,9 @@ export const cyclesCards = [
     date_end: "2026-02-13",
     read: "Structural Shift",
     order: 11,
-    title: "Saturn entered Aries. First since 1996.",
+    title: "Saturn returned to Aries. First run since 1996.",
     content:
-      "A 29-year structural cycle began. The last Saturn in Aries period coincided with the dot-com infrastructure buildup, and the repricing question is open again.",
+      "Saturn first touched Aries in May 2025 and returned to stay. The last Saturn in Aries period coincided with the dot-com infrastructure buildup, and the repricing question is open again.",
     button_text: "SATURN IN ARIES",
     outcome_tag: null,
     icon: [

@@ -51,6 +51,7 @@ import {
   cardStyle,
   railDotStyle,
   sortedRails,
+  sortCards,
 } from "../components/cardMeta";
 
 import {
@@ -269,23 +270,7 @@ export default function Home() {
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
 
-  function sortForDisplay(cards: any[]) {
-    const active = cards
-      .filter((c) => statusOf(c) === "ACTIVE")
-      .sort((a, b) => b.date_start.localeCompare(a.date_start)); // newest start first
-
-    const ahead = cards
-      .filter((c) => statusOf(c) === "AHEAD")
-      .sort((a, b) => a.date_start.localeCompare(b.date_start)); // soonest first
-
-    const record = cards
-      .filter((c) => statusOf(c) === "RECORD")
-      .sort((a, b) => b.date_end.localeCompare(a.date_end)); // most recently ended first
-
-    return [...active, ...ahead, ...record];
-  }
-
-  const visibleCards = sortForDisplay(cyclesCards).slice(0, visibleCount);
+  const visibleCards = sortCards(cyclesCards).slice(0, visibleCount);
   const hasMore = visibleCount < cyclesCards.length;
   const isExpanded = visibleCount >= cyclesCards.length;
   const shouldShowToggle = cyclesCards.length > INITIAL_COUNT;
@@ -1123,6 +1108,9 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
   return (
     <div
       id="hero"
@@ -1776,13 +1764,13 @@ export default function Home() {
                 >
                   {/* AHEAD */}
                   <div className=" flex flex-col w-full gap-[30px]">
-                    <CardCarousel items={cyclesCards} />
+                    <CardCarousel items={sortCards(cyclesCards)} />
                   </div>
                 </motion.div>
 
                 <div className="hidden lg:block xl:hidden w-full! gap-7.5">
                   <motion.div className="w-full! flex justify-around max-h-[100vh] overflow-y-auto  flex-wrap gap-[20px] mt-40 xl:mt-0">
-                    {cyclesCards.map((data, id) => {
+                    {sortCards(cyclesCards).map((data, id) => {
                       const status = statusOf(data);
                       const style = cardStyle(data.read);
 
@@ -2251,6 +2239,7 @@ export default function Home() {
                             <input
                               type="email"
                               value={email}
+                              required
                               onChange={(e: any) => setEmail(e.target.value)}
                               className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] border border-[rgba(248,247,252,0.1)] outline-none"
                             />
@@ -2258,13 +2247,13 @@ export default function Home() {
 
                           <div
                             onClick={() => {
-                              if (names != "" && email != "") {
+                              if (names.trim() !== "" && isValidEmail(email)) {
                                 setShowNatalForm(true);
                                 setErrMsg("");
                               } else {
                                 setTimeout(() => {
                                   setErrMsg(
-                                    "Please fill out your name and email",
+                                    "Please enter your name and a valid email address",
                                   );
                                 }, 5000);
                               }
@@ -2720,7 +2709,9 @@ export default function Home() {
 
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                             <input
+                              type="email"
                               value={email}
+                              required
                               placeholder="EMAIL ADDRESS"
                               onChange={(e: any) => setEmail(e.target.value)}
                               className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-base sm:placeholder:text-[12px] text-base sm:text-[12px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
@@ -2729,13 +2720,13 @@ export default function Home() {
 
                           <div
                             onClick={() => {
-                              if (names != "" && email != "") {
+                              if (names.trim() !== "" && isValidEmail(email)) {
                                 setShowNatalForm(true);
                                 setErrMsg("");
                               } else {
                                 setTimeout(() => {
                                   setErrMsg(
-                                    "Please fill out your name and email",
+                                    "Please enter your name and a valid email address",
                                   );
                                 }, 5000);
                               }
