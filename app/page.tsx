@@ -766,6 +766,39 @@ export default function Home() {
     }
   }, []);
 
+  const HUBSPOT_URL =
+    "https://api.hsforms.com/submissions/v3/integration/submit/44639466/7d83d900-365a-4184-ad93-df7d60ad2d44";
+
+  async function sendToHubSpot(fullName: string, email: string) {
+    try {
+      const [firstname, ...rest] = (fullName || "").trim().split(/\s+/);
+      const lastname = rest.join(" ");
+
+      const hutk = document.cookie.match(/hubspotutk=([^;]+)/)?.[1];
+
+      const res = await fetch(HUBSPOT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fields: [
+            { name: "email", value: email },
+            { name: "firstname", value: firstname || "" },
+            { name: "lastname", value: lastname },
+          ],
+          context: {
+            pageUri: window.location.href,
+            pageName: document.title,
+            ...(hutk && { hutk }),
+          },
+        }),
+      });
+
+      if (!res.ok) console.error("HubSpot error:", await res.text());
+    } catch (err) {
+      console.error("HubSpot request failed:", err);
+    }
+  }
+
   const handleSubmitForm = async () => {
     if (!canProceed || loading) return;
 
@@ -775,6 +808,7 @@ export default function Home() {
     setShowSpinner(true);
 
     submitWaitlist();
+    sendToHubSpot(names, email);
 
     try {
       setLoading(true);
