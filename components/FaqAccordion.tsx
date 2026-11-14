@@ -7,6 +7,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Minus, Plus } from "lucide-react";
+import { faqsList } from "@/lib/faqs";
+
+export { faqsList };
 
 interface FAQ {
   id: string;
@@ -18,38 +21,7 @@ interface FAQAccordionProps {
   items: FAQ[];
 }
 
-export const faqsList = [
-  {
-    id: "faq-1",
-    question: "What is an investor timing profile?",
-    answer:
-      "A behavioral profile drawn from your natal chart and refined by a short questionnaire. It describes how you tend to handle risk, pressure, conviction, and time, and it becomes the lens the rest of Ology reads the market through.",
-  },
-  {
-    id: "faq-2",
-    question: "Does Ology predict the market?",
-    answer:
-      "No. Ology makes no forecasts and no price calls. It maps timing windows, shows what happened in windows like them before, and keeps score alongside your own record. Pattern over prediction.",
-  },
-  {
-    id: "faq-3",
-    question: "Is Ology financial advice?",
-    answer:
-      "No. Ology is not an investment adviser and never recommends trades. It brings context to your decisions and leaves the decisions with you.",
-  },
-  {
-    id: "faq-4",
-    question: "What do I need to get my profile?",
-    answer:
-      "A birth date, time, and place. Birth data is treated as sensitive personal information, encrypted, never shared, and never sold. If you don't know your birth time, simply select 'Unknown'—the engine is designed to handle it.",
-  },
-  {
-    id: "faq-5",
-    question: "When does the beta open?",
-    answer:
-      "Ology beta opens in waves throughout the second half of 2026. Members on the waitlist receive invitations first, with earlier sign-ups getting priority access.",
-  },
-];
+
 
 export default function FAQAccordion() {
   return (

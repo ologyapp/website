@@ -14,7 +14,6 @@ function CardCarousel({ items }: { items: any[] }) {
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
-  console.log(new Date().toString());
 
   // `items` arrives pre-sorted (ACTIVE, then AHEAD, then RECORD) from the
   // shared sortCards() helper, so the first slide is always right: the
