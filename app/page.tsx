@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { SITE_LIVE, BETA_URL } from "../lib/site";
 import a1 from "../public/a1.png";
 import a2 from "../public/a2.png";
 import a3 from "../public/a3.png";
@@ -35,15 +36,13 @@ import e4 from "../public/e4.png";
 import e5 from "../public/e5.png";
 import e6 from "../public/e6.png";
 import iphone from "../public/iphoneMockup.svg";
-import useReferralCapture from "../hooks/useReferralCapture";
+import useReferralCapture, { UTM_COOKIE } from "../hooks/useReferralCapture";
 import Cookies from "js-cookie";
 import { flushSync } from "react-dom";
 import html2canvas from "html2canvas";
 
 import {
-  signalAhead,
   cyclesCards,
-  confirmedSignals,
   missingLayers,
 } from "@/mockData";
 import {
@@ -52,6 +51,9 @@ import {
   railDotStyle,
   sortedRails,
   sortCards,
+  liveSkyCards,
+  marketDay,
+  noopSubscribe,
 } from "../components/cardMeta";
 
 import {
@@ -129,6 +131,7 @@ import {
 import FAQAccordion from "../components/FaqAccordion";
 import Link from "next/link";
 import CardCarousel from "../components/CardCarousel";
+import LazyVideo from "../components/LazyVideo";
 
 const images = [
   a1,
@@ -270,10 +273,21 @@ export default function Home() {
   const CARDS_PER_LOAD = 3;
   const INITIAL_COUNT = 3;
 
-  const visibleCards = sortCards(cyclesCards).slice(0, visibleCount);
-  const hasMore = visibleCount < cyclesCards.length;
-  const isExpanded = visibleCount >= cyclesCards.length;
-  const shouldShowToggle = cyclesCards.length > INITIAL_COUNT;
+  // Sky cards depend on today's date, so they join after mount. Server and
+  // first client render match, then the live cards appear.
+  const skyDay = React.useSyncExternalStore(
+    noopSubscribe,
+    marketDay,
+    () => null,
+  );
+  const allCards = React.useMemo(() => {
+    const now = skyDay ? new Date() : null;
+    return sortCards([...liveSkyCards(now), ...cyclesCards], now ?? undefined);
+  }, [skyDay]);
+  const visibleCards = allCards.slice(0, visibleCount);
+  const hasMore = visibleCount < allCards.length;
+  const isExpanded = visibleCount >= allCards.length;
+  const shouldShowToggle = allCards.length > INITIAL_COUNT;
 
   useEffect(() => {
     if (window.location.hash) {
@@ -504,7 +518,6 @@ export default function Home() {
     );
 
     const rect = node.getBoundingClientRect();
-    console.log("capture rect:", rect.width, rect.height);
 
     try {
       const blob = await domToBlob(node, { scale: 2 }); // no explicit width/height needed now
@@ -528,7 +541,6 @@ export default function Home() {
   }, [showModal]);
 
   const handleShare = () => {
-    console.log("poster url:", getCardPoster(cardType));
     if (!preGeneratedFile) return;
 
     const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
@@ -574,18 +586,21 @@ export default function Home() {
     const [h, m] = timePart.split(":");
 
     let hour = parseInt(h);
+    const complete = !Number.isNaN(hour) && /^\d{2}$/.test(m ?? "");
 
     if (period === "PM" && hour !== 12) hour += 12;
     if (period === "AM" && hour === 12) hour = 0;
 
+    // A time counts only once hour and minute are both picked. The reveal
+    // now sends this time to the engine, so a half picked wheel never
+    // reaches it as a real birth time.
     const result = {
       dob: format(date, "yyyy-MM-dd"),
-      time: `${String(hour).padStart(2, "0")}:${m}`,
+      time: complete ? `${String(hour).padStart(2, "0")}:${m}` : "",
     };
 
     setFormatted(result);
 
-    console.log("formatted", result);
   }, [date, time]);
 
   // -----------------------------
@@ -650,7 +665,7 @@ export default function Home() {
     }
 
     if (type === "ampm") {
-      const [h, m] = time.split(":");
+      const [h = "", m = ""] = time.split(":");
       const minute = m.split(" ")[0];
       setAmpm(value as "AM" | "PM");
       setTime(`${h}:${minute} ${value}`);
@@ -698,19 +713,27 @@ export default function Home() {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [tier, setTier] = useState(1);
 
-  useEffect(() => {
+  // Google Places loads when the birth details step opens, not on page load.
+  const googleRequested = useRef(false);
+  const loadGoogle = React.useCallback(() => {
+    if (googleRequested.current) return;
+    googleRequested.current = true;
     setOptions({
       key: process.env.NEXT_PUBLIC_GOOGLE_API_KEY!,
     });
-
     importLibrary("places").then(() => {
       setGoogleLoaded(true);
     });
   }, []);
 
+  useEffect(() => {
+    if (showNatalForm) loadGoogle();
+  }, [showNatalForm, loadGoogle]);
+
   const handleChange = (value: string) => {
     setData({ ...data, location: value });
 
+    if (!googleLoaded) loadGoogle();
     if (!value || !googleLoaded) {
       setSuggestions([]);
       return;
@@ -720,7 +743,6 @@ export default function Home() {
       window as any
     ).google.maps.places.AutocompleteService();
 
-    console.log("service", service);
 
     service.getPlacePredictions({ input: value }, (predictions: any[]) => {
       setSuggestions(predictions || []);
@@ -753,7 +775,10 @@ export default function Home() {
   }, []);
 
   const activeLines = useMemo(() => {
-    return Array.from({ length: LINES }).map(() => Math.random() > 0.4);
+    // Fixed pattern, about 60 percent lit. Math.random here made the server
+    // and browser render different lines, which failed hydration and forced
+    // a full client re-render on every visit.
+    return Array.from({ length: LINES }).map((_, i) => (i * 7 + 3) % 5 > 1);
   }, []);
 
   const [result, setResult] = useState<any>(null);
@@ -768,6 +793,17 @@ export default function Home() {
 
   const HUBSPOT_URL =
     "https://api.hsforms.com/submissions/v3/integration/submit/44639466/7d83d900-365a-4184-ad93-df7d60ad2d44";
+
+  // The landing page's campaign tags travel with the application, even
+  // after in-page navigation drops them from the address bar.
+  function pageUriWithUtm() {
+    const url = new URL(window.location.href);
+    const stored = new URLSearchParams(Cookies.get(UTM_COOKIE) || "");
+    stored.forEach((value, key) => {
+      if (!url.searchParams.has(key)) url.searchParams.set(key, value);
+    });
+    return url.toString();
+  }
 
   async function sendToHubSpot(fullName: string, email: string) {
     try {
@@ -786,7 +822,7 @@ export default function Home() {
             { name: "lastname", value: lastname },
           ],
           context: {
-            pageUri: window.location.href,
+            pageUri: pageUriWithUtm(),
             pageName: document.title,
             ...(hutk && { hutk }),
           },
@@ -812,7 +848,6 @@ export default function Home() {
 
     try {
       setLoading(true);
-      console.log(formatted?.dob, formatted?.time, data.lat, data.lng);
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/astro`, {
         method: "POST",
         headers: {
@@ -820,16 +855,18 @@ export default function Home() {
         },
         body: JSON.stringify({
           dob: formatted?.dob,
-          time: "12:00",
+          // Same inputs as the app (D4, D5). A known birth time reads as
+          // tier 1 at that time. An unknown time reads as tier 2 at noon.
+          time: timeUnknown ? "12:00" : formatted?.time,
+          time_unknown: timeUnknown,
           lat: data.lat,
           lng: data.lng,
-          tier: 1,
+          tier: timeUnknown ? 2 : 1,
           email,
         }),
       });
 
       const result = await res.json();
-      console.log("astro result", result);
       const referralLink = `${window.location.origin}?ref=${result?.referralCode}`;
       setReferralLink(referralLink);
 
@@ -905,7 +942,6 @@ export default function Home() {
     if (!type) return "/StatBox.png";
 
     const fileName = type.replace(/\s+/g, "") + ".mp4";
-    console.log("Calibrated Maverick", `/${fileName}`);
     return `/${fileName}`;
   };
 
@@ -913,7 +949,6 @@ export default function Home() {
     if (!type) return "/StatBox.png";
 
     const fileName = type.replace(/\s+/g, "") + "Card.jpg";
-    console.log("fileName", fileName);
     return `/${fileName}`;
   };
 
@@ -1416,11 +1451,8 @@ export default function Home() {
                   >
                     <div className="relative w-[117.211px] md:w-[160px]">
                       {/* Video */}
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
+                      <LazyVideo
+                        src="/appflow.mp4"
                         className="
                         absolute
                         top-[2%]
@@ -1431,9 +1463,7 @@ export default function Home() {
                         rounded-[16px]
                         z-10
                       "
-                      >
-                        <source src="/appflow.mp4" type="video/mp4" />
-                      </video>
+                      />
 
                       {/* Phone frame */}
                       <img
@@ -1463,14 +1493,13 @@ export default function Home() {
               >
                 <div className="flex flex-col gap-[30px] md:gap-[60px] text-center md:text-left max-md:[@supports(-webkit-hyphens:none)]:gap-[20px]">
                   <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] font-normal leading-[115%] font-Recoleta">
-                    Timing Intelligence for Modern Investors
+                    Timing Intelligence for Modern Markets
                   </h1>
 
                   <p className="text-[#F8F7FC] text-[18px] md:text-[24px] font-normal leading-[140%] max-w-full lg:max-w-[800px] font-Satoshi">
-                    Ology is a market timing platform that synthesizes celestial
-                    cycles, behavioral psychology, and live market data into a
-                    personalized timing profile. Active traders and investors
-                    use it to recognize patterns and time entries with context.
+                    Ology is a behavioral timing engine for markets. It reads your Trade
+                    DNA against the current sky, market context, and your own record,
+                    so you see the conditions shaping a decision before you act.
                   </p>
                 </div>
                 <Link href="#archetype-form">
@@ -1502,10 +1531,22 @@ export default function Home() {
                   >
                     {" "}
                     <span className=" text-[#F8F7FC] font-Satoshi text-[16px] lg:text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
-                      Access the Beta
+                      Apply for beta access
                     </span>
                   </button>
                 </Link>
+                <p className="-mt-8 md:-mt-10 text-[#F8F7FC]/70 font-Satoshi text-[14px] md:text-[16px] leading-[140%]">
+                  {SITE_LIVE ? (
+                    <>
+                      Already invited?{" "}
+                      <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
+                        Sign in.
+                      </a>
+                    </>
+                  ) : (
+                    "Opening in small waves."
+                  )}
+                </p>
               </motion.div>
 
               <motion.div
@@ -1549,11 +1590,8 @@ export default function Home() {
                     }}
                   >
                     <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
+                      <LazyVideo
+                        src="/appflow.mp4"
                         className="
                         absolute
                         top-[2.25%]
@@ -1564,9 +1602,7 @@ export default function Home() {
                         rounded-[24px]
                         z-30!
                     "
-                      >
-                        <source src={"/appflow.mp4"} type="video/mp4" />
-                      </video>
+                      />
 
                       <img
                         src={phoneMock}
@@ -1697,6 +1733,19 @@ export default function Home() {
                       {item.label}
                     </li>
                   ))}
+                  {SITE_LIVE && (
+                    <li className="font-Satoshi text-[#F8F7FC]/60 hover:text-[#F8F7FC] transition-colors duration-300">
+                      <a href={BETA_URL}>Sign in</a>
+                    </li>
+                  )}
+                  <li>
+                    <a
+                      href="#archetype-form"
+                      className="font-Satoshi text-[#F8F7FC] rounded-[20px] border border-white/20 bg-white/5 px-4 py-2 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+                    >
+                      Apply for beta access
+                    </a>
+                  </li>
                 </ul>
               </nav>
 
@@ -1756,6 +1805,17 @@ export default function Home() {
                         {item?.label}
                       </li>
                     ))}
+                    {SITE_LIVE && (
+                      <li className="text-[#F8F7FC]/80 font-Satoshi hover:text-[#F8F7FC]">
+                        <a href={BETA_URL}>Sign in</a>
+                      </li>
+                    )}
+                    <li
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[#F8F7FC] font-Satoshi"
+                    >
+                      <a href="#archetype-form">Apply for beta access</a>
+                    </li>
                   </ul>
                 </div>
               )}
@@ -1780,11 +1840,10 @@ export default function Home() {
                   </h2>
 
                   <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[17.5px] md:text-[22px] font-normal leading-[120%]">
-                    Major market moments have long clustered
-                    <br className="md:hidden" /> around measurable celestial
-                    alignments.
-                    <br className="md:hidden" /> Ology keeps that record in real
-                    time.
+                    Ology keeps a running record of the sky beside the market.{" "}
+                    <br className="md:hidden" />
+                    What is in effect now, what comes next, and what the record
+                    holds.
                   </h4>
                 </div>
 
@@ -1798,13 +1857,13 @@ export default function Home() {
                 >
                   {/* AHEAD */}
                   <div className=" flex flex-col w-full gap-[30px]">
-                    <CardCarousel items={sortCards(cyclesCards)} />
+                    <CardCarousel key={allCards.length} items={allCards} />
                   </div>
                 </motion.div>
 
                 <div className="hidden lg:block xl:hidden w-full! gap-7.5">
                   <motion.div className="w-full! flex justify-around max-h-[100vh] overflow-y-auto  flex-wrap gap-[20px] mt-40 xl:mt-0">
-                    {sortCards(cyclesCards).map((data, id) => {
+                    {allCards.map((data, id) => {
                       const status = statusOf(data);
                       const style = cardStyle(data.read);
 
@@ -2115,7 +2174,7 @@ export default function Home() {
                   {/* counter + show more */}
                   {/* <div className="w-full flex flex-col items-center gap-4 mt-8">
                     <p className="text-[#F8F7FC]/60 font-Satoshi text-[13px] tracking-[2px] uppercase">
-                      Showing {visibleCards.length} of {cyclesCards.length}{" "}
+                      Showing {visibleCards.length} of {allCards.length}{" "}
                       alignments
                     </p>
 
@@ -2124,7 +2183,7 @@ export default function Home() {
                         type="button"
                         onClick={() =>
                           setVisibleCount(
-                            isExpanded ? INITIAL_COUNT : cyclesCards.length,
+                            isExpanded ? INITIAL_COUNT : allCards.length,
                           )
                         }
                         className="flex items-center gap-2 px-6 py-3 rounded-[16.16px] border border-white/20 bg-[rgba(127,168,212,0.1)] text-[#F8F7FC] font-Satoshi text-[12.148px] font-bold uppercase tracking-[1px] transition-colors hover:bg-[rgba(127,168,212,0.2)]"
@@ -2209,12 +2268,12 @@ export default function Home() {
                 >
                   <div className="flex flex-col gap-[30px]">
                     <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
-                      Access the Beta
+                      Read your archetype and apply for beta access.
                     </h2>
 
                     <h4 className="text-[#F8F7FC] text-start font-Satoshi text-[22px] md:text-[22px] font-normal leading-[120%]">
-                      Generate your behavioral market profile and claim your
-                      spot.
+                      Add your birth date, time, and place. Ology reads them into one of
+                      fifteen archetypes.
                     </h4>
                   </div>
 
@@ -2245,8 +2304,7 @@ export default function Home() {
                             Hi, {names.split("")}.
                           </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
-                            Add your birth details. This is what maps your chart
-                            to a timing profile.
+                            Add your birth date, time, and place.
                           </h3>
                         </>
                       )}
@@ -2631,7 +2689,7 @@ export default function Home() {
                                               key={p}
                                               onClick={() => {
                                                 setAmpm(p as "AM" | "PM");
-                                                const [h, m] = time.split(":");
+                                                const [h = "", m = ""] = time.split(":");
                                                 const minute = m.split(" ")[0];
                                                 setTime(`${h}:${minute} ${p}`);
                                                 scrollToItem(ampmRef, index);
@@ -2675,23 +2733,20 @@ export default function Home() {
                 >
                   <div className="flex flex-col items-center gap-[30px]">
                     <h3 className="text-[#F8F7FC] font-Recoleta text-[32px] sm:text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px] text-center md:text-start">
-                      Access the Beta
+                      Read your archetype and apply for beta access.
                     </h3>
 
                     <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[18.204px] md:text-[22px] font-normal leading-[120%]">
-                      Generate your behavioral market profile and claim your
-                      spot.
+                      Add your birth date, time, and place. Ology reads them into one of
+                      fifteen archetypes.
                     </h4>
                   </div>
 
                   {/* MOBILE PHONE MOCKUP */}
                   <div className="block lg:hidden relative shrink-0 w-[91.08px] sm:w-52">
-                    <video
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="
+                    <LazyVideo
+                        src="/archetypereel3.mp4"
+                        className="
                       absolute
                       top-[2.2%]
                       left-[5.5%]
@@ -2701,9 +2756,7 @@ export default function Home() {
                       rounded-[14px]
                       z-10
                     "
-                    >
-                      <source src="/archetypereel2.mp4" type="video/mp4" />
-                    </video>
+                      />
 
                     <img
                       src={phoneMock}
@@ -3097,7 +3150,7 @@ export default function Home() {
                                               key={p}
                                               onClick={() => {
                                                 setAmpm(p as "AM" | "PM");
-                                                const [h, m] = time.split(":");
+                                                const [h = "", m = ""] = time.split(":");
                                                 const minute = m.split(" ")[0];
                                                 setTime(`${h}:${minute} ${p}`);
                                                 scrollToItem(ampmRef, index);
@@ -3136,12 +3189,9 @@ export default function Home() {
 
                 {/* DESKTOP PHONE MOCKUP */}
                 <div className="hidden lg:block relative shrink-0 lg:w-90.25 lg:h-182.5 mt-5 lg:mt-20">
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="
+                  <LazyVideo
+                        src="/archetypereel3.mp4"
+                        className="
                     absolute
                     top-[2.25%]
                     left-[5.3%]
@@ -3151,9 +3201,7 @@ export default function Home() {
                     rounded-[24px]
                     z-30!
                   "
-                  >
-                    <source src={"/archetypereel2.mp4"} type="video/mp4" />
-                  </video>
+                      />
 
                   <img
                     src={phoneMock}
@@ -3222,8 +3270,8 @@ export default function Home() {
                   </h2>
 
                   <h4 className="hidden lg:block text-[#F8F7FC] text-center font-Satoshi text-[22px] md:text-[22px] font-normal leading-[120%]">
-                    Modern platforms measure everything about the market and
-                    almost nothing about the forces moving through it.
+                    Every tool describes the market. Ology describes the person about to
+                    act on it.
                   </h4>
                 </div>
 
@@ -3705,14 +3753,14 @@ export default function Home() {
                       href="#archetype-form"
                       className="hidden lg:block font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
                     >
-                      REQUEST EARLY ACCESS
+                      Apply for beta access
                     </Link>
 
                     <Link
                       href="#archetype-form"
                       className="block lg:hidden font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
                     >
-                      Access the Beta
+                      Apply for beta access
                     </Link>
                   </button>
                 </div>
@@ -3769,11 +3817,18 @@ export default function Home() {
                       </div>
 
                       <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11.787px] lg:text-[16px] font-medium leading-[140%]">
-                        Pattern over prediction.
+                        Timing intelligence for modern markets.
                       </h4>
                     </div>
                   </Link>
                   <div className="flex justify-start items-center gap-10 relative xl:-left-10">
+                    {SITE_LIVE && (
+                      <a href={BETA_URL}>
+                        <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+                          Sign in
+                        </h5>
+                      </a>
+                    )}
                     <Link href="/privacy-policy">
                       <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
                         Privacy
@@ -3881,7 +3936,7 @@ export default function Home() {
                   <p className="text-[#E8E9F3]/30 text-center font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-[140%]">
                     Ology provides behavioral and timing context for
                     informational purposes only and is not an investment
-                    adviser. © 2026 Ology Intelligence, Inc.
+                    adviser. © {new Date().getFullYear()} Ology Intelligence, Inc.
                   </p>
                 </div>
               </motion.div>
@@ -4121,7 +4176,8 @@ export default function Home() {
                       You're on the list.{" "}
                     </p>
                     <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
-                      Your full Trade DNA opens when we launch.
+                      Invitations go out in small waves. Your full Trade DNA opens with
+                      yours.
                     </p>
                   </div>
                   <div className="flex flex-col gap-[11px] items-center md:items-end">
@@ -4186,7 +4242,7 @@ export default function Home() {
                           </defs>
                         </svg>
                         <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                          {copied ? "COPIED!" : "COPY LINK"}{" "}
+                          {copied ? "COPIED" : "COPY LINK"}{" "}
                         </p>
                       </button>
                     </div>
@@ -4252,12 +4308,13 @@ export default function Home() {
                           </defs>
                         </svg>
                         <p className="font-Satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                          {copied ? "COPIED!" : "COPY LINK"}{" "}
+                          {copied ? "COPIED" : "COPY LINK"}{" "}
                         </p>
                       </button>
                     </div>
                     <p className="font-Satoshi text-[10px] font-normal leading-[140%] tracking-[0.01em] text-center">
-                      Every friend who joins through your link moves you up.
+                      Share your card. Friends who apply through your link are credited
+                      to you.
                     </p>
                   </div>
                 </div>

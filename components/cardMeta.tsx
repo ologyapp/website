@@ -1,3 +1,5 @@
+import skyCards from "@/lib/skyCards.json";
+
 export const READ_HUE: Record<string, string> = {
   "Cyclical Read": "#E89B7F", // Planetary/Mars Ember
   "Structural Shift": "#7A849A", // Planetary/Saturn Stone
@@ -83,3 +85,24 @@ export function railDotStyle(status: any) {
     border: `1.5px solid ${NEUTRAL}59`,
   };
 }
+
+// Sky cards built from the events file the app reads (scripts/build-sky-cards.tsx).
+// Shows what is in effect today and the next four ahead, so Align never goes stale.
+type SkyCard = { date_start: string; date_end: string } & Record<string, unknown>;
+
+export function liveSkyCards(now: Date | null, ahead = 4) {
+  if (!now) return [];
+  const cards = skyCards as SkyCard[];
+  const active = cards.filter((c) => statusOf(c, now) === "ACTIVE");
+  const next = cards
+    .filter((c) => statusOf(c, now) === "AHEAD")
+    .sort((a, b) => a.date_start.localeCompare(b.date_start))
+    .slice(0, ahead);
+  return [...active, ...next];
+}
+
+// Today's date in market time, for useSyncExternalStore. Null on the server,
+// so the first client render matches the server HTML.
+export const marketDay = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
+export const noopSubscribe = () => () => {};

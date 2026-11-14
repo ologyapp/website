@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,9 +19,9 @@ const isVercelPreview =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ologyapp.com"),
-  title: "Ology | Market Timing Intelligence for Modern Investors",
+  title: "Ology | Timing Intelligence for Modern Markets",
   description:
-    "Ology synthesizes celestial cycles, behavioral psychology, and live market data into a personalized timing profile...",
+    "Ology is a behavioral timing engine for markets. It reads your Trade DNA against the current sky, market context, and your own record. Apply for beta access.",
   robots: isVercelPreview
     ? {
         index: false,
@@ -36,9 +37,9 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Ology | Market Timing Intelligence for Modern Investors",
+    title: "Ology | Timing Intelligence for Modern Markets",
     description:
-      "Ology synthesizes celestial cycles, behavioral psychology, and live market data into a personalized timing profile. Pattern over prediction. Beta opening in waves through 2026.",
+      "Ology is a behavioral timing engine for markets. It reads your Trade DNA against the current sky, market context, and your own record. Apply for beta access.",
     url: "https://ologyapp.com",
     siteName: "Ology",
     images: [
@@ -54,9 +55,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Ology | Market Timing Intelligence for Modern Investors",
+    title: "Ology | Timing Intelligence for Modern Markets",
     description:
-      "Ology synthesizes celestial cycles, behavioral psychology, and live market data into a personalized timing profile. Pattern over prediction. Beta opening in waves through 2026.",
+      "Ology is a behavioral timing engine for markets. It reads your Trade DNA against the current sky, market context, and your own record. Apply for beta access.",
     images: ["/og-image.jpg"],
   },
 };
@@ -75,6 +76,7 @@ export default function RootLayout({
         {" "}
         <StructuredData />
         {children}
+        <Analytics />
       </body>
     </html>
   );

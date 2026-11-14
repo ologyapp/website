@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { SITE_LIVE, BETA_URL } from "@/lib/site";
 
 function Footer() {
   return (
@@ -48,11 +49,18 @@ function Footer() {
             </div>
 
             <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11.787px] lg:text-[16px] font-medium leading-[140%]">
-              Pattern over prediction.
+              Timing intelligence for modern markets.
             </h4>
           </div>
         </Link>
         <div className="flex justify-start items-center gap-10 relative xl:-left-10">
+          {SITE_LIVE && (
+            <a href={BETA_URL}>
+              <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+                Sign in
+              </h5>
+            </a>
+          )}
           <Link href="/privacy-policy">
             <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
               Privacy
@@ -146,8 +154,7 @@ function Footer() {
       <div className="w-full text-center">
         <p className="text-[#E8E9F3]/30 text-center font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-[140%]">
           Ology provides behavioral and timing context for informational
-          purposes only and is not an investment adviser. © 2026 Ology
-          Intelligence, Inc.
+          purposes only and is not an investment adviser. © {new Date().getFullYear()} Ology Intelligence, Inc.
         </p>
       </div>
     </footer>
