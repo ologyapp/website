@@ -32,26 +32,26 @@ export function sortedRails(cards: any, now = new Date()) {
   return { ahead, record };
 }
 
-// Cycle cards grouped by state, for every layout (desktop carousel, tablet
-// grid, phone scroll list) — the one shared sort, so all three always agree.
-// ACTIVE first (newest date_start first), then AHEAD (soonest date_start
-// first), then RECORD (newest date_start first — date_start is the date
-// printed on the card, so sorting record on date_end puts a long-running
-// card out of order against ones whose start and end are the same day).
+// Cycle cards as one timeline for every layout (desktop carousel, phone
+// scroll list), left to right in date order. Record cards oldest to newest,
+// then what is active today, then what is ahead, soonest first. Each group
+// sorts on date_start, the date printed on the card. The view opens on
+// today (todayIndex), so earlier record cards sit to the left of it.
 export function sortCards(cards: any[], now = new Date()) {
-  const active = cards
-    .filter((c: any) => statusOf(c, now) === "ACTIVE")
-    .sort((a: any, b: any) => b.date_start.localeCompare(a.date_start));
+  const byStart = (a: any, b: any) =>
+    a.date_start.localeCompare(b.date_start) ||
+    a.date_end.localeCompare(b.date_end);
+  const record = cards.filter((c: any) => statusOf(c, now) === "RECORD").sort(byStart);
+  const active = cards.filter((c: any) => statusOf(c, now) === "ACTIVE").sort(byStart);
+  const ahead = cards.filter((c: any) => statusOf(c, now) === "AHEAD").sort(byStart);
+  return [...record, ...active, ...ahead];
+}
 
-  const ahead = cards
-    .filter((c: any) => statusOf(c, now) === "AHEAD")
-    .sort((a: any, b: any) => a.date_start.localeCompare(b.date_start));
-
-  const record = cards
-    .filter((c: any) => statusOf(c, now) === "RECORD")
-    .sort((a: any, b: any) => b.date_start.localeCompare(a.date_start));
-
-  return [...active, ...ahead, ...record];
+// Where the timeline opens. The first active card, else the first ahead
+// card, else the newest record card.
+export function todayIndex(cards: any[], now = new Date()) {
+  const i = cards.findIndex((c: any) => statusOf(c, now) !== "RECORD");
+  return i === -1 ? Math.max(cards.length - 1, 0) : i;
 }
 
 // Style. Derived from read and status. No card carries a color.

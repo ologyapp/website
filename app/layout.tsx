@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
 import { Analytics } from "@vercel/analytics/next";
+import MotionPrefs from "@/components/MotionPrefs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,7 +76,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {" "}
         <StructuredData />
-        {children}
+        <MotionPrefs>{children}</MotionPrefs>
         <Analytics />
       </body>
     </html>
