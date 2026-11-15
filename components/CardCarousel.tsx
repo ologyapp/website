@@ -8,17 +8,16 @@ import {
 } from "swiper/modules";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { statusOf, cardStyle, railDotStyle, sortCards } from "./cardMeta";
+import { statusOf, cardStyle, railDotStyle, todayIndex } from "./cardMeta";
 
 function CardCarousel({ items }: { items: any[] }) {
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
 
-  // `items` arrives pre-sorted (ACTIVE, then AHEAD, then RECORD) from the
-  // shared sortCards() helper, so the first slide is always right: the
-  // first ACTIVE card, or the first AHEAD card when nothing is active.
-  const initialIndex = 0;
+  // `items` arrives as one timeline from sortCards(): record, then active,
+  // then ahead. Open on today, so the past sits to the left.
+  const initialIndex = todayIndex(items);
 
   const [activeIndex, setActiveIndex] = useState(initialIndex);
 

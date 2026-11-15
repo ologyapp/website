@@ -52,15 +52,14 @@ import {
   sortedRails,
   sortCards,
   liveSkyCards,
+  todayIndex,
   marketDay,
   noopSubscribe,
 } from "../components/cardMeta";
 
 import {
-  ArrowDown,
   ArrowLeft,
   ArrowRight,
-  ArrowUp,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -269,9 +268,7 @@ export default function Home() {
 
   const [timeUnknown, setTimeUnknown] = useState(false);
 
-  const [visibleCount, setVisibleCount] = useState(18);
   const CARDS_PER_LOAD = 3;
-  const INITIAL_COUNT = 3;
 
   // Sky cards depend on today's date, so they join after mount. Server and
   // first client render match, then the live cards appear.
@@ -284,10 +281,8 @@ export default function Home() {
     const now = skyDay ? new Date() : null;
     return sortCards([...liveSkyCards(now), ...cyclesCards], now ?? undefined);
   }, [skyDay]);
-  const visibleCards = allCards.slice(0, visibleCount);
-  const hasMore = visibleCount < allCards.length;
-  const isExpanded = visibleCount >= allCards.length;
-  const shouldShowToggle = allCards.length > INITIAL_COUNT;
+  // The phone list shows the whole timeline (its show more control is off).
+  const visibleCards = allCards;
 
   useEffect(() => {
     if (window.location.hash) {
@@ -304,23 +299,28 @@ export default function Home() {
     }
   }, []);
 
+  const CARD_GAP = 20;
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const cardScrollRef = useRef<HTMLDivElement>(null);
 
   const handleCardScroll = () => {
     if (!cardScrollRef.current) return;
     const { scrollLeft, clientWidth } = cardScrollRef.current;
-    const index = Math.round(scrollLeft / clientWidth);
-    setActiveCardIndex(index);
+    // Each card is the list's width plus the 20px gap. Dividing by the
+    // width alone drifted a card further off with every swipe.
+    const index = Math.round(scrollLeft / (clientWidth + CARD_GAP));
+    setActiveCardIndex(Math.min(Math.max(index, 0), visibleCards.length - 1));
   };
 
-  // Reset active index if visibleCards shrinks (e.g. "Show Fewer")
+  // Open the phone list on today, like the desktop carousel. Runs again
+  // when the live sky cards join after mount.
   useEffect(() => {
-    if (activeCardIndex > visibleCards.length - 1) {
-      setActiveCardIndex(0);
-      cardScrollRef.current?.scrollTo({ left: 0 });
-    }
-  }, [visibleCards.length, activeCardIndex]);
+    const el = cardScrollRef.current;
+    if (!el) return;
+    const i = todayIndex(visibleCards);
+    el.scrollTo({ left: i * (el.clientWidth + CARD_GAP), behavior: "auto" });
+    setActiveCardIndex(i);
+  }, [visibleCards]);
 
   const [copied, setCopied] = useState(false);
 
@@ -1009,7 +1009,7 @@ export default function Home() {
       }
     };
 
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -1053,19 +1053,9 @@ export default function Home() {
   const heroRef = useRef(null);
   const { scrollY } = useScroll(); // whole-page scroll, not section-relative
 
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  const opacity = useTransform(scrollY, [0, isMobile ? 1000 : 120], [1, 0]);
-
-  // Fade out fast over a very light first scroll — no blur
-  // const opacity = useTransform(scrollY, [0, 600], [1, 0]);
+  // The hero fades as it scrolls away, over most of a screen, on every
+  // width. Desktop used to fade out within the first 120px of scroll.
+  const opacity = useTransform(scrollY, [0, 640], [1, 0]);
 
   //pin section to top
 
@@ -1078,10 +1068,6 @@ export default function Home() {
 
   const cardsRef = useRef(null);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end end"],
-  });
 
   const [showCards, setShowCards] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -1090,20 +1076,33 @@ export default function Home() {
 
   const BLOCKS = 5; // 0,100,200,300,400vh
 
+  // Each section's content fades up once, when the section's top reaches
+  // 85 percent of the screen, and stays. Before this the content only
+  // appeared when a section's bottom was near the screen, which left a
+  // screen of empty space under every heading, and hid again on scroll up.
   useEffect(() => {
-    const onScroll = () => {
-      if (!sectionRef.current) return;
-
-      const rect = sectionRef.current.getBoundingClientRect();
-
-      // Trigger when the bottom reaches 80% of the viewport height
-      setShowCards(rect.bottom <= window.innerHeight * 1.2);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-
-    return () => window.removeEventListener("scroll", onScroll);
+    const pairs: [React.RefObject<HTMLDivElement | null>, (v: boolean) => void][] = [
+      [sectionRef, setShowCards],
+      [formRef, setShowForm],
+      [layerRef, setShowLayers],
+      [faqsRef, setShowFaqs],
+    ];
+    const observers = pairs.map(([ref, set]) => {
+      const el = ref.current;
+      if (!el) return null;
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            set(true);
+            io.disconnect();
+          }
+        },
+        { rootMargin: "0px 0px -15% 0px" },
+      );
+      io.observe(el);
+      return io;
+    });
+    return () => observers.forEach((io) => io?.disconnect());
   }, []);
 
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
@@ -1118,64 +1117,6 @@ export default function Home() {
       });
     }
   }, [showDropdown, suggestions]);
-
-  useEffect(() => {
-    const onScroll = () => {
-      // Don't activate on mobile/tablet
-      if (window.innerWidth < 800) {
-        setShowForm(false);
-        return;
-      }
-
-      if (!formRef.current) return;
-
-      const rect = formRef.current.getBoundingClientRect();
-
-      setShowForm(rect.bottom <= window.innerHeight * 1.2);
-    };
-
-    onScroll();
-
-    window.addEventListener("scroll", onScroll);
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (!layerRef.current) return;
-
-      const rect = layerRef.current.getBoundingClientRect();
-
-      // Trigger when the bottom reaches 80% of the viewport height
-      setShowLayers(rect.bottom <= window.innerHeight * 1.2);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (!faqsRef.current) return;
-
-      const rect = faqsRef.current.getBoundingClientRect();
-
-      // Trigger when the bottom reaches 80% of the viewport height
-      setShowFaqs(rect.bottom <= window.innerHeight * 1.2);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const isValidEmail = (value: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -1209,7 +1150,7 @@ export default function Home() {
       {/* HERO SECTION */}
       <section
         ref={heroRef}
-        className="relative h-screen! w-full! flex flex-col items-center! pb-10 box-border z-40!"
+        className="relative h-svh! w-full! flex flex-col items-center! pb-10 box-border z-40!"
       >
         <motion.div
           style={{ opacity }}
@@ -1218,12 +1159,12 @@ export default function Home() {
           <div className="absolute inset-0 bg-[#0d1220]" />
 
           <div
-            className="absolute inset-0 w-full h-screen overflow-hidden flex items-center justify-center"
+            className="absolute inset-0 w-full h-svh overflow-hidden flex items-center justify-center"
             style={{ perspective: "2600px" }}
           >
             {/* Mobile grid - 3 cols x 10 rows, fixed 342px row height */}
             <div
-              className="grid grid-cols-3 lg:hidden w-full h-screen"
+              className="grid grid-cols-3 lg:hidden w-full h-svh"
               style={{ gridTemplateRows: "repeat(6, 1fr)" }}
             >
               {mobileImages.map((img, index) => {
@@ -1231,8 +1172,8 @@ export default function Home() {
                 const col = index % cols;
                 const row = Math.floor(index / cols);
 
-                const baseDelay = 1;
-                const staggerStep = 0.045;
+                const baseDelay = 0.1;
+                const staggerStep = 0.03;
                 const order = row + col;
                 const itemDelay = baseDelay + order * staggerStep;
 
@@ -1243,7 +1184,7 @@ export default function Home() {
                     initial={{ opacity: 0, scale: 1, filter: "blur(1px)" }}
                     animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                     transition={{
-                      duration: 1.4,
+                      duration: 0.9,
                       delay: itemDelay,
                       ease: [0.22, 1, 0.36, 1],
                     }}
@@ -1276,8 +1217,8 @@ export default function Home() {
                 const col = index % cols;
                 const row = Math.floor(index / cols);
 
-                const baseDelay = 1;
-                const staggerStep = 0.045;
+                const baseDelay = 0.1;
+                const staggerStep = 0.03;
                 const order = row + col;
                 const itemDelay = baseDelay + order * staggerStep;
 
@@ -1288,7 +1229,7 @@ export default function Home() {
                     initial={{ opacity: 0, scale: 1, filter: "blur(1px)" }}
                     animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                     transition={{
-                      duration: 1.4,
+                      duration: 0.9,
                       delay: itemDelay,
                       ease: [0.22, 1, 0.36, 1],
                     }}
@@ -1321,7 +1262,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{
-                delay: 2,
+                delay: 0.6,
                 duration: 0.5,
                 ease: "easeOut",
               }}
@@ -1337,8 +1278,8 @@ export default function Home() {
                 backdropFilter: "blur(16px)",
               }}
               transition={{
-                duration: 2,
-                delay: 3, // starts after 2 seconds
+                duration: 0.8,
+                delay: 0.8,
                 ease: [0.22, 1, 0.36, 1],
               }}
               className="absolute inset-0 z-10 bg-transparent"
@@ -1438,11 +1379,11 @@ export default function Home() {
                     }}
                     transition={{
                       opacity: {
-                        delay: 3,
+                        delay: 1.1,
                         duration: 0.5,
                       },
                       y: {
-                        delay: 3,
+                        delay: 1.1,
                         duration: 2,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -1485,8 +1426,8 @@ export default function Home() {
                   x: 0,
                 }}
                 transition={{
-                  duration: 3,
-                  delay: 3,
+                  duration: 0.9,
+                  delay: 1.1,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30 max-md:[@supports(-webkit-hyphens:none)]:gap-[40px]"
@@ -1502,7 +1443,7 @@ export default function Home() {
                     so you see the conditions shaping a decision before you act.
                   </p>
                 </div>
-                <Link href="#archetype-form">
+                <Link href="#perform">
                   <button
                     type="button"
                     className="
@@ -1700,7 +1641,7 @@ export default function Home() {
                 </svg>
               </Link>
               <nav className="hidden md:block">
-                <ul className="flex items-center gap-[65px]">
+                <ul className="flex items-center gap-8 lg:gap-10 xl:gap-[65px]">
                   {[
                     { label: "Align", id: "align" },
                     { label: "Perform", id: "perform" },
@@ -1738,9 +1679,9 @@ export default function Home() {
                       <a href={BETA_URL}>Sign in</a>
                     </li>
                   )}
-                  <li>
+                  <li className="hidden lg:block">
                     <a
-                      href="#archetype-form"
+                      href="#perform"
                       className="font-Satoshi text-[#F8F7FC] rounded-[20px] border border-white/20 bg-white/5 px-4 py-2 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
                     >
                       Apply for beta access
@@ -1814,7 +1755,7 @@ export default function Home() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="text-[#F8F7FC] font-Satoshi"
                     >
-                      <a href="#archetype-form">Apply for beta access</a>
+                      <a href="#perform">Apply for beta access</a>
                     </li>
                   </ul>
                 </div>
@@ -1828,10 +1769,10 @@ export default function Home() {
       <main className="flex justify-center ">
         <section className="relative z-30! w-full max-w-360! xl:max-w-360! mx-auto px-8 flex flex-col items-center! justify-between">
           <SectionReveal>
-            <div ref={sectionRef} className="relative w-full! lg:h-[150vh]">
+            <div ref={sectionRef} className="relative w-full!">
               <div
                 id="align"
-                className=" relative xl:sticky xl:top-20 w-full flex flex-col items-center justify-start gap-[52px] lg:gap-[120px] xl:gap-8 lg:gap-2 md:px-2.5 xl:px-12.5 py-15! h-auto"
+                className="relative scroll-mt-24 w-full flex flex-col items-center justify-start gap-[52px] lg:gap-8 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
                 <div className="flex flex-col gap-7.5 mt-20 ">
                   <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -1853,143 +1794,13 @@ export default function Home() {
                     showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  className="hidden xl:block flex justify-start items-center gap-[47.447px] w-full overflow-x-auto flex-nowrap no-scrollbar h-[450px] mt-8"
+                  className="hidden lg:block w-full h-[450px] mt-8"
                 >
                   {/* AHEAD */}
                   <div className=" flex flex-col w-full gap-[30px]">
                     <CardCarousel key={allCards.length} items={allCards} />
                   </div>
                 </motion.div>
-
-                <div className="hidden lg:block xl:hidden w-full! gap-7.5">
-                  <motion.div className="w-full! flex justify-around max-h-[100vh] overflow-y-auto  flex-wrap gap-[20px] mt-40 xl:mt-0">
-                    {allCards.map((data, id) => {
-                      const status = statusOf(data);
-                      const style = cardStyle(data.read);
-
-                      return (
-                        <div
-                          key={id}
-                          className="
-                            
-                                relative
-                                flex h-[343px] w-[415px] max-w-[415px]
-                                p-5.5 md:p-[27.23px]
-                                flex-col justify-between
-                                rounded-[16.912px]
-                  
-                                bg-[rgba(30,37,64,0.24)]
-                  
-                                backdrop-blur-[2px]
-                  
-                                border border-white/20
-                  
-                                overflow-hidden
-                                transition-all duration-500
-                  
-                              
-                              "
-                        >
-                          <div className="w-full flex justify-between items-center ">
-                            <h3 className="text-[#F8F7FC] font-Satoshi text-[12.638px] font-bold leading-[120%] tracking-[2.148px] uppercase">
-                              {data.date}
-                            </h3>
-
-                            <div className="flex justify-start items-center gap-[12.55px]">
-                              <div
-                                className="w-[21.96px] h-[21.96px] rounded-full flex justify-center items-center"
-                                style={style.button}
-                              >
-                                <div
-                                  className="w-[14.64px] h-[14.64px] rounded-full"
-                                  style={{ background: style.dot.background }}
-                                />
-                              </div>
-
-                              <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
-                                {data.read}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                            <h2 className="text-[#F8F7FC] font-Recoleta text-[20.124px] font-normal leading-[130%]">
-                              {data.title}
-                            </h2>
-
-                            <p className="text-[#F8F7FC] font-Satoshi text-[15.093px] font-normal leading-[150%] -mt-4">
-                              {data.content}
-                            </p>
-                          </div>
-
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="537"
-                            height="1"
-                            viewBox="0 0 537 1"
-                            fill="none"
-                            className="mt-4 md:mt-0"
-                          >
-                            <path
-                              d="M-1.52588e-05 0.484375L536.619 0.484375"
-                              stroke="#6C8BA4"
-                              strokeOpacity="0.1"
-                              strokeWidth="0.968858"
-                            />
-                          </svg>
-
-                          <div className="w-full flex justify-between items-center py-[6.6px] mt-4 md:mt-0 gap-4 lg:gap-auto">
-                            <button
-                              type="button"
-                              className="flex gap-[20.2px] py-3 lg:py-[14.408px] px-3 lg:px-[15.88px] rounded-[16.16px]"
-                              style={style.button}
-                            >
-                              <span className="text-center justify-center text-slate-50 text-[12.148px] font-bold font-Satoshi uppercase leading-6">
-                                {data.button_text}
-                              </span>
-                            </button>
-
-                            <div className="flex flex-col items-end justify-between gap-[17.26px]">
-                              {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
-                              {data.outcome_tag && (
-                                <p
-                                  className="font-mono text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase px-2 py-[2px] rounded-[4px]"
-                                  style={style.outcome}
-                                >
-                                  {data.outcome_tag}
-                                </p>
-                              )}
-
-                              <div className="flex text-white items-center gap-[14.5px]">
-                                {data.icon.map((svg: any, i: number) => {
-                                  if (i !== 1) {
-                                    return (
-                                      <div
-                                        key={i}
-                                        className="w-[22.586px] h-[22.586px] flex items-center justify-center text-white"
-                                        dangerouslySetInnerHTML={{
-                                          __html: svg,
-                                        }}
-                                      />
-                                    );
-                                  }
-
-                                  return (
-                                    <div
-                                      key={i}
-                                      className="w-[12.8px] h-[12.4px] flex items-center justify-center text-white"
-                                      dangerouslySetInnerHTML={{ __html: svg }}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </motion.div>
-                </div>
 
                 <div className="relative block lg:hidden w-full! gap-7.5 flex flex-col items-center">
                   <motion.div
@@ -2123,7 +1934,7 @@ export default function Home() {
                   {/* Dot indicator pill */}
                   <div className="flex justify-center">
                     <div
-                      className="inline-flex items-start"
+                      className="inline-flex items-center"
                       style={{
                         height: "20px",
                         padding: "4px 4px 4px 5px",
@@ -2135,7 +1946,11 @@ export default function Home() {
                       {visibleCards.map((_, id) => (
                         <div
                           key={id}
-                          className="h-[12px] w-[12px]"
+                          className={
+                            visibleCards.length > 12
+                              ? "h-[7px] w-[7px]"
+                              : "h-[12px] w-[12px]"
+                          }
                           style={
                             id === activeCardIndex
                               ? { borderRadius: "12px", background: "#D9D9D9" }
@@ -2171,32 +1986,6 @@ export default function Home() {
                     {activeCardIndex + 1} // {visibleCards.length}
                   </p>
 
-                  {/* counter + show more */}
-                  {/* <div className="w-full flex flex-col items-center gap-4 mt-8">
-                    <p className="text-[#F8F7FC]/60 font-Satoshi text-[13px] tracking-[2px] uppercase">
-                      Showing {visibleCards.length} of {allCards.length}{" "}
-                      alignments
-                    </p>
-
-                    {shouldShowToggle && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setVisibleCount(
-                            isExpanded ? INITIAL_COUNT : allCards.length,
-                          )
-                        }
-                        className="flex items-center gap-2 px-6 py-3 rounded-[16.16px] border border-white/20 bg-[rgba(127,168,212,0.1)] text-[#F8F7FC] font-Satoshi text-[12.148px] font-bold uppercase tracking-[1px] transition-colors hover:bg-[rgba(127,168,212,0.2)]"
-                      >
-                        {isExpanded ? "Show Fewer" : "View the full record"}
-                        {isExpanded ? (
-                          <ArrowUp size={16} />
-                        ) : (
-                          <ArrowDown size={16} />
-                        )}
-                      </button>
-                    )}
-                  </div> */}
                 </div>
               </div>
 
@@ -2250,21 +2039,20 @@ export default function Home() {
 
           {/* COSMIC RHYTHM */}
           <section className="relative w-full flex justify-center">
-            <div className="relative w-full min-h-[100dvh] lg:h-[100vh] xl:h-[150vh]">
+            <div className="relative w-full">
               <div
                 id="perform"
                 ref={formRef}
-                className="relative xl:sticky xl:top-5 w-full flex flex-col xl:flex-row justify-center xl:justify-between min-h-[100dvh] xl:h-[100vh] items-center py-16 md:py-24 xl:py-40.25 md:px-[50px]"
+                className="relative scroll-mt-24 w-full flex flex-col xl:flex-row justify-center xl:justify-between gap-12 items-center py-16 md:py-24 lg:py-32 md:px-[50px]"
               >
-                {/* DESKTOP FORM (xl+) */}
+                {/* DESKTOP FORM (lg+) */}
                 <motion.div
                   initial={{ opacity: 0, y: 80 }}
                   animate={
                     showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  id="archetype-form"
-                  className="x hidden xl:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-360"
+                  className="hidden lg:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-360"
                 >
                   <div className="flex flex-col gap-[30px]">
                     <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
@@ -2726,13 +2514,12 @@ export default function Home() {
                   </motion.div>
                 </motion.div>
 
-                {/* MOBILE / TABLET FORM (< xl) */}
+                {/* MOBILE / TABLET FORM (< lg) */}
                 <div
-                  id="archetype-form"
-                  className="block flex relative xl:hidden z-50! flex-1 min-w-0 flex-col items-center md:items-start gap-[52px] md:gap-18! z-20 px-1 md:px-0 max-w-auto mt-10 md:mt-20"
+                  className="flex relative lg:hidden z-50! flex-1 w-full min-w-0 flex-col items-center gap-[52px] md:gap-18! z-20 px-1 md:px-0 max-w-auto mt-10 md:mt-20"
                 >
                   <div className="flex flex-col items-center gap-[30px]">
-                    <h3 className="text-[#F8F7FC] font-Recoleta text-[32px] sm:text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px] text-center md:text-start">
+                    <h3 className="text-[#F8F7FC] font-Recoleta text-[32px] sm:text-[38px] md:text-[60px] font-normal leading-[120%] max-w-[640px] text-center">
                       Read your archetype and apply for beta access.
                     </h3>
 
@@ -3258,11 +3045,11 @@ export default function Home() {
           </section>
 
           <SectionReveal>
-            <div className="relative w-full sm:h-auto lg:h-[150vh]">
+            <div className="relative w-full">
               <div
                 id="decode"
                 ref={layerRef}
-                className="sticky top-30 w-full min-h-screen h-auto flex flex-col items-center gap-[52px] xl:px-12.5 md:px-12.5 py-25! "
+                className="relative scroll-mt-24 w-full h-auto flex flex-col items-center gap-[52px] xl:px-12.5 md:px-12.5 py-25!"
               >
                 <div className="flex flex-col gap-[30px]">
                   <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -3281,7 +3068,7 @@ export default function Home() {
                     showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
                   }
                   transition={{ duration: 0.3 }}
-                  className="hidden w-full xl:flex lg:flex-wrap xl:flex-nowrap lg:gap-2 items-center xl:justify-between md:justify-evenly mt-8"
+                  className="hidden w-full lg:flex lg:flex-nowrap lg:gap-4 items-stretch lg:justify-between mt-8"
                 >
                   {missingLayers.map((data, id) => (
                     <React.Fragment key={id}>
@@ -3513,11 +3300,11 @@ export default function Home() {
           </SectionReveal>
 
           <SectionReveal>
-            <div className="relative w-full sm:h-auto lg:h-[150vh] xl:-mt-60 lg:mt-10">
+            <div className="relative w-full">
               <div
                 id="ask"
                 ref={faqsRef}
-                className="sticky top-10 w-full min-h-screen h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center lg:gap-[60px] gap-[52px] xl:px-12.5 md:px-12.5 py-25!"
+                className="relative scroll-mt-24 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-[52px] xl:px-12.5 md:px-12.5 py-25!"
               >
                 <div className="flex flex-col gap-[30px] items-center xl:items-start">
                   <h2 className="text-[#F8F7FC] text-start font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -3593,7 +3380,7 @@ export default function Home() {
           </SectionReveal>
 
           <motion.section
-            className="relative w-screen min-h-screen h-auto overflow-hidden"
+            className="relative w-screen ml-[calc(50%-50vw)] min-h-screen h-auto overflow-hidden"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
@@ -3704,7 +3491,7 @@ export default function Home() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{
                   duration: 0.8,
-                  delay: 1.5,
+                  delay: 0.2,
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
@@ -3750,14 +3537,14 @@ export default function Home() {
                 "
                   >
                     <Link
-                      href="#archetype-form"
+                      href="#perform"
                       className="hidden lg:block font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
                     >
                       Apply for beta access
                     </Link>
 
                     <Link
-                      href="#archetype-form"
+                      href="#perform"
                       className="block lg:hidden font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
                     >
                       Apply for beta access
@@ -3772,7 +3559,7 @@ export default function Home() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{
                   duration: 0.8,
-                  delay: 1.5,
+                  delay: 0.2,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="
@@ -3942,30 +3729,10 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* Dark overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.8,
-                delay: 1.5,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="absolute inset-0 bg-[rgba(16,21,36,0.85)]"
-            />
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.8,
-                delay: 1.5,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="absolute inset-0 backdrop-blur-lg pointer-events-none"
-            />
+            {/* Dark overlay and blur, always on. They used to fade in 1.5s
+                after arrival, so the raw stock photos showed sharp first. */}
+            <div className="absolute inset-0 bg-[rgba(16,21,36,0.85)] pointer-events-none" />
+            <div className="absolute inset-0 backdrop-blur-lg pointer-events-none" />
           </motion.section>
         </section>
       </main>
@@ -3982,10 +3749,6 @@ export default function Home() {
         </div>
       )}
 
-      <div
-        className="absolute inset-0 bg-black/10 backdrop-blur-md"
-        onClick={() => setOpenTime(false)}
-      />
 
       {mounted &&
         showModal &&
