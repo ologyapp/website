@@ -131,6 +131,7 @@ import FAQAccordion from "../components/FaqAccordion";
 import Link from "next/link";
 import CardCarousel from "../components/CardCarousel";
 import LazyVideo from "../components/LazyVideo";
+import AppScreen from "../components/AppScreen";
 
 // Hero intro, in seconds. The logo holds centered over the image grid, then
 // glides into the nav slot. Each later step waits on the one before it, not
@@ -1435,16 +1436,14 @@ export default function Home() {
                     }}
                   >
                     <div className="relative w-[117.211px] md:w-[160px]">
-                      {/* Video */}
-                      <LazyVideo
-                        src="/appflow.mp4"
+                      {/* App screen */}
+                      <AppScreen
                         className="
                         absolute
                         top-[2%]
                         left-[10.5%]
                         w-[79.6%]
                         h-[97.4%]
-                        object-cover
                         rounded-[16px]
                         z-10
                       "
@@ -1574,15 +1573,13 @@ export default function Home() {
                     }}
                   >
                     <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
-                      <LazyVideo
-                        src="/appflow.mp4"
+                      <AppScreen
                         className="
                         absolute
                         top-[2.25%]
                         left-[5.2%]
                         w-[89.5%]
                         h-174.5
-                        object-cover
                         rounded-[24px]
                         z-30!
                     "
