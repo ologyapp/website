@@ -132,6 +132,15 @@ import Link from "next/link";
 import CardCarousel from "../components/CardCarousel";
 import LazyVideo from "../components/LazyVideo";
 
+// Hero intro, in seconds. The logo holds centered over the image grid, then
+// glides into the nav slot. Each later step waits on the one before it, not
+// on a clock, so a slow first paint cannot make them overlap. On landing the
+// header fades in around the logo and the hero copy enters, then the intro
+// logo hands off to the nav logo underneath it.
+const INTRO_LOGO_FLY_AT = 1.5;
+const INTRO_LOGO_FLY_FOR = 0.9;
+const INTRO_PHONE_AFTER_LANDING = 0.6;
+
 const images = [
   a1,
   a2,
@@ -1040,15 +1049,44 @@ export default function Home() {
     return () => observer.disconnect();
   }, [hasScrolled]);
 
+  // Intro logo. It appears centered, holds, then glides into the nav logo
+  // slot and hands off to it, so it never sits over the hero copy.
   const [showLogo, setShowLogo] = useState(true);
+  // Set when the intro logo reaches the nav slot, or when it is skipped.
+  const [logoLanded, setLogoLanded] = useState(false);
+  const introLogoRef = useRef<HTMLDivElement>(null);
+  const navLogoRef = useRef<SVGSVGElement>(null);
+  const [logoFlight, setLogoFlight] = useState<{
+    x: number;
+    y: number;
+    scale: number;
+  } | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLogo(false);
-    }, 3000);
+    const fly = setTimeout(() => {
+      const el = introLogoRef.current;
+      const from = el?.getBoundingClientRect();
+      const to = navLogoRef.current?.getBoundingClientRect();
+      if (!el || !from || !to || !from.height || window.scrollY > 20) {
+        setShowLogo(false);
+        setLogoLanded(true);
+        return;
+      }
+      // The wrapper's CSS scale (scale-[2.5]) also scales the motion
+      // translate, so the offset is divided by it. Sizes come from the
+      // unscaled layout box, so an unfinished entrance cannot skew them.
+      const cssScale = parseFloat(getComputedStyle(el).scale) || 1;
+      const baseHeight = el.offsetHeight * cssScale;
+      setLogoFlight({
+        x: (to.left + to.width / 2 - (from.left + from.width / 2)) / cssScale,
+        y: (to.top + to.height / 2 - (from.top + from.height / 2)) / cssScale,
+        scale: to.height / baseHeight,
+      });
+    }, INTRO_LOGO_FLY_AT * 1000);
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(fly);
   }, []);
+
 
   const heroRef = useRef(null);
   const { scrollY } = useScroll(); // whole-page scroll, not section-relative
@@ -1289,19 +1327,26 @@ export default function Home() {
           <AnimatePresence>
             {showLogo && (
               <motion.div
+                ref={introLogoRef}
                 className="z-50! absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%+5em)] sm:-translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
                 initial={{
                   opacity: 0,
                   scale: 1.1,
                 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
+                animate={
+                  logoFlight
+                    ? { opacity: 1, ...logoFlight }
+                    : { opacity: 1, scale: 1 }
+                }
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                onAnimationComplete={() => {
+                  if (logoFlight) setLogoLanded(true);
                 }}
-                transition={{
-                  duration: 0.8,
-                  ease: "easeOut",
-                }}
+                transition={
+                  logoFlight
+                    ? { duration: INTRO_LOGO_FLY_FOR, ease: [0.65, 0, 0.35, 1] }
+                    : { duration: 0.8, ease: "easeOut" }
+                }
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1373,17 +1418,16 @@ export default function Home() {
                 >
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{
-                      opacity: 1,
-                      y: [0, -10, 0],
-                    }}
+                    animate={
+                      logoLanded
+                        ? { opacity: 1, y: [0, -10, 0] }
+                        : { opacity: 0, y: 20 }
+                    }
                     transition={{
                       opacity: {
-                        delay: 1.1,
                         duration: 0.5,
                       },
                       y: {
-                        delay: 1.1,
                         duration: 2,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -1422,12 +1466,11 @@ export default function Home() {
                   opacity: 0,
                 }}
                 animate={{
-                  opacity: 1,
+                  opacity: logoLanded ? 1 : 0,
                   x: 0,
                 }}
                 transition={{
                   duration: 0.9,
-                  delay: 1.1,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30 max-md:[@supports(-webkit-hyphens:none)]:gap-[40px]"
@@ -1495,14 +1538,14 @@ export default function Home() {
                   opacity: 0,
                 }}
                 animate={{
-                  opacity: 1,
+                  opacity: logoLanded ? 1 : 0,
                   scale: 1,
                   y: 0,
                   x: 0,
                 }}
                 transition={{
                   duration: 3,
-                  delay: 3,
+                  delay: logoLanded ? INTRO_PHONE_AFTER_LANDING : 0,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="
@@ -1581,12 +1624,14 @@ export default function Home() {
               opacity: 0,
             }}
             animate={{
-              opacity: 1,
+              opacity: logoLanded ? 1 : 0,
             }}
             transition={{
-              delay: 3.5,
-              duration: 0.8,
+              duration: 0.5,
               ease: "easeOut",
+            }}
+            onAnimationComplete={() => {
+              if (logoLanded) setShowLogo(false);
             }}
             className="
               flex
@@ -1608,6 +1653,7 @@ export default function Home() {
             <div className="flex w-full items-center justify-between px-0 lg:px-4 lg:py-2 py-1 md:px-4 z-50!">
               <Link href="/">
                 <svg
+                  ref={navLogoRef}
                   xmlns="http://www.w3.org/2000/svg"
                   width="70"
                   height="29"
