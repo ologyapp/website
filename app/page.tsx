@@ -3110,7 +3110,7 @@ export default function Home() {
 
                       {/* Divider */}
                       {id < missingLayers.length - 1 && (
-                        <div className="hidden xl:block flex justify-center items-center px-6 shrink-0">
+                        <div className="hidden xl:flex justify-center items-center px-6 shrink-0">
                           <svg
                             width="31"
                             height="47"
