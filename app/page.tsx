@@ -131,6 +131,7 @@ import FAQAccordion from "../components/FaqAccordion";
 import Link from "next/link";
 import CardCarousel from "../components/CardCarousel";
 import LazyVideo from "../components/LazyVideo";
+import AppScreen from "../components/AppScreen";
 
 // Hero intro, in seconds. The logo holds centered over the image grid, then
 // glides into the nav slot. Each later step waits on the one before it, not
@@ -1435,16 +1436,14 @@ export default function Home() {
                     }}
                   >
                     <div className="relative w-[117.211px] md:w-[160px]">
-                      {/* Video */}
-                      <LazyVideo
-                        src="/appflow.mp4"
+                      {/* App screen */}
+                      <AppScreen
                         className="
                         absolute
                         top-[2%]
                         left-[10.5%]
                         w-[79.6%]
                         h-[97.4%]
-                        object-cover
                         rounded-[16px]
                         z-10
                       "
@@ -1519,18 +1518,15 @@ export default function Home() {
                     </span>
                   </button>
                 </Link>
-                <p className="-mt-8 md:-mt-10 text-[#F8F7FC]/70 font-Satoshi text-[14px] md:text-[16px] leading-[140%]">
-                  {SITE_LIVE ? (
-                    <>
-                      Already invited?{" "}
-                      <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
-                        Sign in.
-                      </a>
-                    </>
-                  ) : (
-                    "Opening in small waves."
-                  )}
-                </p>
+                {/* OLG-233. Nothing under the button until the site goes live. */}
+                {SITE_LIVE && (
+                  <p className="-mt-8 md:-mt-10 text-[#F8F7FC]/70 font-Satoshi text-[14px] md:text-[16px] leading-[140%]">
+                    Already invited?{" "}
+                    <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
+                      Sign in.
+                    </a>
+                  </p>
+                )}
               </motion.div>
 
               <motion.div
@@ -1574,15 +1570,13 @@ export default function Home() {
                     }}
                   >
                     <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
-                      <LazyVideo
-                        src="/appflow.mp4"
+                      <AppScreen
                         className="
                         absolute
                         top-[2.25%]
                         left-[5.2%]
                         w-[89.5%]
                         h-174.5
-                        object-cover
                         rounded-[24px]
                         z-30!
                     "
@@ -3425,8 +3419,12 @@ export default function Home() {
             </div>
           </SectionReveal>
 
+          {/* OLG-234. Full width closing section. The parent column already
+              centers it, so it needs no negative margin. The old
+              ml-[calc(50%-50vw)] shifted it a second time and left a dark
+              strip down the right edge on wide windows. */}
           <motion.section
-            className="relative w-screen ml-[calc(50%-50vw)] min-h-screen h-auto overflow-hidden"
+            className="relative w-screen max-w-none shrink-0 min-h-screen h-auto overflow-hidden"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}

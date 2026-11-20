@@ -309,3 +309,31 @@ body {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
+/* Hero phone screen (OLG-221). Holds on the greeting, drifts down to the
+   watchlist, holds, and returns. -36% of the dashboard capture brings the
+   watchlist card fully into view above the pinned tab bar. */
+@keyframes app-screen-drift {
+  0%,
+  18% {
+    transform: translateY(0);
+  }
+  50%,
+  68% {
+    transform: translateY(-36%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.app-screen-drift {
+  animation: app-screen-drift 22s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-screen-drift {
+    animation: none;
+  }
+}
