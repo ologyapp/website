@@ -1186,10 +1186,12 @@ export default function Home() {
 
       <div className="fixed inset-0 z-0! overflow-hidden pointer-events-none bg-[#0d1220]"></div>
 
-      {/* HERO SECTION */}
+      {/* HERO SECTION. OLG-237, at least one screen tall and taller when
+          the copy needs it, so the button never falls outside on short
+          screens (a 768 tall laptop, a small phone). */}
       <section
         ref={heroRef}
-        className="relative h-svh! w-full! flex flex-col items-center! pb-10 box-border z-40!"
+        className="relative min-h-svh h-auto w-full! flex flex-col items-center! pb-10 box-border z-40!"
       >
         <motion.div
           style={{ opacity }}
@@ -1198,12 +1200,12 @@ export default function Home() {
           <div className="absolute inset-0 bg-[#0d1220]" />
 
           <div
-            className="absolute inset-0 w-full h-svh overflow-hidden flex items-center justify-center"
+            className="absolute inset-0 w-full h-full overflow-hidden flex items-center justify-center"
             style={{ perspective: "2600px" }}
           >
             {/* Mobile grid - 3 cols x 10 rows, fixed 342px row height */}
             <div
-              className="grid grid-cols-3 lg:hidden w-full h-svh"
+              className="grid grid-cols-3 lg:hidden w-full h-full"
               style={{ gridTemplateRows: "repeat(6, 1fr)" }}
             >
               {mobileImages.map((img, index) => {
@@ -1401,7 +1403,7 @@ export default function Home() {
                 self-start
                 overflow-visible
                 block
-                md:hidden
+                lg:hidden
                 z-0
               "
               >
@@ -1453,7 +1455,7 @@ export default function Home() {
                       <img
                         src={phoneMock}
                         alt=""
-                        className="relative z-20 w-full h-[210px] pointer-events-none"
+                        className="relative z-20 w-full h-[210px] md:h-[324px] pointer-events-none"
                       />
                     </div>
                   </motion.div>
@@ -1472,10 +1474,10 @@ export default function Home() {
                   duration: 0.9,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30 max-md:[@supports(-webkit-hyphens:none)]:gap-[40px]"
+                className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30 lg:[@media(max-height:820px)]:mt-8 max-md:[@supports(-webkit-hyphens:none)]:gap-[40px]"
               >
-                <div className="flex flex-col gap-[30px] md:gap-[60px] text-center md:text-left max-md:[@supports(-webkit-hyphens:none)]:gap-[20px]">
-                  <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] font-normal leading-[115%] font-Recoleta">
+                <div className="flex flex-col gap-[30px] md:gap-[60px] text-center lg:text-left max-md:[@supports(-webkit-hyphens:none)]:gap-[20px]">
+                  <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] lg:text-[54px] xl:text-[65px] font-normal leading-[115%] font-Recoleta">
                     Timing Intelligence for Modern Markets
                   </h1>
 
@@ -1569,14 +1571,17 @@ export default function Home() {
                       ease: "easeInOut",
                     }}
                   >
-                    <div className="relative shrink-0 w-90.25 h-182.5 mt-20">
+                    {/* OLG-237. The phone scales down on short windows (a 768 or
+                        800 tall laptop) so its foot never runs past the hero.
+                        Everything inside is placed in percentages of this box. */}
+                    <div className="relative shrink-0 aspect-[361/730] h-[min(730px,calc(100svh-190px))] mt-20">
                       <AppScreen
                         className="
                         absolute
                         top-[2.25%]
                         left-[5.2%]
                         w-[89.5%]
-                        h-174.5
+                        h-[95.6%]
                         rounded-[24px]
                         z-30!
                     "
@@ -1585,7 +1590,7 @@ export default function Home() {
                       <img
                         src={phoneMock}
                         alt=""
-                        className="relative z-40! w-95.25 h-182.5!"
+                        className="relative z-40! w-[105.5%] max-w-none h-full!"
                       />
                     </div>
                   </motion.div>
@@ -1814,7 +1819,7 @@ export default function Home() {
                 id="align"
                 className="relative scroll-mt-24 w-full flex flex-col items-center justify-start gap-[52px] lg:gap-8 md:px-2.5 xl:px-12.5 py-15! h-auto"
               >
-                <div className="flex flex-col gap-7.5 mt-20 ">
+                <div className="flex flex-col gap-7.5 mt-10 md:mt-20 ">
                   <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
                     Where Cycles
                     <br className="md:hidden" /> Meet the Tape
@@ -1846,7 +1851,7 @@ export default function Home() {
                   <motion.div
                     ref={cardScrollRef}
                     onScroll={handleCardScroll}
-                    className="w-full! flex overflow-x-auto snap-x snap-mandatory scrollbar-none max-h-auto lg:max-h-[75vh] gap-[20px] sm:mt-40 xl:mt-0"
+                    className="w-full! flex overflow-x-auto snap-x snap-mandatory scrollbar-none max-h-auto lg:max-h-[75vh] gap-[20px] sm:mt-16 xl:mt-0"
                   >
                     {visibleCards.map((data, id) => {
                       const status = statusOf(data);
@@ -2083,7 +2088,7 @@ export default function Home() {
               <div
                 id="perform"
                 ref={formRef}
-                className="relative scroll-mt-24 w-full flex flex-col xl:flex-row justify-center xl:justify-between gap-12 items-center py-16 md:py-24 lg:py-32 md:px-[50px]"
+                className="relative scroll-mt-24 w-full flex flex-col xl:flex-row justify-center xl:justify-between gap-12 items-center py-12 md:py-24 lg:py-32 md:px-[50px]"
               >
                 {/* DESKTOP FORM (lg+) */}
                 <motion.div
@@ -2595,7 +2600,7 @@ export default function Home() {
                   <div
                     className="
                           relative
-                          flex w-[345px] h-auto lg:h-[300px]
+                          flex w-full max-w-[345px] md:max-w-[560px] h-auto lg:h-[300px]
                           flex-col justify-evenly items-start
                           p-[23.12px] 
                           rounded-[16.912px]
@@ -2645,7 +2650,7 @@ export default function Home() {
                                 }, 5000);
                               }
                             }}
-                            className="cursor-pointer flex w-[22.578px] h-[22.538px]  justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                            className="cursor-pointer flex w-10 h-10 sm:w-[22.578px] sm:h-[22.538px] shrink-0 justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
                           >
                             <ArrowRight size={12} />
                           </div>
@@ -3089,7 +3094,7 @@ export default function Home() {
               <div
                 id="decode"
                 ref={layerRef}
-                className="relative scroll-mt-24 w-full h-auto flex flex-col items-center gap-[52px] xl:px-12.5 md:px-12.5 py-25!"
+                className="relative scroll-mt-24 w-full h-auto flex flex-col items-center gap-[52px] xl:px-12.5 md:px-12.5 py-14! md:py-25!"
               >
                 <div className="flex flex-col gap-[30px]">
                   <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -3344,7 +3349,7 @@ export default function Home() {
               <div
                 id="ask"
                 ref={faqsRef}
-                className="relative scroll-mt-24 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-[52px] xl:px-12.5 md:px-12.5 py-25!"
+                className="relative scroll-mt-24 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-[52px] xl:px-12.5 md:px-12.5 py-14! md:py-25!"
               >
                 <div className="flex flex-col gap-[30px] items-center xl:items-start">
                   <h2 className="text-[#F8F7FC] text-start font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
@@ -3625,7 +3630,7 @@ export default function Home() {
           
             "
               >
-                <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center xl:mt-0">
+                <div className="w-full max-w-360 mx-auto xl:px-12.5 flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center xl:mt-0">
                   <Link href="#hero">
                     <div className="flex justify-start items-center gap-5">
                       <div className="hidden lg:block">
