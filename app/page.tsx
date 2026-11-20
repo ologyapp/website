@@ -1518,18 +1518,15 @@ export default function Home() {
                     </span>
                   </button>
                 </Link>
-                <p className="-mt-8 md:-mt-10 text-[#F8F7FC]/70 font-Satoshi text-[14px] md:text-[16px] leading-[140%]">
-                  {SITE_LIVE ? (
-                    <>
-                      Already invited?{" "}
-                      <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
-                        Sign in.
-                      </a>
-                    </>
-                  ) : (
-                    "Opening in small waves."
-                  )}
-                </p>
+                {/* OLG-233. Nothing under the button until the site goes live. */}
+                {SITE_LIVE && (
+                  <p className="-mt-8 md:-mt-10 text-[#F8F7FC]/70 font-Satoshi text-[14px] md:text-[16px] leading-[140%]">
+                    Already invited?{" "}
+                    <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
+                      Sign in.
+                    </a>
+                  </p>
+                )}
               </motion.div>
 
               <motion.div
@@ -3422,8 +3419,12 @@ export default function Home() {
             </div>
           </SectionReveal>
 
+          {/* OLG-234. Full width closing section. The parent column already
+              centers it, so it needs no negative margin. The old
+              ml-[calc(50%-50vw)] shifted it a second time and left a dark
+              strip down the right edge on wide windows. */}
           <motion.section
-            className="relative w-screen ml-[calc(50%-50vw)] min-h-screen h-auto overflow-hidden"
+            className="relative w-screen max-w-none shrink-0 min-h-screen h-auto overflow-hidden"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
