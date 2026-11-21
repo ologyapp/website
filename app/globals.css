@@ -471,3 +471,14 @@ html {
   backdrop-filter: blur(22px) saturate(1.5);
   box-shadow: 0 10px 40px rgb(0 0 0 / 0.28);
 }
+
+/* Phone screen clip (OLG-263). The mask is the frame's own screen opening,
+   so the screen meets the bezel exactly at every corner. */
+.phone-screen {
+  -webkit-mask-image: url("/phone-screen-mask.png");
+  mask-image: url("/phone-screen-mask.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}

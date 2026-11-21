@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import AppScreen from "./AppScreen";
 
-// One phone frame for the whole site (OLG-251, OLG-254). The frame art is
-// 768 by 1600 and its screen opening is measured from the SVG itself:
-// x 33.2 to 735.2, y 36.7 to 1562.9, corner radius 176. The box keeps that
-// ratio at every size, so the frame is never stretched, and the screen sits
-// exactly in the opening.
+// One phone frame for the whole site (OLG-251, OLG-254, OLG-263). The frame
+// art is 768 by 1600. Its screen opening sits at x 33.25 to 735.25 and
+// y 36.75 to 1562.75, with continuous (squircle) corners. The screen is
+// clipped by phone-screen-mask.png, which is that opening traced from the
+// rendered frame and grown 2 units so it tucks under the black border. A CSS
+// border radius cannot match those corners, which is what left slivers of
+// background showing at the corners before.
 export function PhoneFrame({
   className,
   children,
@@ -15,8 +17,10 @@ export function PhoneFrame({
 }) {
   return (
     <div className={`relative aspect-[768/1600] ${className ?? ""}`}>
-      <div className="absolute left-[4.32%] top-[2.29%] h-[95.39%] w-[91.4%] overflow-hidden rounded-[25.1%/11.55%] bg-[#0D1220]">
-        {children}
+      <div className="phone-screen absolute inset-0 bg-[#0D1220]">
+        <div className="absolute left-[4.33%] top-[2.297%] h-[95.375%] w-[91.406%] overflow-hidden">
+          {children}
+        </div>
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
