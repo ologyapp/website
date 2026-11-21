@@ -1962,16 +1962,18 @@ export default function Home() {
                     showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
                   transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
-                  className="hidden lg:block flex-1 min-w-0 max-w-[600px] z-20"
+                  className="hidden lg:block flex-1 min-w-0 max-w-[540px] z-20"
                 >
                   <div className="flex flex-col gap-5">
-                    <h2 className="t-h2 max-w-[18ch]">
+                    {/* OLG-267. Heading, line and form share one column width. */}
+                    <h2 className="t-h2">
                       Read your archetype and apply for beta access.
                     </h2>
 
-                    <h4 className="t-lead max-w-[36rem]">
-                      Add your birth date, time, and place. Ology reads them into one of
-                      fifteen archetypes.
+                    <h4 className="t-lead">
+                      Add your birth date, time, and place.{" "}
+                      <br />
+                      Ology reads them into one of fifteen archetypes.
                     </h4>
                   </div>
 
@@ -1991,12 +1993,10 @@ export default function Home() {
             z-50!
           "
                   >
+                    {/* OLG-267. The first step has no title of its own, the
+                        section heading above already says it. */}
+                    {showNatalForm && (
                     <div className="flex flex-col gap-2">
-                      {!showNatalForm ? (
-                        <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[22px] font-normal leading-[140%]">
-                          Discover your investor timing profile
-                        </h3>
-                      ) : (
                         <>
                           <h3 className="text-[#F8F7FC] font-Recoleta text-[22px] font-normal leading-[140%]">
                             Hi, {names.split("")}.
@@ -2005,8 +2005,8 @@ export default function Home() {
                             Add your birth date, time, and place.
                           </h3>
                         </>
-                      )}
                     </div>
+                    )}
 
                     <div className="flex flex-col w-full">
                       {!showNatalForm && (
