@@ -475,6 +475,11 @@ html {
 /* Phone screen clip (OLG-263). The mask is the frame's own screen opening,
    so the screen meets the bezel exactly at every corner. */
 .phone-screen {
+  /* A playing video gets its own compositing layer, and without this the
+     browser can draw part of it outside the mask (OLG-267). */
+  isolation: isolate;
+  transform: translateZ(0);
+  overflow: hidden;
   -webkit-mask-image: url("/phone-screen-mask.png");
   mask-image: url("/phone-screen-mask.png");
   -webkit-mask-size: 100% 100%;
