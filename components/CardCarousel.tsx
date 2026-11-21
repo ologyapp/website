@@ -85,7 +85,7 @@ function CardCarousel({ items }: { items: any[] }) {
   flex-col justify-between
   rounded-[16.912px]
 
-  bg-[rgba(30,37,64,0.24)]
+  bg-[rgba(19,25,43,0.94)]
 
   backdrop-blur-[2px]
 

@@ -314,7 +314,7 @@ body {
    composed views and glides between them. Each stop puts a card's top edge
    just under the pinned app header, so nothing is cut mid card. Stops are
    percentages of the dashboard capture: greeting 0, Clarity Index 34.6,
-   Watchlist 55.4. */
+   Watchlist 52.2. */
 @keyframes app-screen-drift {
   0%,
   26% {
@@ -326,7 +326,7 @@ body {
   }
   66%,
   90% {
-    transform: translate3d(0, -55.4%, 0);
+    transform: translate3d(0, -52.2%, 0);
   }
   100% {
     transform: translate3d(0, 0, 0);
@@ -335,8 +335,6 @@ body {
 
 .app-screen-drift {
   animation: app-screen-drift 21s cubic-bezier(0.65, 0, 0.35, 1) 3.5s infinite;
-  will-change: transform;
-  backface-visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -353,7 +351,7 @@ body {
 :root {
   --site-max: clamp(1200px, 76vw, 1400px);
   --site-gutter: clamp(20px, 5vw, 48px);
-  --section-y: clamp(72px, 9vw, 136px);
+  --section-y: clamp(64px, 6vw, 104px);
   --nav-offset: 112px;
   --ink: #f8f7fc;
 }

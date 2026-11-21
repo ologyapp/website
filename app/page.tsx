@@ -131,7 +131,7 @@ import FAQAccordion from "../components/FaqAccordion";
 import Link from "next/link";
 import CardCarousel from "../components/CardCarousel";
 import LazyVideo from "../components/LazyVideo";
-import HeroPhone from "../components/HeroPhone";
+import HeroPhone, { PhoneFrame } from "../components/HeroPhone";
 
 // Hero intro, in seconds. The logo holds centered over the image grid, then
 // glides into the nav slot. Each later step waits on the one before it, not
@@ -141,6 +141,39 @@ import HeroPhone from "../components/HeroPhone";
 const INTRO_LOGO_FLY_AT = 1.5;
 const INTRO_LOGO_FLY_FOR = 0.9;
 const INTRO_PHONE_AFTER_LANDING = 0.6;
+
+// Brings a section into the main view below the fixed nav (OLG-254). The
+// section's content (inside its padding) is centered in the space under the
+// nav when it fits, otherwise its top lands a little under the nav. Layout
+// offsets are used, not on screen positions, so a section still waiting to
+// fade up lands in the same place.
+function docTop(el: HTMLElement) {
+  let y = 0;
+  let n: HTMLElement | null = el;
+  while (n) {
+    y += n.offsetTop;
+    n = n.offsetParent as HTMLElement | null;
+  }
+  return y;
+}
+
+function scrollToSection(id: string, smooth = true) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const header = document.querySelector("header");
+  const navBottom = header ? header.getBoundingClientRect().bottom : 96;
+  const cs = getComputedStyle(el);
+  const padTop = parseFloat(cs.paddingTop) || 0;
+  const padBottom = parseFloat(cs.paddingBottom) || 0;
+  const contentTop = docTop(el) + padTop;
+  const contentHeight = el.offsetHeight - padTop - padBottom;
+  const space = window.innerHeight - navBottom;
+  const gap = Math.max(24, (space - contentHeight) / 2);
+  window.scrollTo({
+    top: Math.max(0, contentTop - navBottom - gap),
+    behavior: smooth ? "smooth" : "auto",
+  });
+}
 
 // One easing for every entrance on the page (OLG-251).
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -286,10 +319,7 @@ export default function Home() {
       const id = window.location.hash.replace("#", "");
       // slight delay so the DOM/sections have mounted before we try to scroll
       const timeout = setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        scrollToSection(id);
       }, 100);
 
       return () => clearTimeout(timeout);
@@ -326,7 +356,6 @@ export default function Home() {
 
   const [isLg, setIsLg] = useState(false);
 
-  const phoneMock = "/iPhone17ProDeepBlue.svg";
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
@@ -996,6 +1025,20 @@ export default function Home() {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest?.("a[href]");
+      const href = a?.getAttribute("href") ?? "";
+      const m = href.match(/^\/?#([\w-]+)$/);
+      if (!m || !document.getElementById(m[1])) return;
+      e.preventDefault();
+      scrollToSection(m[1]);
+      history.replaceState(null, "", `#${m[1]}`);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
   const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
@@ -1517,12 +1560,7 @@ export default function Home() {
                   ].map((item) => (
                     <li
                       key={item.id}
-                      onClick={() =>
-                        document.getElementById(item.id)?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        })
-                      }
+                      onClick={() => scrollToSection(item.id)}
                       className={`
                           cursor-pointer
                           text-[13px]
@@ -1596,10 +1634,7 @@ export default function Home() {
                         key={item.id}
                         onClick={() => {
                           setMobileMenuOpen(false);
-                          document.getElementById(item.id)?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
+                          scrollToSection(item.id);
                         }}
                         className="
                         cursor-pointer
@@ -1640,7 +1675,7 @@ export default function Home() {
             <div ref={sectionRef} className="relative w-full!">
               <div
                 id="align"
-                className="section-y relative w-full flex flex-col items-center justify-start gap-10 lg:gap-12 h-auto"
+                className="section-y relative z-10 w-full flex flex-col items-center justify-start gap-10 lg:gap-12 h-auto"
               >
                 <div className="flex flex-col items-center gap-5">
                   <h2 className="t-h2 text-center">
@@ -1859,7 +1894,7 @@ export default function Home() {
 
               {/* line here */}
 
-              <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-25 pointer-events-none overflow-hidden">
+              <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-0 pointer-events-none overflow-hidden">
                 {Array.from({ length: BLOCKS }).map((_, block) => (
                   <div
                     key={block}
@@ -1911,7 +1946,7 @@ export default function Home() {
               <div
                 id="perform"
                 ref={formRef}
-                className="section-y relative w-full flex flex-col lg:flex-row justify-center lg:justify-between gap-12 lg:gap-16 items-center"
+                className="section-y relative z-10 mx-auto w-full max-w-[1120px] flex flex-col lg:flex-row justify-center lg:justify-between gap-12 lg:gap-20 items-center"
               >
                 {/* DESKTOP FORM (lg+) */}
                 <motion.div
@@ -1920,7 +1955,7 @@ export default function Home() {
                     showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
                   transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
-                  className="hidden lg:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-360"
+                  className="hidden lg:block flex-1 min-w-0 max-w-[600px] z-20"
                 >
                   <div className="flex flex-col gap-5">
                     <h2 className="t-h2 max-w-[18ch]">
@@ -1936,20 +1971,20 @@ export default function Home() {
                   <motion.div
                     className="
             relative
-            flex w-full max-w-[640px] h-auto lg:max-h-[300px]
-            flex-col justify-evenly items-start
-            p-[31.381px]
+            flex w-full h-auto
+            flex-col items-start gap-7
+            p-7
             rounded-[16.912px]
-            bg-[rgba(30,37,64,0.24)]
+            bg-[rgba(19,25,43,0.94)]
             backdrop-blur-[2px]
             border border-white/20
             overflow-hidden
             transition-all duration-500
-            mt-10
+            mt-9
             z-50!
           "
                   >
-                    <div className="flex flex-col gap-[16.71px] -mt-2">
+                    <div className="flex flex-col gap-2">
                       {!showNatalForm ? (
                         <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[22px] font-normal leading-[140%]">
                           Discover your investor timing profile
@@ -1966,10 +2001,10 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div className="flex flex-col w-full mt-10">
+                    <div className="flex flex-col w-full">
                       {!showNatalForm && (
-                        <div className="w-full! flex gap-6.5 items-start md:items-end flex-col md:flex-row">
-                          <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
+                        <div className="w-full! flex gap-4 items-start md:items-end flex-col md:flex-row">
+                          <div className="flex flex-col gap-2.5 flex-1 w-full!">
                             <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
                               Full Name
                             </label>
@@ -1980,7 +2015,7 @@ export default function Home() {
                             />
                           </div>
 
-                          <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
+                          <div className="flex flex-col gap-2.5 flex-1 w-full!">
                             <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
                               Email
                             </label>
@@ -2398,27 +2433,12 @@ export default function Home() {
                   </div>
 
                   {/* MOBILE PHONE MOCKUP */}
-                  <div className="block lg:hidden relative shrink-0 w-[52vw] max-w-[220px]">
+                  <PhoneFrame className="block lg:hidden shrink-0 w-[38vw] max-w-[180px]">
                     <LazyVideo
-                        src="/archetypereel3.mp4"
-                        className="
-                      absolute
-                      top-[2.2%]
-                      left-[5.5%]
-                      w-[89%]
-                      h-[95.5%]
-                      object-cover
-                      rounded-[22%/10.5%]
-                      z-10
-                    "
-                      />
-
-                    <img
-                      src={phoneMock}
-                      alt=""
-                      className="relative z-20 w-full h-auto"
+                      src="/archetypereel3.mp4"
+                      className="h-full w-full object-cover"
                     />
-                  </div>
+                  </PhoneFrame>
 
                   <div
                     className="
@@ -2842,31 +2862,17 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* DESKTOP PHONE MOCKUP */}
-                <div className="hidden lg:block relative shrink-0 lg:w-90.25 lg:h-182.5 mt-5 lg:mt-20">
+                {/* DESKTOP PHONE MOCKUP. OLG-254, true frame ratio, sized to fit
+                    the window with the section's heading and form. */}
+                <PhoneFrame className="hidden lg:block shrink-0 h-[min(620px,calc(100svh-190px))]">
                   <LazyVideo
-                        src="/archetypereel3.mp4"
-                        className="
-                    absolute
-                    top-[2.25%]
-                    left-[5.3%]
-                    lg:w-[89%]
-                    lg:h-174
-                    object-cover
-                    rounded-[24px]
-                    z-30!
-                  "
-                      />
-
-                  <img
-                    src={phoneMock}
-                    alt=""
-                    className="relative z-30! w-95.25 h-182.5!"
+                    src="/archetypereel3.mp4"
+                    className="h-full w-full object-cover"
                   />
-                </div>
+                </PhoneFrame>
               </div>
 
-              <div className="block lg:hidden absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-25 pointer-events-none overflow-hidden">
+              <div className="block lg:hidden absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-0 pointer-events-none overflow-hidden">
                 {Array.from({ length: BLOCKS }).map((_, block) => (
                   <div
                     key={block}
@@ -2917,7 +2923,7 @@ export default function Home() {
               <div
                 id="decode"
                 ref={layerRef}
-                className="section-y relative w-full h-auto flex flex-col items-center gap-10 lg:gap-12"
+                className="section-y relative z-10 w-full h-auto flex flex-col items-center gap-10 lg:gap-12"
               >
                 <div className="flex flex-col items-center gap-5">
                   <h2 className="t-h2 text-center">
@@ -2950,7 +2956,7 @@ export default function Home() {
                         gap-6
                         p-5 lg:p-7
                         rounded-[16.912px]
-                        bg-[rgba(30,37,64,0.24)]
+                        bg-[rgba(19,25,43,0.94)]
                         backdrop-blur-[2px]
                         border border-white/20
                         shadow-inner
@@ -2966,7 +2972,7 @@ export default function Home() {
                         <img src={data.imgPath} alt="" className="h-auto w-full" />
 
                         <div className="flex flex-col gap-4 items-center">
-                          <h3 className="t-card-title text-center">
+                          <h3 className="t-card-title text-center min-h-[2.6em] flex items-center justify-center">
                             {data.title}
                           </h3>
 
@@ -3042,7 +3048,7 @@ export default function Home() {
                         <img src={data.imgPath} alt="" className="h-auto w-full" />
 
                         <div className="flex flex-col gap-4 items-center">
-                          <h3 className="t-card-title text-center">
+                          <h3 className="t-card-title text-center min-h-[2.6em] flex items-center justify-center">
                             {data.title}
                           </h3>
 
@@ -3121,7 +3127,7 @@ export default function Home() {
               </div>
               {/* line here */}
 
-              <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-25 pointer-events-none overflow-hidden">
+              <div className="absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-0 pointer-events-none overflow-hidden">
                 {Array.from({ length: BLOCKS }).map((_, block) => (
                   <div
                     key={block}
@@ -3172,7 +3178,7 @@ export default function Home() {
               <div
                 id="ask"
                 ref={faqsRef}
-                className="relative scroll-mt-24 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-[52px] xl:px-12.5 md:px-12.5 py-14! md:py-25!"
+                className="section-y relative z-10 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-10 xl:px-12.5 md:px-12.5"
               >
                 <div className="flex flex-col gap-[30px] items-center xl:items-start">
                   <h2 className="t-h2">
@@ -3201,7 +3207,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="block lg:hidden absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-25 pointer-events-none overflow-hidden">
+              <div className="block lg:hidden absolute top-0 left-1/2 right-1/2 -mx-[50vw] w-screen h-full z-0 pointer-events-none overflow-hidden">
                 {Array.from({ length: BLOCKS }).map((_, block) => (
                   <div
                     key={block}

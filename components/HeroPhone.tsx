@@ -1,13 +1,23 @@
+import type { ReactNode } from "react";
 import AppScreen from "./AppScreen";
 
-// The hero phone (OLG-251). One component for every width, kept at the
-// frame's own proportions (768 by 1600) so neither the frame nor the screen
-// is ever stretched. The screen is placed in percentages of the frame, so
-// the phone can be sized by width or by height from outside.
-export default function HeroPhone({ className }: { className?: string }) {
+// One phone frame for the whole site (OLG-251, OLG-254). The frame art is
+// 768 by 1600 and its screen opening is measured from the SVG itself:
+// x 33.2 to 735.2, y 36.7 to 1562.9, corner radius 176. The box keeps that
+// ratio at every size, so the frame is never stretched, and the screen sits
+// exactly in the opening.
+export function PhoneFrame({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
   return (
     <div className={`relative aspect-[768/1600] ${className ?? ""}`}>
-      <AppScreen className="absolute left-[3.9%] top-[2%] h-[96%] w-[92.2%] rounded-[24%/11.4%]" />
+      <div className="absolute left-[4.32%] top-[2.29%] h-[95.39%] w-[91.4%] overflow-hidden rounded-[25.1%/11.55%] bg-[#0D1220]">
+        {children}
+      </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/iPhone17ProDeepBlue.svg"
@@ -16,5 +26,13 @@ export default function HeroPhone({ className }: { className?: string }) {
         draggable={false}
       />
     </div>
+  );
+}
+
+export default function HeroPhone({ className }: { className?: string }) {
+  return (
+    <PhoneFrame className={className}>
+      <AppScreen className="h-full w-full" />
+    </PhoneFrame>
   );
 }
