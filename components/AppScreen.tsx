@@ -7,37 +7,45 @@ import Image from "next/image";
 // composed views (greeting, Clarity Index, Watchlist) and glides between
 // them, so a card is never cut under the header (OLG-251). Reduced motion
 // keeps it still at the top.
-const SIZES = "(min-width: 768px) 320px, 260px";
 
 function StatusBar() {
+  // Placed inside the frame's rounded corners (radius about 98 in these
+  // units) and level with the island, like a real status bar (OLG-254).
   return (
     <svg
-      viewBox="0 0 390 44"
+      viewBox="0 0 390 52"
       className="block h-auto w-full shrink-0"
       aria-hidden
       fill="#F8F7FC"
     >
-      <text x="42" y="29" fontSize="16" fontWeight="600" fontFamily="-apple-system, system-ui, sans-serif">
+      <text
+        x="88"
+        y="35"
+        textAnchor="middle"
+        fontSize="15"
+        fontWeight="600"
+        fontFamily="-apple-system, system-ui, sans-serif"
+      >
         9:41
       </text>
       {/* Signal */}
-      <rect x="292" y="22" width="3.5" height="5" rx="1" />
-      <rect x="297.5" y="19.5" width="3.5" height="7.5" rx="1" />
-      <rect x="303" y="17" width="3.5" height="10" rx="1" />
-      <rect x="308.5" y="14.5" width="3.5" height="12.5" rx="1" />
+      <rect x="272" y="29" width="3" height="5" rx="1" />
+      <rect x="277" y="26.5" width="3" height="7.5" rx="1" />
+      <rect x="282" y="24" width="3" height="10" rx="1" />
+      <rect x="287" y="21.5" width="3" height="12.5" rx="1" />
       {/* Wifi */}
       <path
-        d="M326 17.2a10.4 10.4 0 0 1 14.2 0M328.6 20.4a6.4 6.4 0 0 1 9 0"
+        d="M297.5 24.6a9.4 9.4 0 0 1 12.8 0M299.9 27.5a5.8 5.8 0 0 1 8 0"
         fill="none"
         stroke="#F8F7FC"
-        strokeWidth="2.2"
+        strokeWidth="2"
         strokeLinecap="round"
       />
-      <circle cx="333.1" cy="24.6" r="1.9" />
+      <circle cx="303.9" cy="31.3" r="1.7" />
       {/* Battery */}
-      <rect x="347" y="14.5" width="23" height="12" rx="3.5" fill="none" stroke="#F8F7FC" strokeOpacity="0.45" strokeWidth="1" />
-      <rect x="349" y="16.5" width="19" height="8" rx="2" />
-      <path d="M371.5 18.6v4a2 2 0 0 0 0-4Z" fillOpacity="0.45" />
+      <rect x="316" y="22.5" width="21" height="11" rx="3.2" fill="none" stroke="#F8F7FC" strokeOpacity="0.45" strokeWidth="1" />
+      <rect x="317.8" y="24.3" width="17.4" height="7.4" rx="1.8" />
+      <path d="M338.4 26.2v3.6a1.8 1.8 0 0 0 0-3.6Z" fillOpacity="0.45" />
     </svg>
   );
 }
@@ -52,8 +60,8 @@ export default function AppScreen({ className }: { className?: string }) {
           alt=""
           width={780}
           height={110}
-          sizes={SIZES}
           priority
+          unoptimized
           className="block h-auto w-full shrink-0 select-none"
           draggable={false}
         />
@@ -64,22 +72,27 @@ export default function AppScreen({ className }: { className?: string }) {
               alt="The Ology dashboard, with the day's window, Clarity Index, market mood and watchlist."
               width={780}
               height={3240}
-              sizes={SIZES}
               priority
+              unoptimized
               className="block h-auto w-full select-none"
               draggable={false}
             />
           </div>
-          <Image
-            src="/hero-dashboard-tabs.webp"
-            alt=""
-            width={780}
-            height={148}
-            sizes={SIZES}
-            priority
-            className="absolute inset-x-0 bottom-0 block h-auto w-full select-none"
-            draggable={false}
-          />
+          {/* Tab bar sits above the home indicator area, clear of the
+              rounded corners, like the app on a real phone (OLG-254). */}
+          <div className="absolute inset-x-0 bottom-0 bg-[#0E131F] pb-[8.5%]">
+            <Image
+              src="/hero-dashboard-tabs.webp"
+              alt=""
+              width={780}
+              height={148}
+              priority
+              unoptimized
+              className="block h-auto w-full select-none px-[3%]"
+              draggable={false}
+            />
+            <div className="absolute bottom-[2.6%] left-1/2 h-[3px] w-[34%] -translate-x-1/2 rounded-full bg-[#F8F7FC]/70" />
+          </div>
         </div>
       </div>
     </div>
