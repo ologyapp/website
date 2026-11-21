@@ -1378,7 +1378,7 @@ export default function Home() {
             {showLogo && (
               <motion.div
                 ref={introLogoRef}
-                className="z-50! absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[calc(50%+5em)] sm:-translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
+                className="z-50! fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center scale-[2.5] text-[#F8F7FC] pointer-events-none select-none"
                 initial={{
                   opacity: 0,
                   scale: 1.1,
@@ -1436,14 +1436,19 @@ export default function Home() {
 
           {/* Hero content (OLG-251). One grid, copy beside the phone from
               tablet up and above it on phones. One phone at every width. */}
-          <div className="site-container relative z-20 grid min-h-svh items-center gap-y-14 pt-32 pb-16 md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-12 md:pt-36 md:pb-20 lg:gap-x-20">
+          {/* Top fade (OLG-264). Blends the photo grid into the page color, which
+              is the color Safari paints its status bar, so there is no hard edge
+              under the status bar on iPhone. */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[15] h-36 bg-gradient-to-b from-[#0d1220] via-[#0d1220]/70 to-transparent md:h-44" />
+
+          <div className="site-container relative z-20 grid min-h-svh content-center items-center gap-y-8 pt-28 pb-12 md:content-normal md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-12 md:gap-y-14 md:pt-36 md:pb-20 lg:gap-x-20">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={logoLanded ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               transition={{ duration: 0.9, ease: EASE }}
-              className="flex flex-col items-center gap-9 text-center md:items-start md:text-left"
+              className="flex flex-col items-center gap-7 text-center md:items-start md:gap-9 md:text-left"
             >
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4 md:gap-6">
                 <h1 className="t-display max-w-[13ch] md:max-w-none">
                   Timing Intelligence for Modern Markets
                 </h1>
@@ -1475,9 +1480,11 @@ export default function Home() {
                 delay: logoLanded ? INTRO_PHONE_AFTER_LANDING * 0.4 : 0,
                 ease: EASE,
               }}
-              className="flex justify-center md:justify-end"
+              className="order-first flex justify-center md:order-none md:justify-end"
             >
-              <HeroPhone className="w-[min(64vw,270px)] md:h-[min(540px,calc(100svh-220px))] md:w-auto lg:h-[min(660px,calc(100svh-220px))]" />
+              {/* On phones the phone sits small above the headline, as it did
+                  before OLG-251, so the whole hero fits one screen (OLG-264). */}
+              <HeroPhone className="h-[min(24svh,200px)] w-auto md:h-[min(540px,calc(100svh-220px))] lg:h-[min(660px,calc(100svh-220px))]" />
             </motion.div>
           </div>
         </motion.div>
