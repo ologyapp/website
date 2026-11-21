@@ -23,8 +23,17 @@ function CardCarousel({ items }: { items: any[] }) {
 
   return (
     <div className="relative w-full flex flex-col items-center gap-2 md:gap-8 overflow-hidden">
+      {/* Side cards fade out at the edges instead of being cut (OLG-251). */}
       <div className="w-full flex items-center gap-2 md:gap-8">
-        <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
+        <div
+          className="flex-1 min-w-0 overflow-hidden flex justify-center"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%)",
+          }}
+        >
           <Swiper
             modules={[Navigation, Mousewheel, EffectCoverflow, Scrollbar]}
             slidesPerView="auto"
@@ -103,7 +112,7 @@ function CardCarousel({ items }: { items: any[] }) {
                           />
                         </div>
 
-                        <p className="text-[#F8F7FC] font-Satoshi text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                        <p className="text-[#F8F7FC] font-Satoshi text-[11px] font-normal leading-[120%] tracking-[1.8px] uppercase">
                           {data.read}
                         </p>
                       </div>
@@ -150,7 +159,7 @@ function CardCarousel({ items }: { items: any[] }) {
                         {/* outcome_tag — Moon Glow only, mono, letter-spaced caps, never a class color. Renders nothing when null. */}
                         {data.outcome_tag && (
                           <p
-                            className="font-mono text-[10.13px] font-normal leading-[120%] tracking-[2.148px] uppercase px-2 py-[2px] rounded-[4px]"
+                            className="font-mono text-[11px] font-normal leading-[120%] tracking-[1.8px] uppercase px-2 py-[2px] rounded-[4px]"
                             style={style.outcome}
                           >
                             {data.outcome_tag}

@@ -48,7 +48,7 @@ function Footer() {
               </svg>
             </div>
 
-            <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11.787px] lg:text-[16px] font-medium leading-[140%]">
+            <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[13px] lg:text-[14px] font-medium leading-[140%]">
               Timing intelligence for modern markets.
             </h4>
           </div>
@@ -56,18 +56,18 @@ function Footer() {
         <div className="flex justify-start items-center gap-10 relative xl:-left-10">
           {SITE_LIVE && (
             <a href={BETA_URL}>
-              <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+              <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
                 Sign in
               </h5>
             </a>
           )}
           <Link href="/privacy-policy">
-            <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+            <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
               Privacy
             </h5>
           </Link>
           <Link href="/Terms-of-service">
-            <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+            <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
               Terms
             </h5>
           </Link>
@@ -76,7 +76,7 @@ function Footer() {
             href="mailto:hello@ologyapp.com?subject=Ology%20Inquiry"
             target="_blank"
           >
-            <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+            <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
               Contact
             </h5>
           </Link>
@@ -152,7 +152,7 @@ function Footer() {
       </div>
 
       <div className="w-full text-center">
-        <p className="text-[#E8E9F3]/30 text-center font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-[140%]">
+        <p className="text-[#E8E9F3]/55 text-center font-Satoshi text-[12px] lg:text-[13px] font-normal leading-[140%]">
           Ology provides behavioral and timing context for informational
           purposes only and is not an investment adviser. © {new Date().getFullYear()} Ology Intelligence, Inc.
         </p>
