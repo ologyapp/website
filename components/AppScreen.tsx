@@ -3,9 +3,11 @@ import Image from "next/image";
 // The hero phone screen (OLG-221, OLG-233). A capture of the live app
 // dashboard at 390 wide on Nov 20, 2026, greeting set to a sample name and
 // the investor headshot removed. The status bar is drawn here, the app
-// header and tab bar stay pinned like the app, and the dashboard drifts down
-// to the watchlist and back. Reduced motion keeps it still at the top.
-const SIZES = "(min-width: 1024px) 330px, (min-width: 768px) 130px, 95px";
+// header and tab bar stay pinned like the app. The dashboard rests on three
+// composed views (greeting, Clarity Index, Watchlist) and glides between
+// them, so a card is never cut under the header (OLG-251). Reduced motion
+// keeps it still at the top.
+const SIZES = "(min-width: 768px) 320px, 260px";
 
 function StatusBar() {
   return (
@@ -15,7 +17,7 @@ function StatusBar() {
       aria-hidden
       fill="#F8F7FC"
     >
-      <text x="34" y="29" fontSize="16" fontWeight="600" fontFamily="-apple-system, system-ui, sans-serif">
+      <text x="42" y="29" fontSize="16" fontWeight="600" fontFamily="-apple-system, system-ui, sans-serif">
         9:41
       </text>
       {/* Signal */}

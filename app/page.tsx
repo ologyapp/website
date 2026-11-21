@@ -131,7 +131,7 @@ import FAQAccordion from "../components/FaqAccordion";
 import Link from "next/link";
 import CardCarousel from "../components/CardCarousel";
 import LazyVideo from "../components/LazyVideo";
-import AppScreen from "../components/AppScreen";
+import HeroPhone from "../components/HeroPhone";
 
 // Hero intro, in seconds. The logo holds centered over the image grid, then
 // glides into the nav slot. Each later step waits on the one before it, not
@@ -141,6 +141,9 @@ import AppScreen from "../components/AppScreen";
 const INTRO_LOGO_FLY_AT = 1.5;
 const INTRO_LOGO_FLY_FOR = 0.9;
 const INTRO_PHONE_AFTER_LANDING = 0.6;
+
+// One easing for every entrance on the page (OLG-251).
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const images = [
   a1,
@@ -198,26 +201,10 @@ const mobileImages = [
 
 const SectionReveal = ({ children }: { children: React.ReactNode }) => (
   <motion.section
-    initial={{
-      opacity: 0,
-      y: 32,
-      scale: 0.985,
-    }}
-    whileInView={{
-      opacity: 1,
-      y: 0,
-      scale: 1,
-    }}
-    viewport={{
-      once: true,
-      amount: 0.2,
-    }}
-    transition={{
-      type: "spring",
-      stiffness: 70,
-      damping: 22,
-      mass: 1,
-    }}
+    initial={{ opacity: 0, y: 28 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.12 }}
+    transition={{ duration: 0.9, ease: EASE }}
     className="relative w-full flex justify-center"
   >
     {children}
@@ -1094,7 +1081,24 @@ export default function Home() {
 
   // The hero fades as it scrolls away, over most of a screen, on every
   // width. Desktop used to fade out within the first 120px of scroll.
-  const opacity = useTransform(scrollY, [0, 640], [1, 0]);
+  // OLG-251. The fade starts once 45 percent of the hero has scrolled by and
+  // ends at its foot, measured from the hero's real height. A fixed 640px
+  // range had the phone, which sits lower on phones, gone before it was seen.
+  const heroHeight = useRef(900);
+  useEffect(() => {
+    const measure = () => {
+      const el = heroRef.current as HTMLElement | null;
+      if (el) heroHeight.current = el.offsetHeight;
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  const opacity = useTransform(scrollY, (y) => {
+    const start = heroHeight.current * 0.45;
+    const end = heroHeight.current * 0.98;
+    return Math.min(1, Math.max(0, 1 - (y - start) / (end - start)));
+  });
 
   //pin section to top
 
@@ -1163,7 +1167,7 @@ export default function Home() {
   return (
     <div
       id="hero"
-      className="flex flex-col scroll-smooth relative cursor-pointer mb-0! w-full!"
+      className="flex flex-col relative mb-0! w-full!"
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         mouseX.set(e.clientX - rect.left);
@@ -1171,7 +1175,7 @@ export default function Home() {
       }}
     >
       <motion.div
-        className="hidden lg:block pointer-events-none absolute inset-0 z-9999! mix-blend-screen"
+        className="hidden pointer-events-none absolute inset-0 z-9999! mix-blend-screen"
         style={{
           background: useMotionTemplate`
       radial-gradient(
@@ -1387,236 +1391,57 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <div className=" relative z-20 max-w-360  xl:max-w-360 w-full px-0 md:px-2 xl:px-14 py-6 md:py-10 gap-15 flex flex-col items-center">
-            {/* Mockup on mobile */}
-            <div className=" w-full! px-0 xl:px-4.5 flex flex-col lg:flex-row justify-between items-center gap-5 md:gap-10 pt-20 md:pt-24 mt-10 md:mt-15">
-              <motion.div
-                className="
-                relative
-                w-full
-                lg:w-[60%]
-                flex
-                justify-center
-                lg:justify-end
-                items-center
-                lg:-top-24
-                self-start
-                overflow-visible
-                block
-                lg:hidden
-                z-0
-              "
-              >
-                <div
-                  className="
-                relative
-                lg:absolute
-                flex
-                justify-center
-                lg:justify-end
-                w-full
-                overflow-visible
-                z-0!
-              "
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={
-                      logoLanded
-                        ? { opacity: 1, y: [0, -10, 0] }
-                        : { opacity: 0, y: 20 }
-                    }
-                    transition={{
-                      opacity: {
-                        duration: 0.5,
-                      },
-                      y: {
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      },
-                    }}
-                  >
-                    <div className="relative w-[117.211px] md:w-[160px]">
-                      {/* App screen */}
-                      <AppScreen
-                        className="
-                        absolute
-                        top-[2%]
-                        left-[10.5%]
-                        w-[79.6%]
-                        h-[97.4%]
-                        rounded-[16px]
-                        z-10
-                      "
-                      />
+          {/* Hero content (OLG-251). One grid, copy beside the phone from
+              tablet up and above it on phones. One phone at every width. */}
+          <div className="site-container relative z-20 grid min-h-svh items-center gap-y-14 pt-32 pb-16 md:grid-cols-[minmax(0,1fr)_auto] md:gap-x-12 md:pt-36 md:pb-20 lg:gap-x-20">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={logoLanded ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={{ duration: 0.9, ease: EASE }}
+              className="flex flex-col items-center gap-9 text-center md:items-start md:text-left"
+            >
+              <div className="flex flex-col gap-6">
+                <h1 className="t-display max-w-[13ch] md:max-w-none">
+                  Timing Intelligence for Modern Markets
+                </h1>
+                <p className="t-lead max-w-[34rem]">
+                  Ology is a behavioral timing engine for markets. It reads your Trade
+                  DNA against the current sky, market context, and your own record,
+                  so you see the conditions shaping a decision before you act.
+                </p>
+              </div>
+              <Link href="#perform" className="btn-glass">
+                Apply for beta access
+              </Link>
+              {/* OLG-233. Nothing under the button until the site goes live. */}
+              {SITE_LIVE && (
+                <p className="-mt-4 font-Satoshi text-[15px] leading-[140%] text-[#F8F7FC]/70">
+                  Already invited?{" "}
+                  <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
+                    Sign in.
+                  </a>
+                </p>
+              )}
+            </motion.div>
 
-                      {/* Phone frame */}
-                      <img
-                        src={phoneMock}
-                        alt=""
-                        className="relative z-20 w-full h-[210px] md:h-[324px] pointer-events-none"
-                      />
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: logoLanded ? 1 : 0,
-                  x: 0,
-                }}
-                transition={{
-                  duration: 0.9,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="w-full xl:w-[100%] flex flex-col gap-[52px] md:gap-[52px] items-center lg:items-start mt-2 lg:mt-30 lg:[@media(max-height:820px)]:mt-8 max-md:[@supports(-webkit-hyphens:none)]:gap-[40px]"
-              >
-                <div className="flex flex-col gap-[30px] md:gap-[60px] text-center lg:text-left max-md:[@supports(-webkit-hyphens:none)]:gap-[20px]">
-                  <h1 className="text-[#F8F7FC] text-[32px] md:text-[65px] lg:text-[54px] xl:text-[65px] font-normal leading-[115%] font-Recoleta">
-                    Timing Intelligence for Modern Markets
-                  </h1>
-
-                  <p className="text-[#F8F7FC] text-[18px] md:text-[24px] font-normal leading-[140%] max-w-full lg:max-w-[800px] font-Satoshi">
-                    Ology is a behavioral timing engine for markets. It reads your Trade
-                    DNA against the current sky, market context, and your own record,
-                    so you see the conditions shaping a decision before you act.
-                  </p>
-                </div>
-                <Link href="#perform">
-                  <button
-                    type="button"
-                    className="
-                    cursor-pointer
-                    inline-flex
-                    flex
-                    w-auto
-                    py-[14.73px]
-                      px-[18px]
-                    justify-center
-                    items-center
-                    rounded-[20px]
-                    bg-gradient-to-b
-                    from-white/10
-                    to-[rgba(30,37,64,0.15)]
-                    border
-                    border-white/20
-                    backdrop-blur-xl
-                    backdrop-saturate-150
-                    shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
-                    hover:bg-white/10
-                    hover:border-white/30
-                    transition-all
-                    duration-500
-                  "
-                  >
-                    {" "}
-                    <span className=" text-[#F8F7FC] font-Satoshi text-[16px] lg:text-[18px] md:text-[17.47px] font-medium leading-[150%] tracking-[0.349px] uppercase">
-                      Apply for beta access
-                    </span>
-                  </button>
-                </Link>
-                {/* OLG-233. Nothing under the button until the site goes live. */}
-                {SITE_LIVE && (
-                  <p className="-mt-8 md:-mt-10 text-[#F8F7FC]/70 font-Satoshi text-[14px] md:text-[16px] leading-[140%]">
-                    Already invited?{" "}
-                    <a href={BETA_URL} className="underline underline-offset-4 hover:text-[#F8F7FC]">
-                      Sign in.
-                    </a>
-                  </p>
-                )}
-              </motion.div>
-
-              <motion.div
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: logoLanded ? 1 : 0,
-                  scale: 1,
-                  y: 0,
-                  x: 0,
-                }}
-                transition={{
-                  duration: 3,
-                  delay: logoLanded ? INTRO_PHONE_AFTER_LANDING : 0,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="
-                relative
-                w-full
-                lg:w-[60%]
-                flex
-                justify-center
-                lg:justify-end
-                lg:-top-24
-                z-20
-                self-start
-                overflow-visible
-                hidden lg:block
-              "
-              >
-                <div className="relative lg:absolute z-50 flex justify-center lg:justify-end w-full overflow-visible">
-                  <motion.div
-                    animate={{
-                      y: [0, -10, 0],
-                    }}
-                    transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    {/* OLG-237. The phone scales down on short windows (a 768 or
-                        800 tall laptop) so its foot never runs past the hero.
-                        Everything inside is placed in percentages of this box. */}
-                    <div className="relative shrink-0 aspect-[361/730] h-[min(730px,calc(100svh-190px))] mt-20">
-                      <AppScreen
-                        className="
-                        absolute
-                        top-[2.25%]
-                        left-[5.2%]
-                        w-[89.5%]
-                        h-[95.6%]
-                        rounded-[24px]
-                        z-30!
-                    "
-                      />
-
-                      <img
-                        src={phoneMock}
-                        alt=""
-                        className="relative z-40! w-[105.5%] max-w-none h-full!"
-                      />
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              animate={logoLanded ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
+              transition={{
+                duration: 1.1,
+                delay: logoLanded ? INTRO_PHONE_AFTER_LANDING * 0.4 : 0,
+                ease: EASE,
+              }}
+              className="flex justify-center md:justify-end"
+            >
+              <HeroPhone className="w-[min(64vw,270px)] md:h-[min(540px,calc(100svh-220px))] md:w-auto lg:h-[min(660px,calc(100svh-220px))]" />
+            </motion.div>
           </div>
         </motion.div>
 
         {/* header */}
         <div
-          className="
-                fixed
-                top-0
-                z-9999
-                w-full!
-                max-w-360
-              
-                xl:max-w-360
-                px-5
-                md:px-10
-                py-6
-                md:py-10
-               mx-auto!
-               
-              "
+          className="site-container fixed top-0 left-1/2 z-9999 -translate-x-1/2 pt-4 md:pt-6"
         >
           <motion.header
             initial={{
@@ -1642,10 +1467,7 @@ export default function Home() {
               py-1
               lg:py-2
               rounded-[20px]
-              border
-              border-[#7478895c]
-              bg-[#1e2540]/5
-              backdrop-blur-xl
+              nav-glass
               z-30!
             "
           >
@@ -1703,9 +1525,10 @@ export default function Home() {
                       }
                       className={`
                           cursor-pointer
-                          text-[17px]
+                          text-[13px]
                           font-Satoshi
-                          font-normal
+                          font-medium
+                          tracking-[0.14em]
                           leading-[150%]
                           uppercase
                           transition-colors duration-300
@@ -1724,10 +1547,10 @@ export default function Home() {
                       <a href={BETA_URL}>Sign in</a>
                     </li>
                   )}
-                  <li className="hidden lg:block">
+                  <li className="hidden md:block">
                     <a
                       href="#perform"
-                      className="font-Satoshi text-[#F8F7FC] rounded-[20px] border border-white/20 bg-white/5 px-4 py-2 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+                      className="font-Satoshi text-[14px] font-medium text-[#F8F7FC] rounded-full border border-white/20 bg-white/5 px-4 py-2 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
                     >
                       Apply for beta access
                     </a>
@@ -1812,34 +1635,33 @@ export default function Home() {
 
       {/* normal section */}
       <main className="flex justify-center ">
-        <section className="relative z-30! w-full max-w-360! xl:max-w-360! mx-auto px-8 flex flex-col items-center! justify-between">
+        <section className="site-container relative z-30! flex flex-col items-center! justify-between">
           <SectionReveal>
             <div ref={sectionRef} className="relative w-full!">
               <div
                 id="align"
-                className="relative scroll-mt-24 w-full flex flex-col items-center justify-start gap-[52px] lg:gap-8 md:px-2.5 xl:px-12.5 py-15! h-auto"
+                className="section-y relative w-full flex flex-col items-center justify-start gap-10 lg:gap-12 h-auto"
               >
-                <div className="flex flex-col gap-7.5 mt-10 md:mt-20 ">
-                  <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
+                <div className="flex flex-col items-center gap-5">
+                  <h2 className="t-h2 text-center">
                     Where Cycles
                     <br className="md:hidden" /> Meet the Tape
                   </h2>
 
-                  <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[17.5px] md:text-[22px] font-normal leading-[120%]">
+                  <h4 className="t-lead text-center mx-auto max-w-[44rem]">
                     Ology keeps a running record of the sky beside the market.{" "}
-                    <br className="md:hidden" />
                     What is in effect now, what comes next, and what the record
                     holds.
                   </h4>
                 </div>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 80 }}
+                  initial={{ opacity: 0, y: 28 }}
                   animate={
-                    showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                    showCards ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
-                  transition={{ duration: 0.3 }}
-                  className="hidden lg:block w-full h-[450px] mt-8"
+                  transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
+                  className="hidden lg:block w-full"
                 >
                   {/* AHEAD */}
                   <div className=" flex flex-col w-full gap-[30px]">
@@ -1847,11 +1669,11 @@ export default function Home() {
                   </div>
                 </motion.div>
 
-                <div className="relative block lg:hidden w-full! gap-7.5 flex flex-col items-center">
+                <div className="relative mx-auto flex w-full max-w-[520px] flex-col items-center gap-6 lg:hidden">
                   <motion.div
                     ref={cardScrollRef}
                     onScroll={handleCardScroll}
-                    className="w-full! flex overflow-x-auto snap-x snap-mandatory scrollbar-none max-h-auto lg:max-h-[75vh] gap-[20px] sm:mt-16 xl:mt-0"
+                    className="w-full! flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-[20px]"
                   >
                     {visibleCards.map((data, id) => {
                       const status = statusOf(data);
@@ -1862,7 +1684,7 @@ export default function Home() {
                           key={id}
                           className="
                         relative
-                        flex h-auto md:h-[313px]
+                        flex h-auto min-h-[250px]
                         w-full shrink-0 snap-center
                         p-[22px] md:p-[27.23px]
                         flex-col justify-between
@@ -1893,18 +1715,18 @@ export default function Home() {
                                 />
                               </div>
 
-                              <p className="text-[#F8F7FC] font-Satoshi text-[7.92px] font-normal leading-[120%] tracking-[2.148px] uppercase">
+                              <p className="text-[#F8F7FC] font-Satoshi text-[10.5px] font-normal leading-[120%] tracking-[1.6px] uppercase">
                                 {data.read}
                               </p>
                             </div>
                           </div>
 
                           <div className="gap-[31.38px] flex flex-col mt-6 md:mt-3">
-                            <h2 className="text-[#F8F7FC] font-Recoleta text-[14.29px] font-normal leading-[130%]">
+                            <h2 className="text-[#F8F7FC] font-Recoleta text-[18px] font-normal leading-[130%]">
                               {data.title}
                             </h2>
 
-                            <p className="text-[#F8F7FC] font-Satoshi text-[12.757px] font-normal leading-[150%] -mt-4">
+                            <p className="text-[#F8F7FC] font-Satoshi text-[15px] font-normal leading-[150%] text-[#F8F7FC]/80 -mt-4">
                               {data.content}
                             </p>
                           </div>
@@ -1931,7 +1753,7 @@ export default function Home() {
                               className="flex gap-[20.2px] py-[7.318px] lg:py-[14.408px] px-[12.192px] lg:px-[15.88px] rounded-[6.098px]"
                               style={style.button}
                             >
-                              <span className="text-center justify-center text-slate-50 text-[7.927px] font-bold font-Satoshi uppercase leading-6">
+                              <span className="text-center justify-center text-slate-50 text-[10.5px] font-bold tracking-[0.08em] font-Satoshi uppercase leading-6">
                                 {data.button_text}
                               </span>
                             </button>
@@ -1976,8 +1798,9 @@ export default function Home() {
                     })}
                   </motion.div>
 
-                  {/* Dot indicator pill */}
-                  <div className="flex justify-center">
+                  {/* Dot indicator pill. Hidden, the counter under it says the same
+                      thing without 22 dots (OLG-251). */}
+                  <div className="hidden">
                     <div
                       className="inline-flex items-center"
                       style={{
@@ -2068,7 +1891,7 @@ export default function Home() {
                                 className="absolute left-1/2 -translate-x-1/2 w-px h-20"
                                 style={{
                                   background:
-                                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
+                                    "linear-gradient(to top, rgba(255,255,255,0.22), rgba(255,255,255,0.08), transparent)",
                                 }}
                               />
                             </motion.div>
@@ -2088,23 +1911,23 @@ export default function Home() {
               <div
                 id="perform"
                 ref={formRef}
-                className="relative scroll-mt-24 w-full flex flex-col xl:flex-row justify-center xl:justify-between gap-12 items-center py-12 md:py-24 lg:py-32 md:px-[50px]"
+                className="section-y relative w-full flex flex-col lg:flex-row justify-center lg:justify-between gap-12 lg:gap-16 items-center"
               >
                 {/* DESKTOP FORM (lg+) */}
                 <motion.div
-                  initial={{ opacity: 0, y: 80 }}
+                  initial={{ opacity: 0, y: 28 }}
                   animate={
-                    showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                    showForm ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
                   className="hidden lg:block flex-1 min-w-0 flex flex-col items-center md:items-start gap-30! z-20 px-4 md:px-0 max-w-360"
                 >
-                  <div className="flex flex-col gap-[30px]">
-                    <h2 className="text-[#F8F7FC] font-Recoleta text-[38px] md:text-[60px] font-normal leading-[120%] md-w-[600px]">
+                  <div className="flex flex-col gap-5">
+                    <h2 className="t-h2 max-w-[18ch]">
                       Read your archetype and apply for beta access.
                     </h2>
 
-                    <h4 className="text-[#F8F7FC] text-start font-Satoshi text-[22px] md:text-[22px] font-normal leading-[120%]">
+                    <h4 className="t-lead max-w-[36rem]">
                       Add your birth date, time, and place. Ology reads them into one of
                       fifteen archetypes.
                     </h4>
@@ -2113,7 +1936,7 @@ export default function Home() {
                   <motion.div
                     className="
             relative
-            flex w-90 h-auto lg:max-h-[300px] md:w-[800px]
+            flex w-full max-w-[640px] h-auto lg:max-h-[300px]
             flex-col justify-evenly items-start
             p-[31.381px]
             rounded-[16.912px]
@@ -2122,18 +1945,18 @@ export default function Home() {
             border border-white/20
             overflow-hidden
             transition-all duration-500
-            mt-18
+            mt-10
             z-50!
           "
                   >
                     <div className="flex flex-col gap-[16.71px] -mt-2">
                       {!showNatalForm ? (
-                        <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[28px] font-normal leading-[150%]">
+                        <h3 className="text-[#F8F7FC] font-Recoleta text-[20px] lg:text-[22px] font-normal leading-[140%]">
                           Discover your investor timing profile
                         </h3>
                       ) : (
                         <>
-                          <h3 className="text-[#F8F7FC] font-Recoleta text-[28px] font-normal leading-[150%]">
+                          <h3 className="text-[#F8F7FC] font-Recoleta text-[22px] font-normal leading-[140%]">
                             Hi, {names.split("")}.
                           </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
@@ -2147,7 +1970,7 @@ export default function Home() {
                       {!showNatalForm && (
                         <div className="w-full! flex gap-6.5 items-start md:items-end flex-col md:flex-row">
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
+                            <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
                               Full Name
                             </label>
                             <input
@@ -2158,7 +1981,7 @@ export default function Home() {
                           </div>
 
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                            <label className="text-[#F8F7FC] font-Satoshi text-[15.925px] font-normal leading-[25.48px] tracking-[2.389px] uppercase">
+                            <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
                               Email
                             </label>
                             <input
@@ -2561,21 +2384,21 @@ export default function Home() {
 
                 {/* MOBILE / TABLET FORM (< lg) */}
                 <div
-                  className="flex relative lg:hidden z-50! flex-1 w-full min-w-0 flex-col items-center gap-[52px] md:gap-18! z-20 px-1 md:px-0 max-w-auto mt-10 md:mt-20"
+                  className="flex relative lg:hidden z-50! flex-1 w-full min-w-0 flex-col items-center gap-10 z-20"
                 >
-                  <div className="flex flex-col items-center gap-[30px]">
-                    <h3 className="text-[#F8F7FC] font-Recoleta text-[32px] sm:text-[38px] md:text-[60px] font-normal leading-[120%] max-w-[640px] text-center">
+                  <div className="flex flex-col items-center gap-5">
+                    <h3 className="t-h2 text-center">
                       Read your archetype and apply for beta access.
                     </h3>
 
-                    <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[18.204px] md:text-[22px] font-normal leading-[120%]">
+                    <h4 className="t-lead text-center mx-auto max-w-[44rem]">
                       Add your birth date, time, and place. Ology reads them into one of
                       fifteen archetypes.
                     </h4>
                   </div>
 
                   {/* MOBILE PHONE MOCKUP */}
-                  <div className="block lg:hidden relative shrink-0 w-[91.08px] sm:w-52">
+                  <div className="block lg:hidden relative shrink-0 w-[52vw] max-w-[220px]">
                     <LazyVideo
                         src="/archetypereel3.mp4"
                         className="
@@ -2585,7 +2408,7 @@ export default function Home() {
                       w-[89%]
                       h-[95.5%]
                       object-cover
-                      rounded-[14px]
+                      rounded-[22%/10.5%]
                       z-10
                     "
                       />
@@ -3075,7 +2898,7 @@ export default function Home() {
                                 className="absolute left-1/2 -translate-x-1/2 w-px h-20"
                                 style={{
                                   background:
-                                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
+                                    "linear-gradient(to top, rgba(255,255,255,0.22), rgba(255,255,255,0.08), transparent)",
                                 }}
                               />
                             </motion.div>
@@ -3094,26 +2917,26 @@ export default function Home() {
               <div
                 id="decode"
                 ref={layerRef}
-                className="relative scroll-mt-24 w-full h-auto flex flex-col items-center gap-[52px] xl:px-12.5 md:px-12.5 py-14! md:py-25!"
+                className="section-y relative w-full h-auto flex flex-col items-center gap-10 lg:gap-12"
               >
-                <div className="flex flex-col gap-[30px]">
-                  <h2 className="text-[#F8F7FC] text-center font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
+                <div className="flex flex-col items-center gap-5">
+                  <h2 className="t-h2 text-center">
                     The Missing Layer in Modern Market Tools
                   </h2>
 
-                  <h4 className="hidden lg:block text-[#F8F7FC] text-center font-Satoshi text-[22px] md:text-[22px] font-normal leading-[120%]">
+                  <h4 className="t-lead text-center mx-auto max-w-[44rem]">
                     Every tool describes the market. Ology describes the person about to
                     act on it.
                   </h4>
                 </div>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 80 }}
+                  initial={{ opacity: 0, y: 28 }}
                   animate={
-                    showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                    showLayers ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
-                  transition={{ duration: 0.3 }}
-                  className="hidden w-full lg:flex lg:flex-nowrap lg:gap-4 items-stretch lg:justify-between mt-8"
+                  transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
+                  className="hidden w-full md:flex items-stretch"
                 >
                   {missingLayers.map((data, id) => (
                     <React.Fragment key={id}>
@@ -3121,11 +2944,11 @@ export default function Home() {
                       <div
                         className="
                         relative
-                        xl:w-130 lg:w-100
+                        flex-1 min-w-0
                         flex
                         flex-col
-                        gap-[31.381px]
-                        p-[27.09px]
+                        gap-6
+                        p-5 lg:p-7
                         rounded-[16.912px]
                         bg-[rgba(30,37,64,0.24)]
                         backdrop-blur-[2px]
@@ -3136,18 +2959,18 @@ export default function Home() {
                       "
                       >
                         <div className="flex justify-center">
-                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[12px] font-bold leading-[140%] tabular-nums uppercase">
+                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11px] font-bold leading-[140%] tracking-[0.14em] uppercase">
                             {data.heading}
                           </h4>
                         </div>
-                        <img src={data.imgPath} />
+                        <img src={data.imgPath} alt="" className="h-auto w-full" />
 
                         <div className="flex flex-col gap-4 items-center">
-                          <h3 className="text-[#F8F7FC] font-[Recoleta] text-[24px] text-center leading-[150%]">
+                          <h3 className="t-card-title text-center">
                             {data.title}
                           </h3>
 
-                          <p className="text-[#F8F7FC] font-Satoshi text-[13.06px] text-center leading-[150%]">
+                          <p className="t-body text-center">
                             {data.subtitle}
                           </p>
                         </div>
@@ -3155,7 +2978,7 @@ export default function Home() {
 
                       {/* Divider */}
                       {id < missingLayers.length - 1 && (
-                        <div className="hidden xl:flex justify-center items-center px-6 shrink-0">
+                        <div className="hidden md:flex justify-center items-center px-2 lg:px-4 shrink-0">
                           <svg
                             width="31"
                             height="47"
@@ -3188,7 +3011,7 @@ export default function Home() {
                   <motion.div
                     ref={scrollRef}
                     onScroll={handleScroll}
-                    className="flex lg:hidden w-full snap-x snap-mandatory overflow-x-auto gap-4 scrollbar-none"
+                    className="flex md:hidden w-full snap-x snap-mandatory overflow-x-auto gap-4 scrollbar-none"
                   >
                     {missingLayers.map((data, id) => (
                       <div
@@ -3212,18 +3035,18 @@ export default function Home() {
                         "
                       >
                         <div className="flex justify-center">
-                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[6px] font-bold leading-[140%] tabular-nums uppercase">
+                          <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11px] font-bold leading-[140%] tracking-[0.14em] uppercase">
                             {data.heading}
                           </h4>
                         </div>
-                        <img src={data.imgPath} />
+                        <img src={data.imgPath} alt="" className="h-auto w-full" />
 
                         <div className="flex flex-col gap-4 items-center">
-                          <h3 className="text-[#F8F7FC] font-[Recoleta] text-[24px] text-center leading-[150%]">
+                          <h3 className="t-card-title text-center">
                             {data.title}
                           </h3>
 
-                          <p className="text-[#F8F7FC] font-Satoshi text-[13.06px] text-center leading-[150%]">
+                          <p className="t-body text-center">
                             {data.subtitle}
                           </p>
                         </div>
@@ -3232,7 +3055,7 @@ export default function Home() {
                   </motion.div>
 
                   {/* Dot indicator pill - mobile only */}
-                  <div className="flex lg:hidden justify-center -mt-2">
+                  <div className="flex md:hidden justify-center">
                     <div
                       className="inline-flex items-start"
                       style={{
@@ -3330,7 +3153,7 @@ export default function Home() {
                                 className="absolute left-1/2 -translate-x-1/2 w-px h-20"
                                 style={{
                                   background:
-                                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
+                                    "linear-gradient(to top, rgba(255,255,255,0.22), rgba(255,255,255,0.08), transparent)",
                                 }}
                               />
                             </motion.div>
@@ -3352,22 +3175,22 @@ export default function Home() {
                 className="relative scroll-mt-24 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-[52px] xl:px-12.5 md:px-12.5 py-14! md:py-25!"
               >
                 <div className="flex flex-col gap-[30px] items-center xl:items-start">
-                  <h2 className="text-[#F8F7FC] text-start font-Recoleta text-[32px] md:text-[60px] font-normal leading-[120%]">
+                  <h2 className="t-h2">
                     FAQs
                   </h2>
 
-                  <h4 className="text-[#F8F7FC] font-Satoshi text-[16.204px] md:text-[22px] font-normal leading-[140%] text-center xl:text-start">
+                  <h4 className="t-lead text-center xl:text-start max-w-[36rem]">
                     Plain answers on the profile, the method, and what Ology
                     will never do. No astrology knowledge required.
                   </h4>
                 </div>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 80 }}
+                  initial={{ opacity: 0, y: 28 }}
                   animate={
-                    showFaqs ? { opacity: 1, y: 0 } : { opacity: 0, y: 80 }
+                    showFaqs ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
                   className="hidden xl:block w-full flex flex-col gap-4 items-center mt-1 lg:mt-8"
                 >
                   <FAQAccordion />
@@ -3410,7 +3233,7 @@ export default function Home() {
                                 className="absolute left-1/2 -translate-x-1/2 w-px h-20"
                                 style={{
                                   background:
-                                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.35), transparent)",
+                                    "linear-gradient(to top, rgba(255,255,255,0.22), rgba(255,255,255,0.08), transparent)",
                                 }}
                               />
                             </motion.div>
@@ -3532,9 +3355,9 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <div className="flex flex-col items-center justify-start lg:justify-between gap-20 lg:gap-20! pt-40 lg:pt-24 w-auto h-[40vh] lg:h-[85vh]">
+            <div className="flex flex-col items-center justify-between gap-16 pt-32 lg:pt-28 w-auto min-h-[76svh] lg:min-h-[85vh]">
               <motion.div
-                className="relative z-10 mt-10 lg:mt-30 flex min-h-fit w-full xl:items-center items-start justify-center px-5"
+                className="relative z-10 my-auto flex min-h-fit w-full xl:items-center items-start justify-center px-5"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -3544,14 +3367,14 @@ export default function Home() {
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                <div className="flex max-w-335 flex-col items-center xl:gap-25 gap-13">
-                  <div className="flex flex-col gap-[30px]">
-                    <h2 className="text-center font-Recoleta text-[32px] lg:text-[60px] font-normal leading-[120%] text-[#F8F7FC] md:text-[65px]">
+                <div className="flex max-w-335 flex-col items-center gap-10">
+                  <div className="flex flex-col gap-5">
+                    <h2 className="t-h2 text-center">
                       Ancient Patterns. <br className="block lg:hidden" />{" "}
                       Modern Lens.
                     </h2>
 
-                    <p className="text-center font-Satoshi text-[18px] lg:text-[22px] font-normal leading-[140%] text-[#F8F7FC] md:text-[24px]">
+                    <p className="t-lead mx-auto max-w-[44rem] text-center">
                       Ology aligns your birth chart, collective sentiment, and
                       live market conditions into a single personalized timing
                       layer. It brings context to real decisions and leaves the
@@ -3559,46 +3382,9 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="
-                  cursor-pointer
-                  inline-flex
-                  flex
-                  w-auto
-                  py-[14.73px]
-                px-[18px]
-                  justify-center
-                  items-center
-                  rounded-[20px]
-                  bg-gradient-to-b
-                  from-white/10
-                  to-[rgba(30,37,64,0.15)]
-                  border
-                  border-white/20
-                  backdrop-blur-xl
-                  backdrop-saturate-150
-                  shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)]
-                  hover:bg-white/10
-                  hover:border-white/30
-                  transition-all
-                  duration-500
-                "
-                  >
-                    <Link
-                      href="#perform"
-                      className="hidden lg:block font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
-                    >
-                      Apply for beta access
-                    </Link>
-
-                    <Link
-                      href="#perform"
-                      className="block lg:hidden font-Satoshi font-medium uppercase leading-[150%] tracking-[0.349px] text-[#F8F7FC] text-[12.87px] lg:text-[17.47px]"
-                    >
-                      Apply for beta access
-                    </Link>
-                  </button>
+                  <Link href="#perform" className="btn-glass">
+                    Apply for beta access
+                  </Link>
                 </div>
               </motion.div>
 
@@ -3652,7 +3438,7 @@ export default function Home() {
                         </svg>
                       </div>
 
-                      <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[11.787px] lg:text-[16px] font-medium leading-[140%]">
+                      <h4 className="text-[#F8F7FC] text-center font-Satoshi text-[13px] lg:text-[14px] font-medium leading-[140%]">
                         Timing intelligence for modern markets.
                       </h4>
                     </div>
@@ -3660,18 +3446,18 @@ export default function Home() {
                   <div className="flex justify-start items-center gap-10 relative xl:-left-10">
                     {SITE_LIVE && (
                       <a href={BETA_URL}>
-                        <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+                        <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
                           Sign in
                         </h5>
                       </a>
                     )}
                     <Link href="/privacy-policy">
-                      <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+                      <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
                         Privacy
                       </h5>
                     </Link>
                     <Link href="/Terms-of-service">
-                      <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+                      <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
                         Terms
                       </h5>
                     </Link>
@@ -3680,7 +3466,7 @@ export default function Home() {
                       href="mailto:hello@ologyapp.com?subject=Ology%20Inquiry"
                       target="_blank"
                     >
-                      <h5 className="text-[#F8F7FC] font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-normal">
+                      <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
                         Contact
                       </h5>
                     </Link>
@@ -3769,7 +3555,7 @@ export default function Home() {
                 </div>
 
                 <div className="w-full text-center">
-                  <p className="text-[#E8E9F3]/30 text-center font-Satoshi text-[11.787px] lg:text-[16px] font-normal leading-[140%]">
+                  <p className="text-[#E8E9F3]/55 text-center font-Satoshi text-[12px] lg:text-[13px] font-normal leading-[140%]">
                     Ology provides behavioral and timing context for
                     informational purposes only and is not an investment
                     adviser. © {new Date().getFullYear()} Ology Intelligence, Inc.
