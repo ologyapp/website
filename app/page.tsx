@@ -290,6 +290,7 @@ export default function Home() {
 
   const [mounted, setMounted] = useState(false);
 
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -354,6 +355,8 @@ export default function Home() {
   const [names, setNames] = useState("");
   const [email, setEmail] = useState("");
 
+  // Also decides which form renders its pickers, so a picker never opens
+  // twice (OLG-283).
   const [isLg, setIsLg] = useState(false);
 
 
@@ -375,6 +378,22 @@ export default function Home() {
   const captureRef = useRef<HTMLDivElement>(null);
 
   const [showNatalForm, setShowNatalForm] = useState(false);
+  // First name as typed, with a capital first letter, for the greeting.
+  // Name and email step. The message shows at once and clears itself. It
+  // used to appear five seconds after the click (OLG-283).
+  const goToBirthDetails = () => {
+    if (names.trim() !== "" && isValidEmail(email)) {
+      setShowNatalForm(true);
+      setErrMsg("");
+      return;
+    }
+    setErrMsg("Please enter your name and a valid email address.");
+    window.setTimeout(() => setErrMsg(""), 5000);
+  };
+  const firstName = (() => {
+    const w = (names || "").trim().split(/\s+/)[0] || "";
+    return w ? w.charAt(0).toUpperCase() + w.slice(1) : "";
+  })();
   const [errMsg, setErrMsg] = useState("");
 
   const ITEM_HEIGHT = 48; // h-12
@@ -435,9 +454,6 @@ export default function Home() {
   // imageUrl,
 
   const [showLogoOnModal, setShowLogoOnModal] = useState(false);
-  const [hideFooter, setHideFooter] = useState(false);
-  const [hideDivider, setHideDivider] = useState(false);
-  const [hideFooterLogo, setHideFooterLogo] = useState(false);
 
   // Waits for the browser to actually paint the current DOM state
   // before continuing — two rAFs is the reliable way to do this.
@@ -452,7 +468,6 @@ export default function Home() {
 
   const [posterDataSrc, setPosterDataSrc] = useState<string | null>(null);
 
-  const [preGeneratedFile, setPreGeneratedFile] = useState<File | null>(null);
   const [debugInfo, setDebugInfo] = useState("");
   const posterRef = useRef<HTMLImageElement>(null);
 
@@ -527,70 +542,96 @@ export default function Home() {
       img.src = src;
     });
 
-  const prepareImage = async () => {
-    if (!captureRef.current) return;
-    const node = captureRef.current;
-
-    // Force width, bypassing any conflicting classes
-    node.style.setProperty("width", "945.24px", "important");
-    node.style.setProperty("max-width", "none", "important");
-    node.style.setProperty("min-width", "945.24px", "important");
-    node.style.setProperty("box-sizing", "border-box", "important");
-
-    await document.fonts.ready;
-    await preloadImage(getCardPoster(cardType)).catch(() => {});
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolve)),
-    );
-
-    const rect = node.getBoundingClientRect();
-
-    try {
-      const blob = await domToBlob(node, { scale: 2 }); // no explicit width/height needed now
-      setPreGeneratedFile(
-        new File([blob], `${names}-${archetype}-card.png`, {
-          type: "image/png",
-        }),
-      );
-    } catch (err) {
-      console.error(err);
-      alert(String(err));
+  // Builds the shared image from the off screen card. Each build is tied to
+  // the reading it was made from (name, archetype and placements), so a card
+  // from an earlier reading can never be shared after a new one opens.
+  const cardKeyRef = useRef("");
+  const builtImage = useRef<{ key: string; file: File } | null>(null);
+  const buildingImage = useRef<{
+    key: string;
+    promise: Promise<File | null>;
+  } | null>(null);
+  const prepareImage = (): Promise<File | null> => {
+    const key = cardKeyRef.current;
+    if (builtImage.current?.key === key) {
+      return Promise.resolve(builtImage.current.file);
     }
+    if (buildingImage.current?.key === key) return buildingImage.current.promise;
+    const run = async () => {
+      const node = captureRef.current;
+      if (!node || !key) return null;
+      await document.fonts.ready;
+      await preloadImage(getCardPoster(cardType)).catch(() => {});
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      );
+      try {
+        const blob = await domToBlob(node, { scale: 2 });
+        if (cardKeyRef.current !== key) return null;
+        const file = new File([blob], `${names}-${archetype}-card.png`, {
+          type: "image/png",
+        });
+        builtImage.current = { key, file };
+        return file;
+      } catch (err) {
+        console.error("Share image failed:", err);
+        return null;
+      }
+    };
+    const promise = run().finally(() => {
+      if (buildingImage.current?.key === key) buildingImage.current = null;
+    });
+    buildingImage.current = { key, promise };
+    return promise;
   };
 
   useEffect(() => {
     if (!showModal) return;
     const timer = setTimeout(() => {
       prepareImage();
-    }, 500);
+    }, 150);
     return () => clearTimeout(timer);
   }, [showModal]);
 
-  const handleShare = () => {
-    if (!preGeneratedFile) return;
+  // One click, one share. The lock stops a second tap from saving the card
+  // twice while the first is still in flight.
+  const [sharing, setSharing] = useState(false);
+  const sharingLock = useRef(false);
+  const handleShare = async () => {
+    if (sharingLock.current) return;
+    sharingLock.current = true;
+    setSharing(true);
+    try {
+      const file = await prepareImage();
+      if (!file) return;
 
-    const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
+      const shareText = `${archetype}. That is what Ology read in my chart. Run yours.`;
 
-    if (
-      navigator.share &&
-      navigator.canShare?.({ files: [preGeneratedFile] })
-    ) {
-      navigator
-        .share({
-          title: "My Ology",
-          text: `${shareText}\n${referralLink}`,
-          files: [preGeneratedFile],
-        })
-        .catch((err) => {
-          if (err?.name !== "AbortError") console.error(err);
-        });
-      return;
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator
+          .share({
+            title: "My Ology",
+            text: `${shareText}\n${referralLink}`,
+            files: [file],
+          })
+          .catch((err) => {
+            if (err?.name !== "AbortError") console.error(err);
+          });
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.download = file.name;
+      link.href = url;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } finally {
+      setSharing(false);
+      setTimeout(() => {
+        sharingLock.current = false;
+      }, 800);
     }
-
-    const link = document.createElement("a");
-    link.download = `${names}-${archetype}-card.png`;
-    link.href = URL.createObjectURL(preGeneratedFile);
-    link.click();
   };
 
   const scrollToItem = (
@@ -1009,6 +1050,99 @@ export default function Home() {
     ? zodiacIcons[astroSigns.saturn as keyof typeof zodiacIcons]
     : null;
 
+
+  // The reveal card's body (OLG-283). One piece of markup for the card on
+  // screen and for the shared image, so the two can never drift apart. Its
+  // layout follows the card's own width (container queries in globals.css),
+  // so the shared image is laid out the same on a phone as on a desktop.
+  const cardKey = archetype
+    ? [names, archetype, astroSigns?.sun, astroSigns?.moon, astroSigns?.mars, astroSigns?.saturn].join("|")
+    : "";
+  useEffect(() => {
+    cardKeyRef.current = cardKey;
+  }, [cardKey]);
+  const revealPills = [
+    { planet: "Sun", sign: astroSigns?.sun, Icon: SunIcon },
+    { planet: "Moon", sign: astroSigns?.moon, Icon: MoonIcon },
+    { planet: "Mars", sign: astroSigns?.mars, Icon: MarsIcon },
+    { planet: "Saturn", sign: astroSigns?.saturn, Icon: SaturnIcon },
+  ];
+  const revealBody = (withLogo: boolean) => (
+    <>
+      <div className="rv-top">
+        <div className="rv-id">
+          {withLogo && (
+            <span className="rv-logo">
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="70"
+                      height="29"
+                      viewBox="0 0 101 42"
+                      fill="none"
+                    >
+                      <path
+                        d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
+                        fill="#F8F7FC"
+                      />
+                      <path
+                        d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
+                        fill="#F8F7FC"
+                      />
+                      <path
+                        d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
+                        fill="#F8F7FC"
+                      />
+                      <path
+                        d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
+                        fill="#F8F7FC"
+                      />
+                      <path
+                        d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
+                        fill="#F8F7FC"
+                      />
+                      <path
+                        d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
+                        fill="#F8F7FC"
+                      />
+                    </svg>
+            </span>
+          )}
+          <p className="rv-name">{archetype}</p>
+          <p className="rv-tag">{tagline}</p>
+        </div>
+        <p className="rv-syn">{synopsisText}</p>
+      </div>
+
+      <div className="rv-pills">
+        {revealPills.map(({ planet, sign, Icon }) => (
+          <div key={planet} className="rv-pill">
+            {Icon && <Icon size={16} />}
+            <span>
+              {planet} in {sign}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="rv-rule" />
+
+      <div className="rv-boxes">
+        <div className="rv-box">
+          <p className="rv-box-title">Best Market Conditions</p>
+          <ul className="rv-box-body">
+            {bestMarketConditions?.map((con: any) => (
+              <li key={con}>✦ {con}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="rv-box">
+          <p className="rv-box-title">Shadow</p>
+          <p className="rv-box-body">{ShadowText}</p>
+        </div>
+      </div>
+    </>
+  );
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -1039,46 +1173,37 @@ export default function Home() {
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, []);
-  const [hasScrolled, setHasScrolled] = useState(false);
-
+  // Which nav link is lit (OLG-283). The section crossing the middle of the
+  // window is the active one, and none is lit while the hero or the closing
+  // section is on screen. The old observer needed half a section in view,
+  // so a link could stay lit after its section had left.
   useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY > 20) {
-        setHasScrolled(true);
-        window.removeEventListener("scroll", onScroll);
+    const ids = ["align", "perform", "decode", "ask"];
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const mid = window.innerHeight / 2;
+      let current = "";
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top <= mid && r.bottom > mid) current = id;
       }
+      setActiveSection(current);
     };
-
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
-
-  useEffect(() => {
-    const sections = ["align", "decode", "perform", "ask"];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!hasScrolled) return;
-
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        threshold: 0.5,
-      },
-    );
-
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [hasScrolled]);
 
   // Intro logo. It appears centered, holds, then glides into the nav logo
   // slot and hands off to it, so it never sits over the hero copy.
@@ -1242,7 +1367,7 @@ export default function Home() {
       >
         <motion.div
           style={{ opacity }}
-          className="w-full! flex justify-center px-8"
+          className="w-full! flex justify-center"
         >
           <div className="absolute inset-0 bg-[#0d1220]" />
 
@@ -1449,7 +1574,7 @@ export default function Home() {
               className="flex flex-col items-center gap-7 text-center md:items-start md:gap-9 md:text-left"
             >
               <div className="flex flex-col gap-4 md:gap-6">
-                <h1 className="t-display max-w-[13ch] md:max-w-none">
+                <h1 className="t-display mx-auto max-w-[13ch] md:mx-0 md:max-w-none">
                   Timing Intelligence for Modern Markets
                 </h1>
                 <p className="t-lead max-w-[34rem]">
@@ -1953,7 +2078,7 @@ export default function Home() {
               <div
                 id="perform"
                 ref={formRef}
-                className="section-y relative z-10 mx-auto w-full max-w-[1120px] flex flex-col lg:flex-row justify-center lg:justify-between gap-12 lg:gap-20 items-center"
+                className="section-y relative z-10 w-full flex flex-col lg:flex-row justify-center lg:justify-between gap-12 lg:gap-16 items-center"
               >
                 {/* DESKTOP FORM (lg+) */}
                 <motion.div
@@ -1999,7 +2124,7 @@ export default function Home() {
                     <div className="flex flex-col gap-2">
                         <>
                           <h3 className="text-[#F8F7FC] font-Recoleta text-[22px] font-normal leading-[140%]">
-                            Hi, {names.split("")}.
+                            Hi, {firstName}.
                           </h3>
                           <h3 className="text-[#F8F7FC] font-Satoshi text-[17.5px] font-light leading-[120%]">
                             Add your birth date, time, and place.
@@ -2010,8 +2135,8 @@ export default function Home() {
 
                     <div className="flex flex-col w-full">
                       {!showNatalForm && (
-                        <div className="w-full! flex gap-4 items-start md:items-end flex-col md:flex-row">
-                          <div className="flex flex-col gap-2.5 flex-1 w-full!">
+                        <div className="w-full flex items-end gap-4">
+                          <div className="flex flex-col gap-2.5 flex-1 min-w-0">
                             <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
                               Full Name
                             </label>
@@ -2022,7 +2147,7 @@ export default function Home() {
                             />
                           </div>
 
-                          <div className="flex flex-col gap-2.5 flex-1 w-full!">
+                          <div className="flex flex-col gap-2.5 flex-1 min-w-0">
                             <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
                               Email
                             </label>
@@ -2035,33 +2160,24 @@ export default function Home() {
                             />
                           </div>
 
-                          <div
-                            onClick={() => {
-                              if (names.trim() !== "" && isValidEmail(email)) {
-                                setShowNatalForm(true);
-                                setErrMsg("");
-                              } else {
-                                setTimeout(() => {
-                                  setErrMsg(
-                                    "Please enter your name and a valid email address",
-                                  );
-                                }, 5000);
-                              }
-                            }}
-                            className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                          <button
+                            type="button"
+                            aria-label="Next"
+                            onClick={goToBirthDetails}
+                            className="form-arrow"
                           >
                             <ArrowRight />
-                          </div>
+                          </button>
                         </div>
                       )}
 
                       {errMsg && (
-                        <p className="text-[#F8F7FC] font-[Satoshi] text-[16px] font-normal leading-[150%]">
+                        <p role="alert" className="mt-3 text-[#F8F7FC]/80 font-Satoshi text-[13px] font-normal leading-[150%]">
                           {errMsg}
                         </p>
                       )}
 
-                      <div className="flex gap-6.5 w-full items-end">
+                      <div className="w-full">
                         <AnimatePresence>
                           {showNatalForm && (
                             <motion.div
@@ -2069,62 +2185,70 @@ export default function Home() {
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 12 }}
                               transition={{ duration: 0.25 }}
-                              className="w-full flex gap-4 items-start md:items-end flex-col md:flex-row"
+                              className="w-full grid grid-cols-2 gap-x-4 gap-y-5"
                             >
-                              <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                                <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
-                                  birth date
+                              {/* OLG-283. Birth date and time share the first
+                                  row, birth place and the arrow the second.
+                                  Every box is the height of the name and email
+                                  boxes, every value stays on one line. */}
+                              <div className="flex flex-col gap-2.5 min-w-0">
+                                <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
+                                  Birth date
                                 </label>
                                 <button
                                   type="button"
                                   onClick={() => setOpenDate(true)}
-                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-base leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
+                                  className={`form-field ${date ? "form-field-set" : ""}`}
                                 >
-                                  {date ? (
-                                    format(date, "MMM d, yyyy")
-                                  ) : (
-                                    <>birth date</>
-                                  )}
-                                </button>
-                              </div>
-
-                              <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                                <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
-                                  birth time
-                                </label>
-                                <button
-                                  type="button"
-                                  onClick={() => setOpenTime(true)}
-                                  className="w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal text-base leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center"
-                                >
-                                  {time || "( HH : MM  AM/PM )"}
-                                </button>
-                              </div>
-
-                              {/* TRIGGER — replaces the old inline input */}
-                              <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
-                                {/* <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
-                                  Birth Location
-                                </label> */}
-                                <button
-                                  type="button"
-                                  onClick={() => setOpenLocation(true)}
-                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-base leading-[25.48px] tracking-[2.07px] uppercase flex justify-between items-center text-center"
-                                >
-                                  <span
-                                    className={
-                                      data.location
-                                        ? "text-[#F8F7FC]/40"
-                                        : "text-[#F8F7FC]/40"
-                                    }
-                                  >
-                                    {data.location || "( CITY, COUNTRY )"}
+                                  <span className="truncate">
+                                    {date ? format(date, "MMM d, yyyy") : "( MM / DD / YYYY )"}
                                   </span>
                                 </button>
                               </div>
 
+                              <div className="flex flex-col gap-2.5 min-w-0">
+                                <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
+                                  Birth time
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenTime(true)}
+                                  className={`form-field ${time ? "form-field-set" : ""}`}
+                                >
+                                  <span className="truncate">
+                                    {time || "( HH : MM AM/PM )"}
+                                  </span>
+                                </button>
+                              </div>
+
+                              <div className="col-span-2 flex items-end gap-4">
+                                <div className="flex flex-col gap-2.5 min-w-0 flex-1">
+                                  <label className="text-[#F8F7FC] font-Satoshi text-[12px] font-medium leading-[20px] tracking-[0.14em] uppercase">
+                                    Birth place
+                                  </label>
+                                  <button
+                                    type="button"
+                                    onClick={() => setOpenLocation(true)}
+                                    className={`form-field touch-manipulation ${data.location ? "form-field-set" : ""}`}
+                                  >
+                                    <span className="truncate">
+                                      {data.location || "( CITY, COUNTRY )"}
+                                    </span>
+                                  </button>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  aria-label="Read my archetype"
+                                  onClick={() => handleSubmitForm()}
+                                  className="form-arrow"
+                                >
+                                  <ArrowRight />
+                                </button>
+                              </div>
+
                               {/* MODAL — input + suggestions live here now */}
-                              {openLocation &&
+                              {openLocation && isLg &&
                                 createPortal(
                                   <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
@@ -2201,14 +2325,7 @@ export default function Home() {
                                   document.body,
                                 )}
 
-                              <button
-                                onClick={() => handleSubmitForm()}
-                                className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
-                              >
-                                <ArrowRight />
-                              </button>
-
-                              {openDate &&
+                              {openDate && isLg &&
                                 createPortal(
                                   <div className="fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
@@ -2251,7 +2368,7 @@ export default function Home() {
                                   document.body,
                                 )}
 
-                              {openTime &&
+                              {openTime && isLg &&
                                 createPortal(
                                   <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
@@ -2450,23 +2567,21 @@ export default function Home() {
                   <div
                     className="
                           relative
-                          flex w-full max-w-[345px] md:max-w-[560px] h-auto lg:h-[300px]
-                          flex-col justify-evenly items-start
-                          p-[23.12px] 
+                          flex w-full md:max-w-[560px] h-auto
+                          flex-col items-start
+                          p-5
                           rounded-[16.912px]
-                          bg-[rgba(1,1,1,0)]
-                          backdrop-blur-[6px]
+                          bg-[rgba(19,25,43,0.94)]
+                          backdrop-blur-[2px]
                           border border-white/20
                           overflow-visible
                           transition-all duration-500
                   
                         "
                   >
-                    <div className="flex flex-col gap-[16.71px] "></div>
-
                     <div className="flex flex-col w-full">
                       {!showNatalForm && (
-                        <div className="w-full! flex gap-2.5 items-center md:items-end flex-col md:flex-row justify-between">
+                        <div className="w-full flex flex-col items-center gap-2.5 md:flex-row">
                           <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                             <input
                               className="w-full h-[50.959px] font-Satoshi px-[21.233px] py-[16.986px] rounded-[10.616px] placeholder:text-base sm:placeholder:text-[12px] text-base sm:text-[12px] border border-[rgba(248,247,252,0.1)] outline-none text-center placeholder:text-center text-[#F8F7FC] placeholder:text-[#F8F7FC]/40 placeholder:font-Satoshi placeholder:tracking-[2.07px] placeholder:uppercase"
@@ -2487,28 +2602,19 @@ export default function Home() {
                             />
                           </div>
 
-                          <div
-                            onClick={() => {
-                              if (names.trim() !== "" && isValidEmail(email)) {
-                                setShowNatalForm(true);
-                                setErrMsg("");
-                              } else {
-                                setTimeout(() => {
-                                  setErrMsg(
-                                    "Please enter your name and a valid email address",
-                                  );
-                                }, 5000);
-                              }
-                            }}
-                            className="cursor-pointer flex w-10 h-10 sm:w-[22.578px] sm:h-[22.538px] shrink-0 justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                          <button
+                            type="button"
+                            aria-label="Next"
+                            onClick={goToBirthDetails}
+                            className="form-arrow form-arrow-lg"
                           >
-                            <ArrowRight size={12} />
-                          </div>
+                            <ArrowRight />
+                          </button>
                         </div>
                       )}
 
                       {errMsg && (
-                        <p className="text-[#F8F7FC] font-[Satoshi] text-[16px] font-normal leading-[150%]">
+                        <p role="alert" className="mt-3 text-[#F8F7FC]/80 font-Satoshi text-[13px] font-normal leading-[150%]">
                           {errMsg}
                         </p>
                       )}
@@ -2521,9 +2627,9 @@ export default function Home() {
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 12 }}
                               transition={{ duration: 0.25 }}
-                              className="w-full flex gap-4 items-center md:items-end flex-col md:flex-row"
+                              className="w-full flex flex-col items-center gap-2.5 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-x-2.5"
                             >
-                              <div className="flex justify-between items-center w-full gap-2">
+                              <div className="flex justify-between items-center w-full gap-2.5 md:col-span-2">
                                 <div className="flex flex-col gap-[26.5px] flex-1 w-full!">
                                   {/* <label className="text-[#F8F7FC] font-Satoshi text-[13.801px] font-normal leading-[25.48px] tracking-[2.07px] uppercase">
                                   birth date
@@ -2532,13 +2638,11 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => setOpenDate(true)}
-                                    className="text-center w-full py-4 px-2 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[11px] text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
+                                    className={`form-field form-field-center ${date ? "form-field-set" : ""}`}
                                   >
-                                    {date ? (
-                                      format(date, "MMM d, yyyy")
-                                    ) : (
-                                      <>birth date</>
-                                    )}
+                                    <span className="truncate">
+                                      {date ? format(date, "MMM d, yyyy") : "birth date"}
+                                    </span>
                                   </button>
                                 </div>
 
@@ -2549,9 +2653,9 @@ export default function Home() {
                                   <button
                                     type="button"
                                     onClick={() => setOpenTime(true)}
-                                    className="w-full py-4 px-2 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi text-[#F8F7FC]/40 font-normal placeholder:text-[11px] text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center"
+                                    className={`form-field form-field-center ${time ? "form-field-set" : ""}`}
                                   >
-                                    {time || <>birth time</>}
+                                    <span className="truncate">{time || "birth time"}</span>
                                   </button>
                                 </div>
                               </div>
@@ -2564,15 +2668,9 @@ export default function Home() {
                                 <button
                                   type="button"
                                   onClick={() => setOpenLocation(true)}
-                                  className="touch-manipulation w-full py-4 px-5 border border-[rgba(248,247,252,0.1)] rounded-[10px] font-Satoshi font-normal text-[11px] leading-[25.48px] tracking-[2.07px] uppercase flex justify-center items-center text-center"
+                                  className={`form-field form-field-center touch-manipulation ${data.location ? "form-field-set" : ""}`}
                                 >
-                                  <span
-                                    className={
-                                      data.location
-                                        ? "text-[#F8F7FC]/40"
-                                        : "text-[#F8F7FC]/40"
-                                    }
-                                  >
+                                  <span className="truncate">
                                     {data.location ||
                                       "BIRTH LOCATION ( CITY, COUNTRY )"}
                                   </span>
@@ -2580,7 +2678,7 @@ export default function Home() {
                               </div>
 
                               {/* MODAL — input + suggestions live here now */}
-                              {openLocation &&
+                              {openLocation && !isLg &&
                                 createPortal(
                                   <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
@@ -2658,13 +2756,15 @@ export default function Home() {
                                 )}
 
                               <button
+                                type="button"
+                                aria-label="Read my archetype"
                                 onClick={() => handleSubmitForm()}
-                                className="cursor-pointer mb-2 flex w-[30.638px] h-[30.638px] p-[9.937px_8.695px_10.701px_7.867px] justify-center items-center aspect-square rounded-[53.748px] bg-[rgba(127,168,212,0.1)]"
+                                className="form-arrow form-arrow-lg"
                               >
                                 <ArrowRight />
                               </button>
 
-                              {openDate &&
+                              {openDate && !isLg &&
                                 createPortal(
                                   <div
                                     className="fixed inset-0 z-50! flex items-center justify-center p-4"
@@ -2696,7 +2796,7 @@ export default function Home() {
                                   document.body,
                                 )}
 
-                              {openTime &&
+                              {openTime && !isLg &&
                                 createPortal(
                                   <div className="font-Satoshi fixed inset-0 z-50! flex items-center justify-center p-4">
                                     <div
@@ -3185,9 +3285,9 @@ export default function Home() {
               <div
                 id="ask"
                 ref={faqsRef}
-                className="section-y relative z-10 w-full h-auto flex xl:flex-row flex-col lg:justify-between justify-start items-center xl:items-start lg:gap-[60px] gap-10 xl:px-12.5 md:px-12.5"
+                className="section-y relative z-10 w-full h-auto flex xl:flex-row flex-col xl:justify-between justify-start items-center xl:items-start xl:gap-16 gap-10"
               >
-                <div className="flex flex-col gap-[30px] items-center xl:items-start">
+                <div className="flex flex-col gap-5 items-center xl:items-start xl:max-w-[26rem] xl:shrink-0">
                   <h2 className="t-h2">
                     FAQs
                   </h2>
@@ -3204,7 +3304,7 @@ export default function Home() {
                     showFaqs ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }
                   }
                   transition={{ duration: 0.9, ease: EASE, delay: 0.08 }}
-                  className="hidden xl:block w-full flex flex-col gap-4 items-center mt-1 lg:mt-8"
+                  className="hidden xl:block w-full max-w-[780px]"
                 >
                   <FAQAccordion />
                 </motion.div>
@@ -3370,7 +3470,7 @@ export default function Home() {
 
             <div className="flex flex-col items-center justify-between gap-16 pt-32 lg:pt-28 w-auto min-h-[76svh] lg:min-h-[85vh]">
               <motion.div
-                className="relative z-10 my-auto flex min-h-fit w-full xl:items-center items-start justify-center px-5"
+                className="site-container relative z-10 my-auto flex min-h-fit xl:items-center items-start justify-center"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, amount: 0.3 }}
@@ -3419,8 +3519,6 @@ export default function Home() {
               pt-[28px]
               lg:absolute
               pb-[10px]
-              lg:px-[80px]
-              px-[22px]
               z-50!
               -mt-10
               lg:bottom-10
@@ -3429,8 +3527,8 @@ export default function Home() {
           
             "
               >
-                <div className="w-full max-w-360 mx-auto xl:px-12.5 flex flex-col xl:flex-row gap-4 xl:gap-0 justify-between items-center xl:mt-0">
-                  <Link href="#hero">
+                <div className="site-container flex flex-col gap-4 items-center xl:grid xl:grid-cols-[1fr_auto_1fr] xl:gap-8">
+                  <Link href="#hero" className="xl:justify-self-start">
                     <div className="flex justify-start items-center gap-5">
                       <div className="hidden lg:block">
                         <svg
@@ -3456,7 +3554,7 @@ export default function Home() {
                       </h4>
                     </div>
                   </Link>
-                  <div className="flex justify-start items-center gap-10 relative xl:-left-10">
+                  <div className="flex justify-center items-center gap-10">
                     {SITE_LIVE && (
                       <a href={BETA_URL}>
                         <h5 className="text-[#F8F7FC] font-Satoshi text-[13px] lg:text-[14px] font-normal leading-normal">
@@ -3485,7 +3583,7 @@ export default function Home() {
                     </Link>
                   </div>
 
-                  <div className="flex justify-start items-center gap-[28px]">
+                  <div className="flex justify-start items-center gap-[28px] xl:justify-self-end">
                     <Link href="https://x.com/OlogyHQ" target="_blank">
                       <svg
                         width="18"
@@ -3567,7 +3665,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="w-full text-center">
+                <div className="site-container text-center">
                   <p className="text-[#E8E9F3]/55 text-center font-Satoshi text-[12px] lg:text-[13px] font-normal leading-[140%]">
                     Ology provides behavioral and timing context for
                     informational purposes only and is not an investment
@@ -3612,7 +3710,7 @@ export default function Home() {
             <div
               ref={cardRef}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex w-[945.24px] max-w-full min-h-[107.29px] h-auto px-6 py-7 md:p-12.5 flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 overflow-y-auto max-h-[90vh]"
+              className="rv relative w-[945.24px] max-w-full h-auto rounded-[16.912px] border border-white/50 overflow-y-auto max-h-[calc(100svh-24px)]"
               style={{
                 backgroundImage: showLogoOnModal
                   ? `url(${getCardPoster(cardType)})`
@@ -3654,149 +3752,23 @@ export default function Home() {
                 </div>
               )}
 
-              {/* TOP SECTION */}
-              <div className="flex flex-col md:flex-row w-full justify-start items-center md:items-center z-20 gap-6 md:gap-20">
-                {/* LEFT */}
-                <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
-                  <div className="mb-4">
-                    {showLogoOnModal && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="70"
-                        height="29"
-                        viewBox="0 0 101 42"
-                        fill="none"
-                      >
-                        <path
-                          d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
-                          fill="#F8F7FC"
-                        />
-                        <path
-                          d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
-                          fill="#F8F7FC"
-                        />
-                        <path
-                          d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
-                          fill="#F8F7FC"
-                        />
-                        <path
-                          d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
-                          fill="#F8F7FC"
-                        />
-                        <path
-                          d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
-                          fill="#F8F7FC"
-                        />
-                        <path
-                          d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
-                          fill="#F8F7FC"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <p className="lg:mb-[36.54px] text-center md:text-left flex w-auto h-auto md:h-[22.84px] flex-col justify-center items-center md:items-start text-[#F8F7FC] font-Recoleta text-[26px] md:text-[35px] font-normal leading-[150%]">
-                    {archetype && archetype}
-                  </p>
+              {/* Card body, the same markup as the shared image (OLG-283). */}
+              <div className="rv-body">
+                {revealBody(false)}
 
-                  <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
-                    {tagline && tagline}
-                  </p>
-                </div>
-
-                {/* RIGHT */}
-                <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
-                  {synopsisText && synopsisText}
-                </h2>
-              </div>
-
-              {/* ASTRO ROW — 2x2 grid on mobile, single row on desktop */}
-              <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {SunIcon && <SunIcon size={16} />} &nbsp; Sun in{" "}
-                    {astroSigns?.sun}
-                  </p>
-                </div>
-
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {MoonIcon && <MoonIcon size={16} />} &nbsp; Moon in{" "}
-                    {astroSigns?.moon}
-                  </p>
-                </div>
-
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {MarsIcon && <MarsIcon size={16} />} &nbsp; Mars in{" "}
-                    {astroSigns?.mars}
-                  </p>
-                </div>
-
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {SaturnIcon && <SaturnIcon size={16} />} &nbsp; Saturn in{" "}
-                    {astroSigns?.saturn}
-                  </p>
-                </div>
-              </div>
-
-              {/* DIVIDER */}
-              <div className="hidden lg:block flex w-full z-20">
-                <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-              </div>
-
-              {/* CARDS — 2 cols full width on mobile, side-by-side on desktop */}
-              <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
-                <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
-                    Best Market Conditions
-                  </p>
-
-                  <div className="flex flex-col gap-2 h-auto md:h-[80px] flex-1">
-                    {bestMarketConditions?.map((con: any) => (
-                      <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] font-Satoshi">
-                        ✦ {con}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
-                    Shadow
-                  </p>
-
-                  <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] h-auto md:h-[80px] flex-1 font-Satoshi">
-                    {ShadowText}
-                  </p>
-                </div>
-              </div>
-
-              {/* DIVIDER */}
-              {!hideDivider && (
-                <div className="flex w-full z-20">
-                  <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-                </div>
-              )}
-
-              {/* FOOTER section — stacked/centered on mobile, row on desktop */}
-              {!hideFooter && (
-                <div className="relative z-20 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-0 w-full h-auto">
-                  <div className="flex flex-col lg:gap-4 items-center md:items-start text-center md:text-left">
-                    <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
-                      You're on the list.{" "}
-                    </p>
-                    <p className="font-Satoshi text-[12px] lg:text-[20px] font-normal leading-[140%] tracking-normal">
+              {/* Footer. On the card on screen only, never in the shared image. */}
+                <div className="rv-rule" />
+                <div className="rv-foot">
+                  <div className="rv-foot-copy">
+                    <p>You&apos;re on the list.</p>
+                    <p>
                       Invitations go out in small waves. Your full Trade DNA opens with
                       yours.
                     </p>
                   </div>
-                  <div className="flex flex-col gap-[11px] items-center md:items-end">
-                    <div className="hidden lg:flex justify-center md:justify-start gap-4">
-                      <button
-                        onClick={handleShare}
-                        className="touch-manipulation flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
-                      >
+                  <div className="rv-actions">
+                    <div className="rv-btns">
+                      <button type="button" onClick={handleShare} className="rv-btn touch-manipulation">
                         <svg
                           width="12"
                           height="12"
@@ -3816,15 +3788,9 @@ export default function Home() {
                             </clipPath>
                           </defs>
                         </svg>
-                        <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                          Share{" "}
-                        </p>
+                        <span>{sharing ? "Preparing" : "Share"}</span>
                       </button>
-
-                      <button
-                        onClick={handleCopy}
-                        className="touch-manipulation flex h-[44.287px] items-center gap-[9px] cursor-pointer rounded-[14.421px] border border-[rgba(197,209,224,0.5)] bg-[rgba(30,37,64,0.30)] p-[17.054px]"
-                      >
+                      <button type="button" onClick={handleCopy} className="rv-btn touch-manipulation">
                         <svg
                           width="12"
                           height="12"
@@ -3852,92 +3818,16 @@ export default function Home() {
                             </clipPath>
                           </defs>
                         </svg>
-                        <p className="font-satoshi text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                          {copied ? "COPIED" : "COPY LINK"}{" "}
-                        </p>
+                        <span>{copied ? "Copied" : "Copy link"}</span>
                       </button>
                     </div>
-
-                    <div className="lg:hidden flex justify-center md:justify-start gap-4 w-full!">
-                      <button
-                        onClick={handleShare}
-                        className="touch-manipulation w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
-                      >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 14 14"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g clipPath="url(#clip0_490_777)">
-                            <path
-                              d="M9.66659 7.33387C9.28854 7.33418 8.91625 7.42647 8.58184 7.60278C8.24743 7.77909 7.96093 8.03412 7.74709 8.34587L4.49259 6.87637C4.72374 6.31818 4.72464 5.69121 4.49509 5.13237L7.74509 3.65537C8.06202 4.11375 8.53275 4.44335 9.07189 4.58439C9.61102 4.72543 10.1828 4.66857 10.6836 4.42412C11.1844 4.17967 11.5811 3.76382 11.8015 3.252C12.022 2.74019 12.0517 2.1663 11.8853 1.63445C11.7189 1.10261 11.3673 0.648016 10.8945 0.353145C10.4216 0.0582749 9.85868 -0.0573459 9.30786 0.0272559C8.75704 0.111858 8.25479 0.391078 7.89221 0.814269C7.52962 1.23746 7.33072 1.77659 7.33159 2.33387C7.33371 2.46577 7.34709 2.59725 7.37159 2.72687L3.91659 4.29687C3.58476 3.98598 3.16934 3.77879 2.72138 3.70075C2.27341 3.62271 1.8124 3.67723 1.39499 3.8576C0.977583 4.03797 0.621951 4.33634 0.371786 4.71605C0.121622 5.09576 -0.0121789 5.54028 -0.013178 5.99499C-0.014177 6.4497 0.117669 6.89481 0.366163 7.27561C0.614656 7.65642 0.968974 7.95635 1.38559 8.13856C1.8022 8.32076 2.26296 8.3773 2.71127 8.30123C3.15957 8.22516 3.5759 8.0198 3.90909 7.71037L7.37309 9.27437C7.34903 9.40388 7.33582 9.53517 7.33359 9.66687C7.33349 10.1284 7.47028 10.5797 7.72665 10.9635C7.98302 11.3473 8.34745 11.6465 8.77387 11.8231C9.20028 11.9998 9.66951 12.0461 10.1222 11.9561C10.5749 11.866 10.9907 11.6438 11.3171 11.3174C11.6435 10.991 11.8658 10.5752 11.9558 10.1225C12.0458 9.66979 11.9995 9.20056 11.8229 8.77415C11.6462 8.34773 11.347 7.9833 10.9632 7.72693C10.5794 7.47056 10.1282 7.33377 9.66659 7.33387V7.33387ZM9.66659 1.00037C9.93035 1.00027 10.1882 1.07839 10.4076 1.22486C10.6269 1.37133 10.7979 1.57956 10.8989 1.82321C10.9999 2.06687 11.0264 2.33501 10.975 2.59371C10.9236 2.85242 10.7967 3.09007 10.6102 3.27662C10.4237 3.46316 10.1861 3.59021 9.92743 3.64171C9.66874 3.6932 9.40059 3.66682 9.1569 3.56591C8.9132 3.46499 8.70491 3.29408 8.55836 3.07477C8.41181 2.85547 8.33359 2.59763 8.33359 2.33387C8.33385 1.98037 8.47436 1.64142 8.72428 1.39141C8.97419 1.1414 9.31309 1.00077 9.66659 1.00037V1.00037ZM2.33359 7.33387C2.06983 7.33397 1.81196 7.25584 1.5926 7.10938C1.37324 6.96291 1.20224 6.75468 1.10124 6.51102C1.00023 6.26737 0.973753 5.99923 1.02515 5.74052C1.07655 5.48182 1.20351 5.24416 1.38998 5.05762C1.57646 4.87107 1.81406 4.74402 2.07275 4.69253C2.33144 4.64103 2.59959 4.66741 2.84328 4.76833C3.08698 4.86924 3.29527 5.04016 3.44182 5.25946C3.58837 5.47877 3.66659 5.73661 3.66659 6.00037C3.66619 6.35383 3.52564 6.6927 3.27575 6.94268C3.02587 7.19266 2.68705 7.33334 2.33359 7.33387ZM9.66659 11.0004C9.40285 11.0004 9.14503 10.9222 8.92574 10.7756C8.70644 10.6291 8.53552 10.4208 8.4346 10.1772C8.33367 9.93351 8.30726 9.66539 8.35871 9.40672C8.41016 9.14804 8.53717 8.91044 8.72366 8.72394C8.91015 8.53745 9.14776 8.41045 9.40644 8.35899C9.66511 8.30754 9.93323 8.33395 10.1769 8.43488C10.4206 8.53581 10.6288 8.70672 10.7754 8.92602C10.9219 9.14531 11.0001 9.40313 11.0001 9.66687C10.9998 10.0205 10.8592 10.3595 10.6092 10.6095C10.3592 10.8595 10.0202 11.0001 9.66659 11.0004V11.0004Z"
-                              fill="#E8E9F3"
-                            />
-                          </g>
-                          <defs>
-                            <clipPath id="clip0_490_777">
-                              <rect width="14" height="14" fill="white" />
-                            </clipPath>
-                          </defs>
-                        </svg>
-                        <p className="font-Satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                          Share{" "}
-                        </p>
-                      </button>
-
-                      <button
-                        onClick={handleCopy}
-                        className="touch-manipulation w-[136px] flex flex-1 items-center justify-center gap-[8px] rounded-[13px] bg-[rgba(30,37,64,0.30)] px-4.5 py-3.5"
-                      >
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 14 14"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g clipPath="url(#clip0_490_772)">
-                            <path
-                              d="M6.92263 8.63347L5.29163 10.2645C4.81809 10.7253 4.18214 10.9813 3.52136 10.9768C2.86058 10.9724 2.22811 10.708 1.76079 10.2408C1.29347 9.77362 1.02888 9.14123 1.02426 8.48045C1.01965 7.81967 1.27538 7.18364 1.73613 6.70997L3.36713 5.07748C3.46089 4.98366 3.51353 4.85644 3.51348 4.7238C3.51344 4.59117 3.4607 4.46398 3.36688 4.37023C3.27306 4.27647 3.14584 4.22383 3.01321 4.22388C2.88057 4.22392 2.75339 4.27666 2.65963 4.37048L1.02913 6.00297C0.370268 6.66217 0.000253965 7.5561 0.000488393 8.4881C0.00072282 9.42011 0.371187 10.3139 1.03038 10.9727C1.68958 11.6316 2.58351 12.0016 3.51552 12.0014C4.44753 12.0011 5.34127 11.6307 6.00013 10.9715L7.63113 9.34047C7.72221 9.24617 7.77261 9.11987 7.77147 8.98877C7.77033 8.85767 7.71775 8.73226 7.62504 8.63956C7.53234 8.54686 7.40693 8.49427 7.27583 8.49313C7.14474 8.49199 7.01843 8.54239 6.92413 8.63347H6.92263Z"
-                              fill="#E8E9F3"
-                            />
-                            <path
-                              d="M10.9722 1.03076C10.6469 0.703164 10.2597 0.443396 9.83326 0.266504C9.40678 0.0896132 8.94944 -0.000884087 8.48773 0.000256461C8.02627 -0.000969404 7.56914 0.0892955 7.14277 0.265832C6.71641 0.442369 6.32926 0.701675 6.00373 1.02876L4.37023 2.66026C4.27641 2.75401 4.22368 2.8812 4.22363 3.01383C4.22359 3.14647 4.27623 3.27369 4.36998 3.36751C4.46374 3.46133 4.59092 3.51406 4.72356 3.51411C4.85619 3.51415 4.98341 3.46151 5.07723 3.36776L6.70973 1.73676C6.94251 1.50258 7.21943 1.31691 7.52445 1.19049C7.82948 1.06406 8.15655 0.999407 8.48673 1.00026C8.98387 1.00042 9.46979 1.14797 9.88308 1.42426C10.2964 1.70054 10.6185 2.09315 10.8086 2.55247C10.9988 3.01178 11.0486 3.51717 10.9516 4.00475C10.8546 4.49232 10.6152 4.9402 10.2637 5.29176L8.63273 6.92276C8.53891 7.01658 8.48621 7.14383 8.48621 7.27651C8.48621 7.40919 8.53891 7.53644 8.63273 7.63026C8.72655 7.72408 8.8538 7.77679 8.98648 7.77679C9.11917 7.77679 9.24641 7.72408 9.34023 7.63026L10.9712 6.00026C11.6293 5.34081 11.9989 4.44731 11.9991 3.51571C11.9993 2.58412 11.63 1.69047 10.9722 1.03076Z"
-                              fill="#E8E9F3"
-                            />
-                            <path
-                              d="M7.14679 4.14646L4.14678 7.14645C4.09903 7.19258 4.06094 7.24775 4.03473 7.30875C4.00853 7.36975 3.99474 7.43536 3.99416 7.50175C3.99358 7.56814 4.00623 7.63398 4.03137 7.69543C4.05651 7.75688 4.09364 7.8127 4.14059 7.85965C4.18753 7.9066 4.24336 7.94372 4.30481 7.96886C4.36626 7.994 4.4321 8.00665 4.49849 8.00608C4.56487 8.0055 4.63048 7.99171 4.69149 7.9655C4.75249 7.9393 4.80766 7.90121 4.85378 7.85345L7.85379 4.85346C7.94486 4.75916 7.99526 4.63286 7.99412 4.50176C7.99298 4.37066 7.9404 4.24525 7.84769 4.15255C7.75499 4.05985 7.62958 4.00726 7.49849 4.00612C7.36739 4.00498 7.24109 4.05538 7.14679 4.14646Z"
-                              fill="#E8E9F3"
-                            />
-                          </g>
-                          <defs>
-                            <clipPath id="clip0_490_772">
-                              <rect width="14" height="14" fill="white" />
-                            </clipPath>
-                          </defs>
-                        </svg>
-                        <p className="font-Satoshi text-[12px] lg:text-[14.9px] font-medium leading-[150%] tracking-[0.02em] text-center uppercase">
-                          {copied ? "COPIED" : "COPY LINK"}{" "}
-                        </p>
-                      </button>
-                    </div>
-                    <p className="font-Satoshi text-[10px] font-normal leading-[140%] tracking-[0.01em] text-center">
+                    <p className="rv-note">
                       Share your card. Friends who apply through your link are credited
                       to you.
                     </p>
                   </div>
                 </div>
-              )}
-
-              {hideFooterLogo && (
-                <div className="w-full flex justify-center text-center z-30!">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
-                    ologyapp.com
-                  </p>
-                </div>
-              )}
+              </div>
             </div>
           </div>,
           document.body,
@@ -3957,136 +3847,20 @@ export default function Home() {
             <div
               ref={captureRef}
               style={{
-                width: "80%",
+                width: "945.24px",
+                flex: "none",
                 backgroundImage: `url(${getCardPoster(cardType)})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
-              className="flex flex-col items-center gap-4.5 md:gap-12.5 rounded-[16.912px] border border-white/50 px-6 py-7 md:p-12.5"
+              className="rv relative overflow-hidden rounded-[16.912px] border border-white/50"
             >
               <div className="absolute inset-0 rounded-[16.912px] bg-black/45 z-10" />
 
-              {/* TOP SECTION */}
-              <div className="flex flex-col md:flex-row w-full justify-start items-center md:items-center z-20 gap-6 md:gap-20">
-                {/* LEFT */}
-                <div className="flex flex-col items-center md:items-start basis-full lg:basis-[40%] gap-2">
-                  <div className="mb-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="70"
-                      height="29"
-                      viewBox="0 0 101 42"
-                      fill="none"
-                    >
-                      <path
-                        d="M11.7222 31.8191C5.10567 31.8191 0.861077 26.7657 0.861077 21.0858C0.861077 15.2806 5.27213 10.9372 10.9732 10.9372C17.2153 10.9372 21.5431 15.6983 21.5431 21.5452C21.5431 27.3086 17.5898 31.8191 11.7222 31.8191ZM12.2216 30.4409C15.4675 30.4409 17.8811 27.4757 17.8811 22.7981C17.8811 16.9512 14.8017 12.3154 10.5571 12.3154C7.0199 12.3154 4.56469 15.2389 4.56469 19.9164C4.56469 25.2622 7.64411 30.4409 12.2216 30.4409Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M25.3894 31.4015C24.89 31.4015 24.5987 31.1927 24.5987 30.8585V30.7332C24.5987 29.898 26.0552 29.9397 26.0552 28.478V5.00671C26.0552 3.37792 24.5987 3.12733 24.5987 2.50088V2.41735C24.5987 2.08324 24.8068 1.95795 25.1813 1.74913L28.4272 0.162101C29.2595 -0.255537 29.7172 0.203864 29.7172 0.746795V28.478C29.7172 29.9397 31.3402 29.898 31.3402 30.7332V30.8585C31.3402 31.1927 31.0073 31.4015 30.5079 31.4015H25.3894Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M45.0863 31.8191C38.4698 31.8191 34.2252 26.7657 34.2252 21.0858C34.2252 15.2806 38.6362 10.9372 44.3373 10.9372C50.5793 10.9372 54.9072 15.6983 54.9072 21.5452C54.9072 27.3086 50.9539 31.8191 45.0863 31.8191ZM45.5857 30.4409C48.8316 30.4409 51.2452 27.4757 51.2452 22.7981C51.2452 16.9512 48.1657 12.3154 43.9211 12.3154C40.384 12.3154 37.9288 15.2389 37.9288 19.9164C37.9288 25.2622 41.0082 30.4409 45.5857 30.4409Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M75.6903 11.3548C77.1051 11.3548 77.3548 11.9813 76.8554 12.3989C76.1064 13.1924 74.6915 13.0254 73.4431 13.3595C75.2325 14.6959 76.3561 16.9929 76.3561 19.1229C76.3561 22.5893 74.4418 25.3039 71.3624 26.6404C74.9828 27.4339 76.7722 29.4386 76.7722 31.9026C76.7722 35.7867 72.7357 38.1672 67.1178 38.1672C60.7093 38.1672 57.6299 34.492 57.6299 31.8191C57.6299 30.9838 58.0877 30.2321 59.1696 30.2321C61.7497 30.2321 60.418 36.789 67.3675 36.8308C70.7798 36.8308 73.0686 34.9514 73.0686 32.1532C73.0686 29.4803 71.2792 27.6427 68.4495 27.3921C67.9085 27.4339 67.4091 27.4757 66.8682 27.4757C61.8745 27.4757 57.9628 23.884 57.9628 19.3735C57.9628 14.4871 61.6248 10.9372 67.1595 10.9372C69.9892 10.9372 70.4469 11.3548 75.6903 11.3548ZM67.534 26.0975C70.7382 26.0975 72.7357 23.6334 72.7357 20.4176C72.7357 16.0741 70.1973 12.2736 66.4936 12.2736C63.4975 12.2736 61.5832 14.6959 61.5832 17.87C61.5832 22.3387 64.1633 26.0975 67.534 26.0975Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M99.6682 11.3548C100.001 11.3548 100.251 11.5219 100.251 11.856V11.9813C100.251 12.8166 99.1688 12.7748 98.3782 14.5706L90.5132 31.9862C88.8902 35.6614 86.976 40.2554 82.8979 40.2554C79.7768 40.2554 77.7794 38.1672 77.7794 36.5384C77.7794 35.5779 78.362 34.8679 79.3607 34.8679C81.5246 34.8679 80.942 38.7937 83.5221 38.7937C85.3115 38.7937 87.1425 35.8702 88.5989 32.195L80.6091 14.5289C79.7768 12.7748 78.6117 12.8166 78.6117 11.9813V11.856C78.6117 11.5219 78.903 11.3548 79.2359 11.3548H84.6456C84.9786 11.3548 85.2282 11.5636 85.2282 11.856V11.9813C85.2282 12.8166 83.7301 12.7748 84.5208 14.5706L90.5132 28.7286L96.4639 14.9047C97.3794 12.7748 94.8826 12.8166 94.8826 11.9813V11.856C94.8826 11.5636 95.1323 11.3548 95.5068 11.3548H99.6682Z"
-                        fill="#F8F7FC"
-                      />
-                      <path
-                        d="M0.561072 3.32952C1.00238 3.11301 1.68422 3.41914 2.555 4.19479C3.42288 4.96786 4.46474 6.19547 5.61282 7.78602C7.90849 10.9664 10.6218 15.5881 13.2076 20.897C15.7935 26.2058 17.7606 31.1935 18.8512 34.9652C19.3966 36.8514 19.7219 38.4306 19.7966 39.5928C19.8716 40.7588 19.6935 41.4869 19.2522 41.7034C18.8109 41.9199 18.1291 41.6138 17.2583 40.8381C16.5294 40.1889 15.6778 39.219 14.7437 37.9828C14.5655 37.7471 14.3844 37.5017 14.2005 37.2469C13.0991 35.7211 11.9016 33.8634 10.6682 31.7574H11.1022C12.7004 34.4075 14.212 36.5595 15.4708 37.9828C16.7419 39.4202 17.755 40.1144 18.3388 39.828C19.9961 39.0149 17.5644 30.6051 12.9075 21.0442C8.25062 11.4833 3.13192 4.39186 1.47455 5.2049C0.856291 5.50823 0.807049 6.86873 1.23008 8.95175C1.57502 10.6502 2.23391 12.829 3.15435 15.3067L3.14183 15.2823L2.90079 15.6936L2.89557 15.6938C2.09517 13.6329 1.44325 11.7319 0.962055 10.0677C0.850705 9.68261 0.748507 9.31032 0.655766 8.95175C0.294271 7.55407 0.0761169 6.36506 0.0166312 5.44015C-0.0583611 4.27408 0.119764 3.54603 0.561072 3.32952Z"
-                        fill="#F8F7FC"
-                      />
-                    </svg>
-                  </div>
-                  <p className="lg:mb-[36.54px] text-center md:text-left flex w-auto h-auto md:h-[22.84px] flex-col justify-center items-center md:items-start text-[#F8F7FC] font-Recoleta text-[26px] md:text-[35px] font-normal leading-[150%]">
-                    {archetype && archetype}
-                  </p>
-
-                  <p className="text-[#F8F7FC] text-center md:text-left font-Satoshi text-[13px] md:text-[23px] font-normal leading-[120%]">
-                    {tagline && tagline}
-                  </p>
-                </div>
-
-                {/* RIGHT */}
-                <h2 className="text-[#F8F7FC] font-Satoshi text-[13px] text-center md:text-left md:text-[20px] font-normal leading-[150%] basis-full md:basis-[60%]">
-                  {synopsisText && synopsisText}
-                </h2>
-              </div>
-
-              {/* ASTRO ROW — 2x2 grid on mobile, single row on desktop */}
-              <div className="grid grid-cols-2 md:flex md:flex-nowrap items-stretch md:items-start gap-3 md:gap-6 w-full z-20">
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {SunIcon && <SunIcon size={16} />} &nbsp; Sun in{" "}
-                    {astroSigns?.sun}
-                  </p>
-                </div>
-
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {MoonIcon && <MoonIcon size={16} />} &nbsp; Moon in{" "}
-                    {astroSigns?.moon}
-                  </p>
-                </div>
-
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {MarsIcon && <MarsIcon size={16} />} &nbsp; Mars in{" "}
-                    {astroSigns?.mars}
-                  </p>
-                </div>
-
-                <div className="flex w-full min-w-0 md:flex-1 md:min-w-[140px] items-center justify-center gap-[9.691px] px-[10px] py-[11px] lg:p-[11.3px] rounded-[19.381px] border border-[rgba(197,209,224,0.20)] bg-[rgba(21,27,48,0.30)]">
-                  <p className="text-[#F8F7FC] font-Satoshi text-[10px] md:text-[15px] font-bold leading-[150%] flex items-center flex-nowrap">
-                    {SaturnIcon && <SaturnIcon size={16} />} &nbsp; Saturn in{" "}
-                    {astroSigns?.saturn}
-                  </p>
-                </div>
-              </div>
-
-              {/* DIVIDER */}
-              <div className="hidden lg:block flex w-full z-20">
-                <div className="w-full h-px bg-[rgba(197,209,224,0.5)]" />
-              </div>
-
-              {/* CARDS — 2 cols full width on mobile, side-by-side on desktop */}
-              <div className="grid grid-cols-1 md:flex md:flex-row items-start gap-3 md:gap-5 self-stretch w-full z-20">
-                <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
-                    Best Market Conditions
-                  </p>
-
-                  <div className="flex flex-col gap-2 h-auto md:h-[80px] flex-1">
-                    {bestMarketConditions?.map((con: any) => (
-                      <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] font-Satoshi">
-                        ✦ {con}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-5 p-[14px] md:p-[20.67px] rounded-[20.666px] border border-[rgba(197,209,224,0.5)] bg-[rgba(165,196,211,0.03)] md:flex-1">
-                  <p className="text-[#F8F7FC] font-Recoleta text-[12px] md:text-[20px] shrink-0 basis-[23%] md:basis-auto">
-                    Shadow
-                  </p>
-
-                  <p className="text-[#F8F7FC] text-[9.5px] md:text-[14px] h-auto md:h-[80px] flex-1 font-Satoshi">
-                    {ShadowText}
-                  </p>
-                </div>
-              </div>
-
-              <div className="w-full flex justify-center text-center z-30!">
-                <p className="text-[#F8F7FC] font-Recoleta text-[18px]">
-                  ologyapp.com
-                </p>
+              <div className="rv-body">
+                {revealBody(true)}
+                <p className="rv-site">ologyapp.com</p>
               </div>
             </div>
           </div>,
