@@ -22,13 +22,20 @@ export function PhoneFrame({
           {children}
         </div>
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/iPhone17ProDeepBlue.svg"
-        alt=""
-        className="pointer-events-none absolute inset-0 h-full w-full select-none"
-        draggable={false}
-      />
+      {/* Below desktop width the frame is a flat image of the same art
+          (phone-frame.webp, 1536 by 3200, drawn from the SVG). The SVG has
+          12 blur filters and 2 masks, and iPhone Safari draws those at low
+          resolution when the phone is small, which left jagged corners with
+          a pale square behind them (OLG-286). Desktop keeps the SVG. */}
+      <picture className="contents">
+        <source media="(min-width: 1024px)" srcSet="/iPhone17ProDeepBlue.svg" />
+        <img
+          src="/phone-frame.webp"
+          alt=""
+          className="pointer-events-none absolute inset-0 h-full w-full select-none"
+          draggable={false}
+        />
+      </picture>
     </div>
   );
 }
