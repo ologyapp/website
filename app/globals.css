@@ -487,3 +487,433 @@ html {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
+
+/* Application form (OLG-283). One field box and one arrow for every step,
+   so name, email, birth date, time and place are the same height, the same
+   radius and the same type, and a value never wraps. */
+.form-field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 50.959px;
+  padding: 0 21.233px;
+  border-radius: 10.616px;
+  border: 1px solid rgb(248 247 252 / 0.1);
+  background: transparent;
+  color: rgb(248 247 252 / 0.4);
+  font-family: "Satoshi", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.form-field > span {
+  min-width: 0;
+}
+
+.form-field:hover,
+.form-field:focus-visible {
+  border-color: rgb(248 247 252 / 0.28);
+  outline: none;
+}
+
+.form-field-set {
+  color: var(--ink);
+}
+
+/* Phone and tablet form. Same box, value centered like its name and email
+   fields. */
+.form-field-center {
+  justify-content: center;
+  padding: 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-align: center;
+}
+
+.form-arrow {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 30.638px;
+  height: 30.638px;
+  /* centers the arrow on a 50.959px field when the row is bottom aligned */
+  margin-bottom: 10.16px;
+  border-radius: 999px;
+  background: rgb(127 168 212 / 0.1);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-arrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.form-arrow:hover {
+  background: rgb(127 168 212 / 0.24);
+}
+
+.form-arrow-lg {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------------
+   Archetype reveal card (OLG-283). The card on screen and the shared
+   image use the same markup and these rules. Layout follows the card's
+   own width, never the window's, so the shared image (always 945px
+   wide) is the same picture from a phone and from a desktop.
+   Steps: under 640 stacked, 640 and up two columns, 860 and up the four
+   placements on one row.
+   ------------------------------------------------------------------ */
+.rv {
+  container-type: inline-size;
+  color: var(--ink);
+}
+
+.rv-body {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  padding: 30px 22px 24px;
+}
+
+.rv-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.rv-id {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rv-logo {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.rv-logo svg {
+  display: block;
+}
+
+.rv-name {
+  font-family: "Recoleta", serif;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.rv-tag {
+  font-family: "Satoshi", sans-serif;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.rv-syn {
+  font-family: "Satoshi", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.rv-pills {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rv-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 8px;
+  border-radius: 19.381px;
+  border: 1px solid rgb(197 209 224 / 0.2);
+  background: rgb(21 27 48 / 0.3);
+  font-family: "Satoshi", sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rv-pill svg {
+  flex: none;
+}
+
+.rv-rule {
+  display: none;
+  width: 100%;
+  height: 1px;
+  background: rgb(197 209 224 / 0.5);
+}
+
+.rv-boxes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 10px;
+}
+
+.rv-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px 18px;
+  border-radius: 20.666px;
+  border: 1px solid rgb(197 209 224 / 0.5);
+  background: rgb(165 196 211 / 0.03);
+  text-align: left;
+}
+
+.rv-box-title {
+  font-family: "Recoleta", serif;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.rv-box-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: "Satoshi", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.rv-site {
+  font-family: "Recoleta", serif;
+  font-size: 18px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.rv-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding-top: 4px;
+  text-align: center;
+}
+
+.rv-foot-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: "Satoshi", sans-serif;
+  font-size: 13.5px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.rv-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.rv-btns {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.rv-btn {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 14.421px;
+  border: 1px solid rgb(197 209 224 / 0.5);
+  background: rgb(30 37 64 / 0.3);
+  color: var(--ink);
+  font-family: "Satoshi", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.rv-btn:hover {
+  background: rgb(30 37 64 / 0.55);
+  border-color: rgb(197 209 224 / 0.8);
+}
+
+.rv-btn svg {
+  flex: none;
+}
+
+.rv-note {
+  font-family: "Satoshi", sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgb(248 247 252 / 0.72);
+  text-wrap: balance;
+}
+
+@container (min-width: 640px) {
+  .rv-body {
+    gap: 36px;
+    padding: 40px;
+  }
+
+  .rv-top {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: 48px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .rv-id {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .rv-name {
+    font-size: 35px;
+  }
+
+  .rv-tag {
+    font-size: 21px;
+  }
+
+  .rv-syn {
+    font-size: 18px;
+  }
+
+  .rv-pills {
+    gap: 14px;
+  }
+
+  .rv-pill {
+    gap: 9px;
+    height: 47px;
+    font-size: 15px;
+  }
+
+  .rv-rule {
+    display: block;
+  }
+
+  .rv-boxes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .rv-box {
+    gap: 16px;
+    padding: 22px 24px 24px;
+  }
+
+  .rv-box-title {
+    font-size: 20px;
+  }
+
+  .rv-box-body {
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .rv-foot {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .rv-foot-copy {
+    gap: 8px;
+    font-size: 17px;
+    max-width: 30rem;
+  }
+
+  .rv-actions {
+    align-items: flex-end;
+    width: auto;
+    flex: none;
+  }
+
+  .rv-btns {
+    width: auto;
+  }
+
+  .rv-btn {
+    flex: none;
+    font-size: 14px;
+  }
+
+  .rv-note {
+    max-width: 17rem;
+    text-align: right;
+  }
+}
+
+@container (min-width: 860px) {
+  .rv-body {
+    gap: 50px;
+    padding: 50px;
+  }
+
+  .rv-top {
+    column-gap: 64px;
+  }
+
+  .rv-tag {
+    font-size: 23px;
+  }
+
+  .rv-syn {
+    font-size: 20px;
+  }
+
+  .rv-pills {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .rv-foot-copy {
+    font-size: 19px;
+  }
+}
