@@ -81,8 +81,8 @@ function Question({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <p className={BROW}>{brow}</p>
         <p id={id} className="font-Satoshi text-[16px] font-medium leading-6 text-[#EDEDF2]">
           {question}
@@ -112,7 +112,7 @@ function Choices({
     else onChange(value.includes(option) ? [] : [option]);
   };
   return (
-    <div role={multi ? "group" : "radiogroup"} aria-labelledby={labelledBy} className="flex flex-wrap gap-2">
+    <div role={multi ? "group" : "radiogroup"} aria-labelledby={labelledBy} className="flex flex-wrap gap-x-2 gap-y-2.5">
       {options.map((option) => (
         <Pill key={option} label={option} multi={multi} selected={value.includes(option)} onClick={() => toggle(option)} />
       ))}
@@ -282,7 +282,7 @@ export default function BaselineForm() {
       <StarrySky />
       <canvas ref={canvasRef} aria-hidden className="pointer-events-none fixed inset-0 z-10 h-full w-full" />
 
-      <div className="relative mx-auto flex w-full flex-col items-center gap-6 px-4 pb-12 pt-8 md:gap-7 md:px-6 md:pb-24 md:pt-12">
+      <div className="relative mx-auto flex w-full flex-col items-center gap-8 px-4 pb-14 pt-9 md:gap-10 md:px-6 md:pb-24 md:pt-14">
         <div
           ref={logoRef}
           style={{
@@ -296,7 +296,7 @@ export default function BaselineForm() {
 
         {done ? (
           <>
-            <div className="flex w-full max-w-[520px] flex-col items-center gap-2 text-center" style={shown()}>
+            <div className="flex w-full max-w-[520px] flex-col items-center gap-3 text-center" style={shown()}>
               <p className={BROW}>Answers received</p>
               <h1 className="font-Recoleta text-[28px] font-normal leading-[36px] text-[#EDEDF2] md:text-[34px] md:leading-[42px]">
                 Thank you.
@@ -310,7 +310,7 @@ export default function BaselineForm() {
             </div>
 
             <div
-              className="flex w-full max-w-[520px] flex-col items-center gap-[14px] rounded-2xl border border-[#2B3557] bg-[#131A2C] p-5 text-center md:p-7"
+              className="flex w-full max-w-[520px] flex-col items-center gap-4 rounded-2xl border border-[#2B3557] bg-[#131A2C] px-5 py-6 text-center md:p-8"
               style={shown()}
             >
               <div className="flex flex-col items-center gap-2">
@@ -336,7 +336,7 @@ export default function BaselineForm() {
           </>
         ) : (
           <>
-            <div className="flex w-full max-w-[560px] flex-col items-center gap-2 text-center" style={shown()}>
+            <div className="flex w-full max-w-[560px] flex-col items-center gap-3 text-center" style={shown()}>
               <p className={BROW}>Secure your access to the beta</p>
               <h1 className="font-Recoleta text-[28px] font-normal leading-[36px] text-[#EDEDF2] md:text-[34px] md:leading-[42px]">
                 Your trading routine,
@@ -356,10 +356,10 @@ export default function BaselineForm() {
             <form
               onSubmit={send}
               noValidate
-              className="flex w-full max-w-[640px] flex-col gap-[26px] rounded-2xl border border-[#2B3557] bg-[#131A2C] p-5 md:gap-7 md:p-7"
+              className="flex w-full max-w-[640px] flex-col gap-8 rounded-2xl border border-[#2B3557] bg-[#131A2C] px-5 py-6 md:gap-9 md:p-8"
               style={shown(240)}
             >
-              <label className="flex flex-col gap-1.5 rounded-xl border border-[#2B3557] bg-[#0F1526] px-4 py-3 transition-colors focus-within:border-[#7FA8D4] md:items-center">
+              <label className="flex flex-col gap-1.5 rounded-xl border border-[#2B3557] bg-[#0F1526] px-4 py-3.5 transition-colors focus-within:border-[#7FA8D4] md:items-center">
                 <span className={BROW}>Email</span>
                 <input
                   type="email"
@@ -376,8 +376,6 @@ export default function BaselineForm() {
                   className="w-full bg-transparent font-Satoshi text-[16px] leading-6 text-[#EDEDF2] outline-none placeholder:text-[#7A849A] md:text-center"
                 />
               </label>
-
-              <Hairline />
 
               <Question id="baseline-q1" brow="01 · How often" question="How often do you buy or sell with your own money?">
                 <Choices labelledBy="baseline-q1" options={HOW_OFTEN} value={howOften} onChange={answered(setHowOften)} />
@@ -426,7 +424,7 @@ export default function BaselineForm() {
 
               <Hairline />
 
-              <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-4">
                 {error && (
                   <p role="alert" className="font-Satoshi text-[13px] leading-[1.4] text-[#D66B7E]">
                     {error}
