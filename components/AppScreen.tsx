@@ -91,7 +91,9 @@ export default function AppScreen({ className }: { className?: string }) {
               className="block h-auto w-full select-none px-[3%]"
               draggable={false}
             />
-            <div className="absolute bottom-[2.6%] left-1/2 h-[3px] w-[34%] -translate-x-1/2 rounded-full bg-[#F8F7FC]/70" />
+            {/* Home indicator, desktop only. At phone size the 3px bar was
+                too heavy for the small frame (OLG-286). */}
+            <div className="absolute bottom-[2.6%] left-1/2 hidden h-[3px] w-[34%] -translate-x-1/2 rounded-full bg-[#F8F7FC]/70 lg:block" />
           </div>
         </div>
       </div>
