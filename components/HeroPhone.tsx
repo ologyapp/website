@@ -29,7 +29,6 @@ export function PhoneFrame({
           a pale square behind them (OLG-286). Desktop keeps the SVG. */}
       <picture className="contents">
         <source media="(min-width: 1024px)" srcSet="/iPhone17ProDeepBlue.svg" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/phone-frame.webp"
           alt=""
