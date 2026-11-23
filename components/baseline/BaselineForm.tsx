@@ -343,11 +343,6 @@ export default function BaselineForm() {
                 <br />
                 in your own words.
               </h1>
-              {/* The phone frame keeps the two lines of context; the desktop frame does not. */}
-              <p className="font-Satoshi text-[14px] leading-[1.4] text-[#9BA3B8] md:hidden">
-                Five short questions, about two minutes. Your answers are saved before you see your trader archetype on
-                November 30, so you can compare the two later.
-              </p>
               <p className="font-Satoshi text-[14px] font-medium leading-[1.4] text-[#EDEDF2]">
                 Please answer by Friday, November 27.
               </p>
