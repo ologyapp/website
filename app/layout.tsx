@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StructuredData from "@/components/StructuredData";
-import { Analytics } from "@vercel/analytics/next";
+import SiteAnalytics from "@/components/SiteAnalytics";
 import MotionPrefs from "@/components/MotionPrefs";
 
 const geistSans = Geist({
@@ -77,7 +77,7 @@ export default function RootLayout({
         {" "}
         <StructuredData />
         <MotionPrefs>{children}</MotionPrefs>
-        <Analytics />
+        <SiteAnalytics />
       </body>
     </html>
   );
