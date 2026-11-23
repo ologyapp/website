@@ -47,11 +47,24 @@ export function sortCards(cards: any[], now = new Date()) {
   return [...record, ...active, ...ahead];
 }
 
-// Where the timeline opens. The first active card, else the first ahead
-// card, else the newest record card.
+// Where the timeline opens. Among the cards in effect today or still ahead,
+// the one whose printed date is nearest today (OLG-285). A long retrograde
+// that began months ago no longer holds the opening slot when a new event
+// is a day away. Ties go to the earlier card. With nothing in effect or
+// ahead, the newest record card.
 export function todayIndex(cards: any[], now = new Date()) {
-  const i = cards.findIndex((c: any) => statusOf(c, now) !== "RECORD");
-  return i === -1 ? Math.max(cards.length - 1, 0) : i;
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  let best = -1;
+  let bestGap = Infinity;
+  cards.forEach((c: any, i: number) => {
+    if (statusOf(c, now) === "RECORD") return;
+    const gap = Math.abs(new Date(c.date_start + "T00:00:00").getTime() - today);
+    if (gap < bestGap) {
+      bestGap = gap;
+      best = i;
+    }
+  });
+  return best === -1 ? Math.max(cards.length - 1, 0) : best;
 }
 
 // Style. Derived from read and status. No card carries a color.

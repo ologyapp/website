@@ -3285,7 +3285,7 @@ export default function Home() {
               <div
                 id="ask"
                 ref={faqsRef}
-                className="section-y relative z-10 w-full h-auto flex xl:flex-row flex-col xl:justify-between justify-start items-center xl:items-start xl:gap-16 gap-10"
+                className="section-y relative z-10 w-full h-auto flex xl:flex-row flex-col xl:justify-between justify-start items-center xl:gap-16 gap-10"
               >
                 <div className="flex flex-col gap-5 items-center xl:items-start xl:max-w-[26rem] xl:shrink-0">
                   <h2 className="t-h2">
