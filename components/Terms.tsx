@@ -12,7 +12,7 @@ const terms = [
   {
     title: "What Ology is",
     content:
-      "Ology generates a behavioral timing profile from your natal chart and a questionnaire, provides a calendar of celestial and market context, offers a journal for your own record, and includes Ology Intelligence (OI), an AI layer that reflects your profile and record back to you. The interpretive framework draws on the astrological tradition. It is a lens for self-understanding, not a scientific instrument, and we do not claim natal astrology has predictive validity for individual outcomes. Our own materials say the same thing.",
+      "Ology generates a behavioral timing profile from your natal chart, provides a calendar of celestial and market context, offers a journal for your own record, and includes Ology Intelligence (OI), an AI layer that reflects your profile and record back to you. The interpretive framework draws on the astrological tradition. It is a lens for self-understanding, not a scientific instrument, and we do not claim natal astrology has predictive validity for individual outcomes. Our own materials say the same thing.",
   },
 
   {
@@ -102,13 +102,15 @@ function Terms() {
             </h1>
             <h4 className="text-[#F8F7FC] text-start lg:text-center font-Satoshi text-[14px] lg:text-[18px] font-normal leading-[150%]">
               These terms are the agreement between you and Ology Intelligence,
-              Inc. when you use the Ology website, app, and services. By
-              creating an account or joining the waitlist, you accept them. They
-              are written to be understood, because a term you did not
-              understand is a term we should not enforce.
+              Inc. when you use the Ology website and join the waitlist. By
+              joining the waitlist, you accept them. The Ology app carries its
+              own Terms of Service, shown when you create an account, and where
+              the two differ those terms govern your use of the app. They are
+              written to be understood, because a term you did not understand
+              is a term we should not enforce.
             </h4>
             <p className="text-[#F8F7FC] text-center font-Satoshi text-[12px] lg:text-[18px] font-normal leading-[150%]">
-              Effective July 2026
+              Effective November 28, 2026
             </p>
           </div>
 

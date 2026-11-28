@@ -14,6 +14,7 @@ const policy = [
     title: "What we collect",
     content: [
       "Waitlist and account information. Your name and email address when you join the waitlist or create an account, and a password when accounts open.",
+      "Survey answers. Answers you choose to give on short forms we send you, such as the five questions before the beta opens, kept with your waitlist record.",
       "Birth data. Your birth date, birth time, and birth place, provided by you to generate your timing profile. If your birth time is unknown, we record that instead. Birth data is the most sensitive thing you give us and it is handled under the strictest rules in this policy.",
       "Profile results. The archetype and behavioral profile our engine derives from your birth data, stored so your profile does not need to be recomputed.",
       "Journal entries. Trades, notes, and reflections you choose to log. Your journal exists for you. We read it in aggregate to improve the product, never to profile you individually for any purpose outside the product.",
@@ -51,7 +52,7 @@ const policy = [
   {
     title: "Cookies and tracking",
     content:
-      "The website uses cookies and similar technologies. Our email and waitlist platform sets cookies so the signup form works and so the emails you asked for fire at the right moments. We use basic analytics to understand how the site performs. We do not use advertising cookies and we do not participate in ad networks.",
+      "The website keeps cookies to a minimum. Our email and waitlist platform sets none on this site. We use basic analytics that count visits without cookies and without your email address. A cookie may be used to remember a referral, described below. We do not use advertising cookies and we do not participate in ad networks.",
     subcontent1:
       "When you share your archetype card, your share link carries an identifier so that signups arriving through it credit you in the beta line. That attribution is used to order beta access and to measure how sharing performs in aggregate. It is never sold, and it is not used to profile you beyond your own referral count.",
     subcontent2:
@@ -111,7 +112,7 @@ function privacyPolicy() {
               will never do with it.
             </h4>
             <p className="text-[#F8F7FC] text-center font-Satoshi text-[12px] lg:text-[18px] font-normal leading-[150%]">
-              Effective July 2026{" "}
+              Effective November 28, 2026{" "}
             </p>
           </div>
 
